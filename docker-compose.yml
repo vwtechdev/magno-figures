@@ -1,0 +1,123 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    volumes:
+      - ./staticfiles:/app/staticfiles:ro
+      - $HOME/data/${COMPOSE_PROJECT_NAME}/media:/app/media:ro
+      - $HOME/logs/${COMPOSE_PROJECT_NAME}/nginx:/var/log/nginx
+    depends_on:
+      - web
+    networks:
+      - app_net
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=myresolver"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.scheme=http"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-headers.headers.customrequestheaders.Host=${DOMAIN}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=${COMPOSE_PROJECT_NAME}-headers"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.priority=100"
+      - "traefik.docker.network=proxy"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.3'
+        reservations:
+          memory: 32M
+          cpus: '0.1'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["sh", "-c", "./scripts/wait-for-database.sh && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000 --timeout 120 --workers 2 --worker-class sync --keep-alive 5 --max-requests 1000 --max-requests-jitter 100 --preload"]
+    volumes:
+      - $HOME/data/${COMPOSE_PROJECT_NAME}/media:/app/media
+      - ./staticfiles:/app/staticfiles
+      - $HOME/logs/${COMPOSE_PROJECT_NAME}/django:/app/logs
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.3'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:15
+    volumes:
+      - $HOME/data/${COMPOSE_PROJECT_NAME}/postgres:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - app_net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.3'
+        reservations:
+          memory: 64M
+          cpus: '0.1'
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
+    volumes:
+      - $HOME/data/${COMPOSE_PROJECT_NAME}/redis:/data
+    networks:
+      - app_net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.2'
+        reservations:
+          memory: 32M
+          cpus: '0.1'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes: {}
+
+networks:
+  app_net:
+    name: ${COMPOSE_PROJECT_NAME}-net
+    driver: bridge
+  proxy:
+    external: true
