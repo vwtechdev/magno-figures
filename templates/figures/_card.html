@@ -1,0 +1,12 @@
+<a href="{% url 'figures:detail' figure.slug %}" class="card">
+    <div class="card__media">
+        <img src="{{ figure.first_image.url }}" alt="{{ figure.name }}" class="card__image" loading="lazy">
+        {% if not figure.in_stock %}
+        <span class="card__badge card__badge--sold">Sob encomenda</span>
+        {% endif %}
+    </div>
+    <div class="card__overlay">
+        <h3 class="card__title">{{ figure.name }}</h3>
+        <p class="card__price">R$ {{ figure.price|floatformat:2 }}</p>
+    </div>
+</a>

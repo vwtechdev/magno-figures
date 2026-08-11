@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Termos de Uso — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="page container">
+    <h1 class="page__title"><span class="text-gold">Termos</span> de Uso</h1>
+    <div class="page__body">{{ website_config.terms|linebreaks }}</div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/website/pages.css' %}">
+{% endblock %}

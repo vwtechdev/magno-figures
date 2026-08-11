@@ -1,0 +1,46 @@
+{% if page_obj.has_other_pages %}
+{% spaceless %}
+<nav class="pagination" aria-label="Paginação">
+    <p class="pagination__summary">
+        Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} resultados
+    </p>
+    <ul class="pagination__list">
+        {% if page_obj.has_previous %}
+        <li>
+            <a class="pagination__link" href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.previous_page_number }}">&laquo; Anterior</a>
+        </li>
+        {% else %}
+        <li>
+            <span class="pagination__link pagination__link--disabled">&laquo; Anterior</span>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.get_elided_page_range %}
+        {% if num == page_obj.paginator.ELLIPSIS %}
+        <li>
+            <span class="pagination__ellipsis">&hellip;</span>
+        </li>
+        {% elif num == page_obj.number %}
+        <li>
+            <span class="pagination__link pagination__link--active" aria-current="page">{{ num }}</span>
+        </li>
+        {% else %}
+        <li>
+            <a class="pagination__link" href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ num }}">{{ num }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li>
+            <a class="pagination__link" href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima &raquo;</a>
+        </li>
+        {% else %}
+        <li>
+            <span class="pagination__link pagination__link--disabled">Próxima &raquo;</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endspaceless %}
+{% endif %}

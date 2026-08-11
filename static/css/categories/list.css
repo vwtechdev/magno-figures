@@ -1,0 +1,48 @@
+.cats {
+    padding-top: 120px;
+    padding-bottom: 48px;
+}
+
+.cats__title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: 32px;
+}
+
+.cats__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.cat {
+    display: block;
+    padding: 32px 24px;
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.cat:hover {
+    border-color: rgba(234, 201, 121, 0.5);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.cat__name {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.cat:hover .cat__name {
+    color: var(--gold-2);
+}
+
+.cat__count {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.cats__empty {
+    color: var(--text-muted);
+}

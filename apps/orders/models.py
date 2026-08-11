@@ -8,12 +8,14 @@ from core.models import BaseModel
 
 
 class OrderStatus(models.TextChoices):
-    NEW = "NEW", "Novo"
-    WHATSAPP_SENT = "WHATSAPP_SENT", "Enviado WhatsApp"
-    NEGOTIATING = "NEGOTIATING", "Em Negociação"
-    PAID = "PAID", "Pago"
-    CANCELLED = "CANCELLED", "Cancelado"
-    COMPLETED = "COMPLETED", "Finalizado"
+    NEW = "NEW", "Novo Pedido"
+    CONFIRM = "CONFIRM", "Aguardando Confirmação"
+    PAYMENT = "PAYMENT", "Aguardando Pagamento"
+    PAID = "PAID", "Pedido Pago"
+    PRODUCTION = "PRODUCTION", "Em Produção"
+    SENT = "SENT", "Pedido Enviado"
+    CANCELED = "CANCELED", "Pedido Cancelado"
+    DELIVERED = "DELIVERED", "Pedido Entregue"
 
 
 class OrderManager(models.Manager):
@@ -61,18 +63,42 @@ class Order(BaseModel):
     def item_count(self):
         return self.items.aggregate(total=Sum("quantity"))["total"] or 0
 
-    def generate_whatsapp_message(self):
-        items_text = ""
-        for item in self.items.select_related("figure").all():
-            items_text += f"* {item.quantity}x {item.figure.name} — R$ {item.price:.2f}\n"
+    @property
+    def user_status(self):
+        if self.status == OrderStatus.NEW:
+            return "confirm"
+        return self.status.lower()
 
+    @property
+    def user_status_display(self):
+        if self.status == OrderStatus.NEW:
+            return "Aguardando Confirmação"
+        return self.get_status_display()
+
+    @property
+    def can_cancel(self):
+        return self.status not in {
+            OrderStatus.PAID,
+            OrderStatus.PRODUCTION,
+            OrderStatus.SENT,
+            OrderStatus.CANCELED,
+            OrderStatus.DELIVERED,
+        }
+
+    def _items_text(self):
+        return "".join(
+            f"* {item.quantity}x {item.figure.name} — R$ {item.price:.2f}\n"
+            for item in self.items.select_related("figure").all()
+        )
+
+    def generate_whatsapp_message(self):
         message = (
-            f"Olá! 🎯\n\n"
+            f"Olá!\n\n"
             f"*Novo Pedido #{self.pk}*\n\n"
             f"*Cliente:* {self.user.name}\n"
             f"*Telefone:* {self.user.phone}\n\n"
             f"*Itens:*\n"
-            f"{items_text}\n"
+            f"{self._items_text()}\n"
             f"*Endereço:*\n"
             f"{self.address.full_address}\n\n"
             f"*Total:* R$ {self.total:.2f}\n\n"
@@ -80,13 +106,31 @@ class Order(BaseModel):
         )
         return message
 
-    def get_whatsapp_url(self):
+    def generate_confirmation_message(self):
+        message = (
+            f"Olá, {self.user.name}!\n\n"
+            f"Recebemos seu pedido *#{self.pk}* na Magno Figures:\n\n"
+            f"*Itens:*\n"
+            f"{self._items_text()}\n"
+            f"*Endereço de entrega:*\n"
+            f"{self.address.full_address}\n\n"
+            f"*Total:* R$ {self.total:.2f}\n\n"
+            f"Confirma a realização desse pedido? Assim que você confirmar, "
+            f"envio os dados para o pagamento."
+        )
+        return message
+
+    def _whatsapp_url(self, message):
         from apps.website.models import Website
 
         config = Website.objects.get_config()
-        message = self.generate_whatsapp_message()
-        whatsapp_link = config.whatsapp_api_link
-        return f"{whatsapp_link}&text={quote(message)}"
+        return f"{config.whatsapp_api_link}&text={quote(message)}"
+
+    def get_whatsapp_url(self):
+        return self._whatsapp_url(self.generate_whatsapp_message())
+
+    def get_confirmation_url(self):
+        return self._whatsapp_url(self.generate_confirmation_message())
 
 
 class OrderItem(BaseModel):

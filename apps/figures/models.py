@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.models import BaseModel
+from core.validators import validate_image_size
 
 
 class FigureManager(models.Manager):
@@ -27,8 +28,34 @@ class Figure(BaseModel):
     stock = models.PositiveIntegerField(
         default=0, verbose_name="Estoque"
     )
+    weight_kg = models.DecimalField(
+        max_digits=5,
+        decimal_places=3,
+        default=0.3,
+        verbose_name="Peso (kg)",
+    )
+    height_cm = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=10,
+        verbose_name="Altura (cm)",
+    )
+    width_cm = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=10,
+        verbose_name="Largura (cm)",
+    )
+    length_cm = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=15,
+        verbose_name="Comprimento (cm)",
+    )
     image = models.ImageField(
-        upload_to="figures/", verbose_name="Imagem Principal"
+        upload_to="figures/",
+        validators=[validate_image_size],
+        verbose_name="Imagem Principal",
     )
     categories = models.ManyToManyField(
         "categories.Category",
@@ -52,8 +79,10 @@ class Figure(BaseModel):
 
     @property
     def first_image(self):
+        if self.image:
+            return self.image
         image = self.images.order_by("order").first()
-        return image.image if image else self.image
+        return image.image if image else None
 
 
 class FigureImage(BaseModel):
@@ -64,7 +93,9 @@ class FigureImage(BaseModel):
         verbose_name="Action Figure",
     )
     image = models.ImageField(
-        upload_to="figures/gallery/", verbose_name="Imagem"
+        upload_to="figures/gallery/",
+        validators=[validate_image_size],
+        verbose_name="Imagem",
     )
     order = models.PositiveSmallIntegerField(
         default=0, verbose_name="Ordem"

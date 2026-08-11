@@ -1,0 +1,178 @@
+.cart-page {
+    padding-top: 120px;
+    padding-bottom: 48px;
+}
+
+.cart-page__title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: 32px;
+}
+
+.cart-page__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.cart-item__image {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.cart-item__info {
+    flex: 1;
+}
+
+.cart-item__name {
+    font-size: 1rem;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cart-item__price {
+    color: var(--gold-2);
+    font-weight: 700;
+}
+
+.cart-item__qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-item__qty-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.cart-item__qty-btn:hover:not(:disabled) {
+    border-color: var(--gold-2);
+    color: var(--gold-2);
+    background: rgba(234, 201, 121, 0.08);
+}
+
+.cart-item__qty-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.cart-item__qty-value {
+    min-width: 40px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.cart-item__preorder {
+    padding: 6px 12px;
+    border: 1px dashed rgba(248, 113, 113, 0.4);
+    border-radius: 8px;
+    color: #f87171;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.cart-item__total {
+    min-width: 90px;
+    text-align: right;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.cart-item__remove-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.cart-item__remove-btn:hover {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.5);
+    background: rgba(248, 113, 113, 0.08);
+}
+
+.cart-page__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.cart-page__subtotal {
+    color: var(--text-muted);
+}
+
+.cart-page__subtotal strong {
+    color: var(--gold-2);
+    font-size: 1.15rem;
+}
+
+.cart-page__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cart-page__btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 10px;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.cart-page__btn--ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.cart-page__btn:hover {
+    transform: translateY(-2px);
+}
+
+.cart-page__empty {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}

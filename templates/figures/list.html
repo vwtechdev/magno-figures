@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Catálogo — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="catalog-page container">
+    <h1 class="catalog-page__title">
+        <span class="text-gold">Catálogo</span> de Figures
+    </h1>
+    {% if query %}
+    <p class="catalog-page__subtitle">Resultados para “{{ query }}”</p>
+    {% endif %}
+
+    {% if figures %}
+    <div class="catalog-page__grid">
+        {% for figure in figures %}
+            {% include "figures/_card.html" with figure=figure %}
+        {% endfor %}
+    </div>
+    {% include "partials/pagination.html" %}
+    {% else %}
+    <div class="catalog-page__empty">
+        <p>Nenhum resultado encontrado.</p>
+        <a href="{% url 'figures:list' %}" class="catalog-page__clean">Limpar busca</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/figures/list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+{% endblock %}

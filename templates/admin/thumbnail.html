@@ -1,0 +1,7 @@
+{% if item.image %}
+    <a href="{{ item.image.url }}" target="_blank">
+        <img src="{{ item.image.url }}" style="max-height: 120px; max-width: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" />
+    </a>
+{% else %}
+    <span style="color: #999;">No Image</span>
+{% endif %}

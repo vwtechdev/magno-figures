@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Carrinho — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="cart-page container">
+    <h1 class="cart-page__title"><span class="text-gold">Meu</span> Carrinho</h1>
+
+    {% if cart_items %}
+    <div class="cart-page__list">
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <img src="{{ item.figure.first_image.url }}" alt="{{ item.figure.name }}" class="cart-item__image">
+            <div class="cart-item__info">
+                <h3 class="cart-item__name">{{ item.figure.name }}</h3>
+                <p class="cart-item__price">R$ {{ item.figure.price|floatformat:2 }}</p>
+            </div>
+            <form class="cart-item__qty" method="post" action="{% url 'carts:update' item.figure.id %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="dec" class="cart-item__qty-btn" aria-label="Diminuir quantidade" {% if item.quantity <= 1 %}disabled{% endif %}>−</button>
+                <span class="cart-item__qty-value">{{ item.quantity }}</span>
+                <button type="submit" name="action" value="inc" class="cart-item__qty-btn" aria-label="Aumentar quantidade" {% if item.figure.in_stock and item.quantity >= item.figure.stock %}disabled{% endif %}>+</button>
+            </form>
+            {% if not item.figure.in_stock %}
+            <span class="cart-item__preorder">Sob encomenda</span>
+            {% endif %}
+            <div class="cart-item__total">R$ {{ item.total|floatformat:2 }}</div>
+            <form class="cart-item__remove" method="post" action="{% url 'carts:remove' item.figure.id %}">
+                {% csrf_token %}
+                <button type="submit" class="cart-item__remove-btn" aria-label="Remover {{ item.figure.name }}" title="Remover">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart-page__footer">
+        <span class="cart-page__subtotal">Subtotal: <strong>R$ {{ subtotal|floatformat:2 }}</strong></span>
+        <div class="cart-page__actions">
+            <a href="{% url 'figures:list' %}" class="cart-page__btn cart-page__btn--ghost">Continuar comprando</a>
+            <a href="{% url 'orders:checkout' %}" class="cart-page__btn">Finalizar pedido</a>
+        </div>
+    </div>
+    {% else %}
+    <p class="cart-page__empty">Seu carrinho está vazio.</p>
+    <a href="{% url 'figures:list' %}" class="cart-page__btn">Ver catálogo</a>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/carts/detail.css' %}">
+{% endblock %}

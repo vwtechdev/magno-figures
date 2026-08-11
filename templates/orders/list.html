@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meus Pedidos — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="orders container">
+    <h1 class="orders__title"><span class="text-gold">Meus</span> Pedidos</h1>
+
+    {% include "accounts/_orders_tab.html" %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/list.css' %}">
+{% endblock %}

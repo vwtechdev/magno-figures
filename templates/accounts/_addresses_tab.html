@@ -1,0 +1,32 @@
+{% if addresses %}
+<div class="addr__list">
+    {% for address in addresses %}
+    <div class="addr__item{% if address.is_primary %} addr__item--primary{% endif %}">
+        <div class="addr__info">
+            <p class="addr__text">{{ address.street }}, {{ address.number }}{% if address.complement %} - {{ address.complement }}{% endif %}</p>
+            <p class="addr__text">{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</p>
+            <p class="addr__text">CEP: {{ address.zip_code }}</p>
+            {% if address.is_primary %}
+            <span class="addr__badge">Principal</span>
+            {% endif %}
+        </div>
+        <div class="addr__actions">
+            {% if not address.is_primary %}
+            <form method="post" action="{% url 'addresses:set-primary' address.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="addr__link">Definir como principal</button>
+            </form>
+            {% endif %}
+            <a href="{% url 'addresses:update' address.pk %}" class="addr__link">Editar</a>
+            <form method="post" action="{% url 'addresses:delete' address.pk %}" onsubmit="return confirm('Remover este endereço?');">
+                {% csrf_token %}
+                <button type="submit" class="addr__link addr__link--danger">Remover</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="addr__empty">Você ainda não cadastrou endereços.</p>
+<a href="{% url 'addresses:create' %}" class="addr__btn">Cadastrar endereço</a>
+{% endif %}

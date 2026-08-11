@@ -7,4 +7,5 @@ django-mptt==0.18.0
 pillow==12.3.0
 python-dotenv==1.2.2
 sqlparse==0.5.5
+requests==2.34.2
 typing_extensions==4.16.0

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ website_config.company_name }} — Catálogo de Action Figures{% endblock %}
+
+{% block content %}
+
+{% if banners %}
+<section class="hero" aria-label="Destaques">
+    <div class="hero__track" id="heroTrack">
+        {% for banner in banners %}
+        <div class="hero__slide">
+            {% if banner.link %}
+            <a href="{{ banner.link }}" class="hero__slide-link">
+                <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="hero__image">
+                {% if banner.title %}
+                <div class="hero__caption">
+                    <h2 class="hero__title text-gold">{{ banner.title }}</h2>
+                    {% if banner.subtitle %}
+                    <p class="hero__subtitle">{{ banner.subtitle }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </a>
+            {% else %}
+            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="hero__image">
+            {% if banner.title %}
+            <div class="hero__caption">
+                <h2 class="hero__title text-gold">{{ banner.title }}</h2>
+                {% if banner.subtitle %}
+                <p class="hero__subtitle">{{ banner.subtitle }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if banners|length > 1 %}
+    <button class="hero__arrow hero__arrow--left" id="heroPrev" aria-label="Anterior">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/>
+        </svg>
+    </button>
+    <button class="hero__arrow hero__arrow--right" id="heroNext" aria-label="Próximo">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/>
+        </svg>
+    </button>
+    <div class="hero__dots" id="heroDots"></div>
+    {% endif %}
+</section>
+{% endif %}
+
+<section class="catalog container">
+    <div class="section-head">
+        <h2 class="section-title"><span class="text-gold">Catálogo</span> de Figures</h2>
+        {% if figures|length > 1 %}
+        <div class="section-actions">
+            <button class="catalog__arrow" id="catalogPrev" aria-label="Anterior">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="22" height="22">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <button class="catalog__arrow" id="catalogNext" aria-label="Próximo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="22" height="22">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/>
+                </svg>
+            </button>
+            <a href="{% url 'figures:list' %}" class="section-link">Ver todos</a>
+        </div>
+        {% else %}
+        <a href="{% url 'figures:list' %}" class="section-link">Ver todos</a>
+        {% endif %}
+    </div>
+
+    {% if figures %}
+    <div class="catalog__scroll" id="catalogScroll" data-scroll-carousel>
+        {% for figure in figures %}
+            {% include "figures/_card.html" with figure=figure %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="catalog__empty">
+        <p>Nenhuma figure cadastrada ainda. Volte em breve!</p>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/website/home.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/website/home.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrahead %}
+<style>
+.brand-link .brand-image,
+img.brand-image {
+    max-width: 180px !important;
+    max-height: 40px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Select2 autocomplete — Jazzmin dark theme */
+.select2-container--admin-autocomplete .select2-selection {
+    background-color: #343a40 !important;
+    border: 1px solid #454d55 !important;
+    border-radius: 4px !important;
+    min-height: 38px !important;
+    padding-top: 4px !important;
+    color: #e9ecef !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice {
+    background-color: #495057 !important;
+    border: 1px solid #6c757d !important;
+    color: #e9ecef !important;
+    border-radius: 3px !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice__remove {
+    color: #adb5bd !important;
+    border-right-color: #6c757d !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--multiple .select2-search__field {
+    color: #e9ecef !important;
+}
+
+.select2-container--admin-autocomplete .select2-dropdown {
+    background-color: #343a40 !important;
+    border: 1px solid #454d55 !important;
+}
+
+.select2-container--admin-autocomplete .select2-results__option {
+    color: #e9ecef !important;
+}
+
+.select2-container--admin-autocomplete .select2-results__option[aria-selected="true"] {
+    background-color: #495057 !important;
+}
+
+.select2-container--admin-autocomplete .select2-results__option--highlighted[aria-selected] {
+    background-color: #3498db !important;
+}
+</style>
+{{ block.super }}
+{% endblock %}

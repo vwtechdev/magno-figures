@@ -1,0 +1,29 @@
+{% if orders %}
+<div class="orders__list">
+    {% for order in orders %}
+    <a href="{% url 'orders:detail' order.pk %}" class="order">
+        {% with first_item=order.items.all.0 %}
+        {% if first_item.figure.first_image %}
+        <img class="order__thumb" src="{{ first_item.figure.first_image.url }}" alt="{{ first_item.figure.name }}" loading="lazy">
+        {% else %}
+        <div class="order__thumb order__thumb--empty"></div>
+        {% endif %}
+        {% endwith %}
+        <div class="order__info">
+            <span class="order__id">Pedido #{{ order.pk }}</span>
+            <span class="order__date">{{ order.created_at|date:"d/m/Y" }} às {{ order.created_at|date:"H:i" }}</span>
+        </div>
+        <div class="order__middle">
+            <span class="order__items">{{ order.item_count }} {{ order.item_count|pluralize:"item,itens" }}</span>
+            <span class="order__total">R$ {{ order.total|floatformat:2 }}</span>
+        </div>
+        <span class="order__status order__status--{{ order.user_status }}">{{ order.user_status_display }}</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="orders__empty-box">
+    <p class="orders__empty">Você ainda não fez nenhum pedido.</p>
+    <a href="{% url 'figures:list' %}" class="orders__cta">Ver catálogo</a>
+</div>
+{% endif %}

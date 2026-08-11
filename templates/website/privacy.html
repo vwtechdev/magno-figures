@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Política de Privacidade — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="page container">
+    <h1 class="page__title"><span class="text-gold">Política</span> de Privacidade</h1>
+    <div class="page__body">{{ website_config.privacy_policy|linebreaks }}</div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/website/pages.css' %}">
+{% endblock %}

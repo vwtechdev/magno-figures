@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cadastro — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="auth container">
+    <div class="auth__box">
+        <h1 class="auth__title"><span class="text-gold">Criar</span> conta</h1>
+        <p class="auth__hint">Preencha seus dados para começar.</p>
+
+        {% if messages %}
+        <div class="auth__error">
+            {% for message in messages %}{{ message }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <form class="auth__form" method="post" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+            <label class="auth__field">
+                <span class="auth__label">Nome</span>
+                <input class="auth__input" type="text" name="name" value="{{ values.name }}" required autocomplete="name">
+            </label>
+            <label class="auth__field">
+                <span class="auth__label">Email</span>
+                <input class="auth__input" type="email" name="email" value="{{ values.email }}" required autocomplete="email">
+            </label>
+            <label class="auth__field">
+                <span class="auth__label">Telefone</span>
+                <input class="auth__input" type="tel" name="phone" value="{{ values.phone }}" autocomplete="tel" data-phone-mask>
+            </label>
+            <label class="auth__field">
+                <span class="auth__label">Senha</span>
+                <span class="auth__password">
+                    <input class="auth__input" type="password" name="password1" required autocomplete="new-password">
+                    <button type="button" class="auth__toggle" aria-label="Mostrar senha">
+                        <svg class="auth__toggle--on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="auth__toggle--off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </span>
+            </label>
+            <label class="auth__field">
+                <span class="auth__label">Confirmar senha</span>
+                <span class="auth__password">
+                    <input class="auth__input" type="password" name="password2" required autocomplete="new-password">
+                    <button type="button" class="auth__toggle" aria-label="Mostrar senha">
+                        <svg class="auth__toggle--on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="auth__toggle--off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </span>
+            </label>
+            <button class="auth__submit" type="submit">Cadastrar</button>
+        </form>
+
+        <p class="auth__switch">Já tem conta? <a href="{% url 'accounts:login' %}" class="auth__link">Entrar</a></p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/register.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/password-toggle.js' %}" defer></script>
+<script src="{% static 'js/accounts/phone-mask.js' %}" defer></script>
+{% endblock %}

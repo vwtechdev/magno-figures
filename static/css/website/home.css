@@ -1,0 +1,232 @@
+/* ============ HERO / CAROUSEL ============ */
+.hero {
+    position: relative;
+    height: 80vh;
+    min-height: 420px;
+    max-height: 700px;
+    overflow: hidden;
+    margin-bottom: 48px;
+}
+
+.hero__track {
+    display: flex;
+    height: 100%;
+    transition: transform 500ms ease;
+}
+
+.hero__slide {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+}
+
+.hero__slide-link,
+.hero__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero__image {
+    filter: brightness(0.85) saturate(1.05);
+}
+
+.hero__caption {
+    position: absolute;
+    left: 8%;
+    bottom: 18%;
+    max-width: 480px;
+    text-align: left;
+    animation: heroFadeUp 600ms ease;
+}
+
+.hero__title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.1;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.hero__subtitle {
+    font-size: 1.1rem;
+    color: #E7E5E4;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+.hero__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(234, 201, 121, 0.4);
+    color: var(--gold-2);
+    transition: background var(--transition), color var(--transition);
+    z-index: 5;
+}
+
+.hero__arrow:hover {
+    background: var(--gold-gradient);
+    color: var(--bg);
+}
+
+.hero__arrow--left {
+    left: 20px;
+}
+
+.hero__arrow--right {
+    right: 20px;
+}
+
+.hero__dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 5;
+}
+
+.hero__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    transition: background var(--transition), transform var(--transition);
+}
+
+.hero__dot.is-active {
+    background: var(--gold-gradient);
+    transform: scale(1.3);
+}
+
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============ CATALOG ============ */
+.catalog {
+    padding-bottom: 24px;
+}
+
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.section-link {
+    color: var(--gold-2);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color var(--transition);
+}
+
+.section-link:hover {
+    color: var(--gold-3);
+}
+
+.catalog__scroll {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    padding: 8px 4px 20px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.catalog__scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.catalog__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--gold-2);
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), opacity var(--transition);
+}
+
+.catalog__arrow:hover:not(:disabled) {
+    background: var(--gold-gradient);
+    border-color: transparent;
+    color: var(--bg);
+}
+
+.catalog__arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.catalog__empty {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-muted);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+}
+
+/* ============ CATALOG (cards globais em base.css) ============ */
+.catalog .card {
+    flex: 0 0 280px;
+    scroll-snap-align: start;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .hero {
+        height: 60vh;
+        min-height: 320px;
+    }
+
+    .hero__caption {
+        left: 20px;
+        right: 20px;
+        bottom: 70px;
+    }
+
+    .catalog .card {
+        flex: 0 0 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog .card {
+        flex: 0 0 180px;
+    }
+}

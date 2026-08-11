@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedido #{{ order.pk }} — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="order-page container">
+    <a href="{% url 'accounts:profile' %}?tab=orders" class="order-page__back">← Voltar para meus pedidos</a>
+
+    <div class="order-page__header">
+        <h1 class="order-page__title">Pedido <span class="text-gold">#{{ order.pk }}</span></h1>
+        <span class="order-page__status order-page__status--{{ order.user_status }}">{{ order.user_status_display }}</span>
+    </div>
+    <p class="order-page__date">Realizado em {{ order.created_at|date:"d/m/Y" }} às {{ order.created_at|date:"H:i" }}</p>
+
+    {% if messages %}
+    <div class="order-page__messages">
+        {% for message in messages %}<p class="order-page__message">{{ message }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="order-page__card">
+        <h2 class="order-page__subtitle">Itens ({{ order.item_count }})</h2>
+        <div class="order-page__items">
+            {% for item in order.items.all %}
+            <div class="order-item">
+                {% if item.figure.first_image %}
+                <img class="order-item__thumb" src="{{ item.figure.first_image.url }}" alt="{{ item.figure.name }}" loading="lazy">
+                {% else %}
+                <div class="order-item__thumb order-item__thumb--empty"></div>
+                {% endif %}
+                <div class="order-item__body">
+                    <a class="order-item__name" href="{% url 'figures:detail' item.figure.slug %}">{{ item.figure.name }}</a>
+                    <span class="order-item__qty">{{ item.quantity }}x R$ {{ item.price|floatformat:2 }}</span>
+                </div>
+                <span class="order-item__price">R$ {{ item.price|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="order-page__total">
+            <span>Total</span>
+            <span>R$ {{ order.total|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <div class="order-page__card">
+        <h2 class="order-page__subtitle">Endereço de entrega</h2>
+        <div class="order-page__address">{{ order.address.full_address|linebreaks }}</div>
+    </div>
+
+    {% if order.can_cancel %}
+    <div class="order-page__actions">
+        <form method="post" action="{% url 'orders:cancel' order.pk %}" onsubmit="return confirm('Tem certeza que deseja cancelar este pedido?');">
+            {% csrf_token %}
+            <button type="submit" class="order-page__cancel">Cancelar pedido</button>
+        </form>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/detail.css' %}">
+{% endblock %}

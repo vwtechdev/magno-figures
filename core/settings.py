@@ -54,6 +54,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.global_context",
             ],
         },
     },
@@ -73,6 +74,30 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "website:home"
+LOGOUT_REDIRECT_URL = "website:home"
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL", "Magno Figures <no-reply@example.com>"
+)
+
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "1") == "1"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "0") == "1"
+
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+
+BASE_URL = (
+    os.getenv("BASE_URL")
+    or (f"https://{os.getenv('DOMAIN')}" if os.getenv("DOMAIN") else "http://localhost:8000")
+).rstrip("/")
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -86,6 +111,10 @@ LANGUAGE_CODE = "pt-br"
 LANGUAGES = [
     ("pt-br", "Português"),
 ]
+
+DATA_UPLOAD_MAX_NUMBER_FILES = 50
+
+FIGURES_PER_PAGE = 12
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
@@ -113,6 +142,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SUPERFRETE_TOKEN = os.getenv("SUPERFRETE_TOKEN", "")
+SUPERFRETE_SANDBOX = os.getenv("SUPERFRETE_SANDBOX", "0") == "1"
 
 JAZZMIN_SETTINGS = {
     "site_title": "Magno Figures",
@@ -144,6 +176,30 @@ JAZZMIN_SETTINGS = {
         "addresses.Address": "fas fa-map-marker-alt",
         "website.Website": "fas fa-cog",
     },
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark navbar-black",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_options": {
+        "dark_mode_toggle": True
+    },
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
 }
 
 LOGGING = {

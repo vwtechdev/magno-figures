@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meus Endereços — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="auth container">
+    <div class="auth__box auth__box--wide">
+        <div class="addr__header">
+            <h1 class="auth__title"><span class="text-gold">Meus</span> Endereços</h1>
+            <a href="{% url 'addresses:create' %}" class="addr__btn">Novo endereço</a>
+        </div>
+
+        {% include "accounts/_addresses_tab.html" %}
+
+        <div class="addr__back">
+            <a href="{% url 'accounts:profile' %}?tab=addresses" class="addr__link">← Voltar ao perfil</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/addresses/list.css' %}">
+{% endblock %}

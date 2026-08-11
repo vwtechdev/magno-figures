@@ -6,3 +6,4 @@ django-modeltranslation==0.20.3
 python-dotenv==1.2.2
 Pillow==12.3.0
 psycopg2-binary==2.9.10
+requests==2.34.2

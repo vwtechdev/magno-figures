@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finalizar Pedido — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="checkout container">
+    <h1 class="checkout__title"><span class="text-gold">Finalizar</span> Pedido</h1>
+
+    <div class="checkout__box">
+        {% if selected_address %}
+        <div class="checkout__selected">
+            <p class="checkout__selected-label">Enviar para:</p>
+            <p class="checkout__selected-address">{{ selected_address.full_address|linebreaksbr }}</p>
+            <p class="checkout__selected-hint">Você pode alterar o endereço abaixo antes de enviar o pedido.</p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="checkout__error">{{ error }}</div>
+        {% endif %}
+
+        <form class="checkout__form" method="post" action="{% url 'orders:checkout' %}">
+            {% csrf_token %}
+
+            <h2 class="checkout__subtitle">Endereço de entrega</h2>
+
+            {% if addresses %}
+            <div class="checkout__addresses">
+                {% for address in addresses %}
+                <label class="checkout__address{% if selected_id == address.pk %} checkout__address--selected{% endif %}">
+                    <input type="radio" name="address_id" value="{{ address.pk }}" class="checkout__radio"
+                        {% if selected_id == address.pk %}checked{% elif selected_id is None and address.is_primary %}checked{% endif %}>
+                    <div class="checkout__address-body">
+                        <strong>{{ address.street }}, {{ address.number }}{% if address.complement %} - {{ address.complement }}{% endif %}</strong>
+                        <span>{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</span>
+                        <span>CEP: {{ address.zip_code }}</span>
+                        {% if address.is_primary %}<span class="checkout__badge">Principal</span>{% endif %}
+                    </div>
+                </label>
+                {% endfor %}
+
+                <label class="checkout__address checkout__address--new{% if selected_id == 'new' %} checkout__address--selected{% endif %}">
+                    <input type="radio" name="address_id" value="new" class="checkout__radio" id="id_use_new" {% if selected_id == 'new' %}checked{% endif %}>
+                    <div class="checkout__address-body"><strong>+ Usar novo endereço</strong></div>
+                </label>
+            </div>
+
+            <div class="checkout__new" id="newAddressBox" {% if selected_id != 'new' %}hidden{% endif %}>
+                {% include "orders/_address_fields.html" %}
+            </div>
+            {% else %}
+            <p class="checkout__hint">Cadastre o endereço de entrega:</p>
+            <div class="checkout__new">
+                {% include "orders/_address_fields.html" %}
+            </div>
+            {% endif %}
+
+            <button class="checkout__submit" type="submit">Enviar pedido pelo WhatsApp</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/checkout.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cep.js' %}"></script>
+<script src="{% static 'js/orders/checkout.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,18 @@
+from apps.carts.models import Cart
+from apps.categories.models import Category
+from apps.website.models import Website
+
+
+def global_context(request):
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_count = cart.item_count
+    else:
+        cart_count = sum((request.session.get("cart") or {}).values())
+    return {
+        "website_config": Website.objects.get_config(),
+        "cart_count": cart_count,
+        "nav_categories": Category.objects.filter(
+            parent__isnull=True, is_active=True
+        ),
+    }

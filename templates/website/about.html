@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sobre — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="page container">
+    <h1 class="page__title"><span class="text-gold">Sobre</span> {{ website_config.company_name }}</h1>
+    <div class="page__body">{{ website_config.about|linebreaks }}</div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/website/pages.css' %}">
+{% endblock %}

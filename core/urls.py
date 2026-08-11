@@ -13,11 +13,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health_check),
     path("", include("apps.website.urls", namespace="website")),
-    path("categoria/", include("apps.categories.urls", namespace="categories")),
+    path("categories/", include("apps.categories.urls", namespace="categories")),
     path("figures/", include("apps.figures.urls", namespace="figures")),
-    path("carrinho/", include("apps.carts.urls", namespace="carts")),
-    path("pedidos/", include("apps.orders.urls", namespace="orders")),
-    path("conta/", include("apps.accounts.urls", namespace="accounts")),
+    path("carts/", include("apps.carts.urls", namespace="carts")),
+    path("orders/", include("apps.orders.urls", namespace="orders")),
+    path("addresses/", include("apps.addresses.urls", namespace="addresses")),
+    path("accounts/", include("apps.accounts.urls", namespace="accounts")),
 ]
 
 if settings.DEBUG:

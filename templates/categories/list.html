@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Categorias — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="cats container">
+    <h1 class="cats__title"><span class="text-gold">Categorias</span></h1>
+
+    {% if categories %}
+    <div class="cats__grid">
+        {% for category in categories %}
+        <a href="{% url 'categories:detail' category.slug %}" class="cat">
+            <h2 class="cat__name">{{ category.name }}</h2>
+            {% if category.figure_count %}
+            <span class="cat__count">{{ category.figure_count }} figures</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="cats__empty">Nenhuma categoria cadastrada.</p>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/categories/list.css' %}">
+{% endblock %}

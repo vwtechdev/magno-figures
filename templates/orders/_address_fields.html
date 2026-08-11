@@ -1,0 +1,35 @@
+<div class="checkout__grid">
+    <label class="checkout__field">
+        <span class="checkout__label">CEP</span>
+        {{ address_form.zip_code }}
+        <span class="checkout__status" id="cepStatus"></span>
+    </label>
+    <label class="checkout__field">
+        <span class="checkout__label">Estado (UF)</span>
+        {{ address_form.state }}
+    </label>
+    <label class="checkout__field checkout__field--full">
+        <span class="checkout__label">Cidade</span>
+        {{ address_form.city }}
+    </label>
+    <label class="checkout__field checkout__field--full">
+        <span class="checkout__label">Bairro</span>
+        {{ address_form.neighborhood }}
+    </label>
+    <label class="checkout__field checkout__field--grow">
+        <span class="checkout__label">Rua</span>
+        {{ address_form.street }}
+    </label>
+    <label class="checkout__field">
+        <span class="checkout__label">Número</span>
+        {{ address_form.number }}
+    </label>
+    <label class="checkout__field checkout__field--full">
+        <span class="checkout__label">Complemento (opcional)</span>
+        {{ address_form.complement }}
+    </label>
+    <label class="checkout__field checkout__field--full checkout__primary">
+        {{ address_form.is_primary }}
+        <span class="checkout__label">Salvar como endereço principal</span>
+    </label>
+</div>
