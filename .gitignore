@@ -178,3 +178,5 @@ cython_debug/
 PRD.md
 AGENTS.md
 /docs
+settings-dev.py
+requirements-dev.txt
