@@ -3,6 +3,27 @@
 
 {% block title %}{{ category.name }} — {{ website_config.company_name }}{% endblock %}
 
+{% block og_title %}{{ category.name }} — {{ website_config.company_name }}{% endblock %}
+{% block og_description %}{{ website_config.description }}{% endblock %}
+{% block twitter_title %}{{ category.name }} — {{ website_config.company_name }}{% endblock %}
+{% block twitter_description %}{{ website_config.description }}{% endblock %}
+
+{% block extra_head %}
+{% with ancestors=category.get_ancestors %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ base_url }}/"},
+        {% for ancestor in ancestors %}{"@type": "ListItem", "position": {{ forloop.counter|add:1 }}, "name": "{{ ancestor.name|escapejs }}", "item": "{{ base_url }}{% url 'categories:detail' ancestor.slug %}"},
+        {% endfor %}{"@type": "ListItem", "position": {{ ancestors|length|add:2 }}, "name": "{{ category.name|escapejs }}", "item": "{{ base_url }}{{ request.path }}"}
+    ]
+}
+</script>
+{% endwith %}
+{% endblock %}
+
 {% block content %}
 <section class="cat-page container">
     <nav class="cat-page__crumbs">
