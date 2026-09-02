@@ -6,12 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ website_config.company_name }}{% endblock %}</title>
+    {% if website_config.description %}<meta name="description" content="{{ website_config.description }}">{% endif %}
+    {% if website_config.seo_keywords %}<meta name="keywords" content="{{ website_config.seo_keywords }}">{% endif %}
     <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
+    {% if website_config.google_analytics %}{{ website_config.google_analytics|safe }}{% endif %}
 </head>
 <body>
     <header class="navbar">
@@ -139,6 +142,13 @@
                         <a href="{{ website_config.facebook }}" target="_blank" rel="noopener" class="footer__social-link" aria-label="Facebook">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="22" height="22">
                                 <path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0 0 24 12Z"/>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        {% if website_config.twitter %}
+                        <a href="{{ website_config.twitter }}" target="_blank" rel="noopener" class="footer__social-link" aria-label="X (Twitter)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="22" height="22">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                             </svg>
                         </a>
                         {% endif %}

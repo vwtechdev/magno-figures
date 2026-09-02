@@ -31,7 +31,8 @@ class WebsiteAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
     fieldsets = (
         ("Identidade", {"fields": ("company_name", "description", "logo", "favicon", "batch_upload")}),
-        ("Contato", {"fields": ("whatsapp", "email", "instagram", "facebook")}),
+        ("Contato", {"fields": ("whatsapp", "email", "instagram", "facebook", "twitter")}),
+        ("SEO", {"fields": ("seo_keywords", "google_analytics")}),
         ("Envio", {"fields": ("origin_zip_code",)}),
         ("Sobre", {"fields": ("about", "privacy_policy", "terms")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),

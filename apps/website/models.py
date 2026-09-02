@@ -106,8 +106,21 @@ class Website(BaseModel):
     facebook = models.URLField(
         blank=True, verbose_name="Facebook"
     )
+    twitter = models.URLField(
+        blank=True, verbose_name="Twitter / X"
+    )
     email = models.EmailField(
         blank=True, verbose_name="Email"
+    )
+    seo_keywords = models.TextField(
+        blank=True,
+        verbose_name="Palavras-chave (SEO)",
+        help_text="Separadas por vírgula. Ex.: action figure, colecionáveis, bonecos importados.",
+    )
+    google_analytics = models.TextField(
+        blank=True,
+        verbose_name="Script Google Analytics",
+        help_text="Cole o snippet completo fornecido pelo Google Analytics (tags <script>...</script>).",
     )
     about = models.TextField(
         verbose_name="Sobre"
