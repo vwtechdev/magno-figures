@@ -1,4 +1,5 @@
 import logging
+import re
 
 import requests
 from django.conf import settings
@@ -33,8 +34,8 @@ def calculate_shipping(figure, destination_zip, origin_zip):
         return [], "CEP de origem não configurado."
 
     payload = {
-        "from": {"postal_code": origin_zip},
-        "to": {"postal_code": destination_zip},
+        "from": {"postal_code": re.sub(r"\D", "", origin_zip)},
+        "to": {"postal_code": re.sub(r"\D", "", destination_zip)},
         "package": {
             "height": str(figure.height_cm),
             "width": str(figure.width_cm),
@@ -45,7 +46,7 @@ def calculate_shipping(figure, destination_zip, origin_zip):
 
     headers = {
         "Authorization": f"Bearer {token}",
-        "User-Agent": "Superfrete (magnofigures@gmail.com)",
+        "User-Agent": f"Superfrete ({settings.SUPERFRETE_USER_AGENT_EMAIL})",
         "accept": "application/json",
         "content-type": "application/json",
     }
