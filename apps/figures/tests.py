@@ -182,6 +182,20 @@ class SuperFreteShippingTest(TestCase):
         self.assertEqual(payload["to"]["postal_code"], "01310100")
 
     @override_settings(
+        SUPERFRETE_TOKEN="token-teste",
+        SUPERFRETE_SANDBOX=True,
+        SUPERFRETE_SERVICES="PAC,SEDEX,SEDEX12",
+    )
+    def test_payload_includes_configured_services(self):
+        with mock.patch(
+            "apps.figures.services.requests.post",
+            return_value=self._fake_response([]),
+        ) as post:
+            calculate_shipping(self.figure, "01310100", "05311900")
+        payload = post.call_args.kwargs["json"]
+        self.assertEqual(payload["services"], "PAC,SEDEX,SEDEX12")
+
+    @override_settings(
         SUPERFRETE_TOKEN="token-teste", SUPERFRETE_SANDBOX=True
     )
     def test_filters_correios_and_sorts_by_price(self):

@@ -42,6 +42,7 @@ def calculate_shipping(figure, destination_zip, origin_zip):
             "length": str(figure.length_cm),
             "weight": str(figure.weight_kg),
         },
+        "services": settings.SUPERFRETE_SERVICES,
     }
 
     headers = {
