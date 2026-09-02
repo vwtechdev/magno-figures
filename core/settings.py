@@ -143,8 +143,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SUPERFRETE_TOKEN = os.getenv("SUPERFRETE_TOKEN", "")
 SUPERFRETE_SANDBOX = os.getenv("SUPERFRETE_SANDBOX", "0") == "1"
 SUPERFRETE_USER_AGENT_EMAIL = os.getenv(
-    "SUPERFRETE_USER_AGENT_EMAIL", "magnofigures@gmail.com"
-)
+    "SUPERFRETE_USER_AGENT_EMAIL"
+) or "example@example.com"
 
 JAZZMIN_SETTINGS = {
     "site_title": "Magno Figures",
