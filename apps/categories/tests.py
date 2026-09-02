@@ -3,7 +3,6 @@ import re
 from io import BytesIO
 
 from PIL import Image
-from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -11,6 +10,7 @@ from django.urls import reverse
 
 from apps.categories.models import Category
 from apps.website.models import Website
+from core.utils import site_base_url
 
 
 def make_image(name="category.png"):
@@ -50,4 +50,4 @@ class CategoryBreadcrumbSeoTest(TestCase):
         self.assertContains(response, '"name": "Avô"')
         self.assertContains(response, '"name": "Pai"')
         self.assertContains(response, '"name": "Filha"')
-        self.assertContains(response, f'"{settings.BASE_URL}/categories/filha/"')
+        self.assertContains(response, f'"{site_base_url()}/categories/filha/"')

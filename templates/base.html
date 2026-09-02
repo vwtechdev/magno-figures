@@ -9,18 +9,18 @@
     {% if website_config.description %}<meta name="description" content="{{ website_config.description }}">{% endif %}
     {% if website_config.seo_keywords %}<meta name="keywords" content="{{ website_config.seo_keywords }}">{% endif %}
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ base_url }}{{ request.path }}">
+    <link rel="canonical" href="{{ site_url }}{{ request.path }}">
     <meta property="og:site_name" content="{{ website_config.company_name }}">
     <meta property="og:locale" content="pt_BR">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{% block og_title %}{{ website_config.company_name }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ website_config.description }}{% endblock %}">
-    <meta property="og:url" content="{{ base_url }}{{ request.path }}">
-    <meta property="og:image" content="{% block og_image %}{{ base_url }}{{ website_config.logo.url }}{% endblock %}">
+    <meta property="og:url" content="{{ site_url }}{{ request.path }}">
+    <meta property="og:image" content="{% block og_image %}{{ site_url }}{{ website_config.logo.url }}{% endblock %}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block twitter_title %}{{ website_config.company_name }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ website_config.description }}{% endblock %}">
-    <meta name="twitter:image" content="{% block twitter_image %}{{ base_url }}{{ website_config.logo.url }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ site_url }}{{ website_config.logo.url }}{% endblock %}">
     <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,11 +33,11 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "{{ website_config.company_name|escapejs }}",
-        "url": "{{ base_url }}/",
+        "url": "{{ site_url }}/",
         "description": "{{ website_config.description|escapejs }}",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "{{ base_url }}/figures/?q={search_term_string}",
+            "target": "{{ site_url }}/figures/?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
@@ -47,8 +47,8 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "{{ website_config.company_name|escapejs }}",
-        "url": "{{ base_url }}/",
-        "logo": "{{ base_url }}{{ website_config.logo.url }}",
+        "url": "{{ site_url }}/",
+        "logo": "{{ site_url }}{{ website_config.logo.url }}",
         "sameAs": [
             {% if website_config.instagram %}"{{ website_config.instagram }}"{% endif %}{% if website_config.instagram and website_config.facebook %},{% endif %}
             {% if website_config.facebook %}"{{ website_config.facebook }}"{% endif %}{% if website_config.facebook and website_config.twitter %},{% endif %}

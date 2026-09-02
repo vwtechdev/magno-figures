@@ -94,10 +94,7 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "0") == "1"
 
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
-BASE_URL = (
-    os.getenv("BASE_URL")
-    or (f"https://{os.getenv('DOMAIN')}" if os.getenv("DOMAIN") else "http://localhost:8000")
-).rstrip("/")
+DOMAIN = os.getenv("DOMAIN") or "localhost:8000"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

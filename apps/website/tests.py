@@ -4,7 +4,6 @@ from decimal import Decimal
 from io import BytesIO
 
 from PIL import Image
-from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -12,6 +11,7 @@ from django.urls import reverse
 
 from apps.figures.models import Figure
 from apps.website.models import Website
+from core.utils import site_base_url
 
 
 def make_image(name="website.png"):
@@ -75,15 +75,15 @@ class WebsiteSeoTest(TestCase):
     def test_canonical_and_open_graph_rendered(self):
         response = self.client.get(reverse("website:home"))
         self.assertContains(
-            response, f'<link rel="canonical" href="{settings.BASE_URL}/">'
+            response, f'<link rel="canonical" href="{site_base_url()}/">'
         )
         self.assertContains(response, '<meta property="og:site_name" content="Magno Figures">')
         self.assertContains(response, '<meta property="og:locale" content="pt_BR">')
         self.assertContains(response, '<meta property="og:type" content="website">')
-        self.assertContains(response, f'<meta property="og:url" content="{settings.BASE_URL}/">')
+        self.assertContains(response, f'<meta property="og:url" content="{site_base_url()}/">')
         self.assertContains(
             response,
-            f'<meta property="og:image" content="{settings.BASE_URL}{self.website.logo.url}">',
+            f'<meta property="og:image" content="{site_base_url()}{self.website.logo.url}">',
         )
         self.assertContains(response, '<meta name="twitter:card" content="summary_large_image">')
         self.assertContains(response, '<meta name="robots" content="index, follow">')
@@ -104,7 +104,7 @@ class WebsiteSeoTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/plain")
         self.assertIn(
-            f"Sitemap: {settings.BASE_URL}/sitemap.xml", response.content.decode()
+            f"Sitemap: {site_base_url()}/sitemap.xml", response.content.decode()
         )
 
     def test_sitemap_xml(self):
@@ -120,9 +120,9 @@ class WebsiteSeoTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/xml")
         content = response.content.decode()
-        self.assertIn(f"<loc>{settings.BASE_URL}/figures/</loc>", content)
-        self.assertIn(f"<loc>{settings.BASE_URL}/about/</loc>", content)
-        self.assertIn(f"<loc>{settings.BASE_URL}/figures/figure-seo/</loc>", content)
+        self.assertIn(f"<loc>{site_base_url()}/figures/</loc>", content)
+        self.assertIn(f"<loc>{site_base_url()}/about/</loc>", content)
+        self.assertIn(f"<loc>{site_base_url()}/figures/figure-seo/</loc>", content)
 
 
 class WebsiteEmptySeoTest(TestCase):

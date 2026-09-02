@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -7,6 +6,7 @@ from django.urls import reverse
 from apps.categories.models import Category
 from apps.figures.models import Figure
 from apps.website.models import Banner
+from core.utils import site_base_url
 
 
 def home_view(request):
@@ -33,13 +33,13 @@ def robots_txt_view(request):
     content = (
         "User-agent: *\n"
         "Allow: /\n"
-        f"Sitemap: {settings.BASE_URL}/sitemap.xml\n"
+        f"Sitemap: {site_base_url()}/sitemap.xml\n"
     )
     return HttpResponse(content, content_type="text/plain")
 
 
 def sitemap_view(request):
-    base = settings.BASE_URL
+    base = site_base_url()
     entries = []
     for path in ("/", "/figures/", "/about/", "/privacy/", "/terms/"):
         entries.append(

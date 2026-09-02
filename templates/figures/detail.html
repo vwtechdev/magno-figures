@@ -7,10 +7,10 @@
 {% block og_type %}product{% endblock %}
 {% block og_title %}{{ figure.name }} — {{ website_config.company_name }}{% endblock %}
 {% block og_description %}{{ figure.description|truncatechars:155 }}{% endblock %}
-{% block og_image %}{{ base_url }}{{ figure.first_image.url }}{% endblock %}
+{% block og_image %}{{ site_url }}{{ figure.first_image.url }}{% endblock %}
 {% block twitter_title %}{{ figure.name }} — {{ website_config.company_name }}{% endblock %}
 {% block twitter_description %}{{ figure.description|truncatechars:155 }}{% endblock %}
-{% block twitter_image %}{{ base_url }}{{ figure.first_image.url }}{% endblock %}
+{% block twitter_image %}{{ site_url }}{{ figure.first_image.url }}{% endblock %}
 
 {% block extra_head %}
 {% with cats=figure.categories.all %}
@@ -21,8 +21,8 @@
     "@type": "Product",
     "name": "{{ figure.name|escapejs }}",
     "description": "{{ figure.description|truncatechars:155|escapejs }}",
-    "image": "{{ base_url }}{{ figure.first_image.url }}",
-    "url": "{{ base_url }}{{ request.path }}",
+    "image": "{{ site_url }}{{ figure.first_image.url }}",
+    "url": "{{ site_url }}{{ request.path }}",
     "brand": {"@type": "Brand", "name": "{{ website_config.company_name|escapejs }}"},
     "offers": {
         "@type": "Offer",
@@ -37,9 +37,9 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ base_url }}/"},
-        {% for category in cats %}{"@type": "ListItem", "position": {{ forloop.counter|add:1 }}, "name": "{{ category.name|escapejs }}", "item": "{{ base_url }}{% url 'categories:detail' category.slug %}"},
-        {% endfor %}{"@type": "ListItem", "position": {{ total|add:2 }}, "name": "{{ figure.name|escapejs }}", "item": "{{ base_url }}{{ request.path }}"}
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/"},
+        {% for category in cats %}{"@type": "ListItem", "position": {{ forloop.counter|add:1 }}, "name": "{{ category.name|escapejs }}", "item": "{{ site_url }}{% url 'categories:detail' category.slug %}"},
+        {% endfor %}{"@type": "ListItem", "position": {{ total|add:2 }}, "name": "{{ figure.name|escapejs }}", "item": "{{ site_url }}{{ request.path }}"}
     ]
 }
 </script>

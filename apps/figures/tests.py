@@ -4,7 +4,6 @@ import json
 import re
 
 from PIL import Image
-from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -13,6 +12,7 @@ from django.urls import reverse
 from apps.categories.models import Category
 from apps.figures.models import Figure
 from apps.website.models import Website
+from core.utils import site_base_url
 
 
 def make_image(name="figure.png"):
@@ -123,7 +123,7 @@ class FigureDetailSeoTest(TestCase):
         self.assertContains(response, '<meta property="og:type" content="product">')
         self.assertContains(
             response,
-            f'<meta property="og:image" content="{settings.BASE_URL}{self.figure.first_image.url}">',
+            f'<meta property="og:image" content="{site_base_url()}{self.figure.first_image.url}">',
         )
         html = response.content.decode()
         blocks = re.findall(

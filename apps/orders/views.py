@@ -10,6 +10,7 @@ from apps.addresses.models import Address
 from apps.carts.views import clear_cart, get_cart_items, merge_session_cart
 from apps.orders.models import Order, OrderItem, OrderStatus
 from apps.website.models import Website
+from core.utils import site_base_url
 
 
 @login_required
@@ -59,7 +60,7 @@ def _notify_admin_new_order(order):
         f"Itens:\n{items_text}\n"
         f"Endereço:\n{order.address.full_address}\n\n"
         f"Total: R$ {order.total:.2f}\n\n"
-        f"Gerencie em: {settings.BASE_URL}/admin/orders/order/{order.pk}/change/"
+        f"Gerencie em: {site_base_url()}/admin/orders/order/{order.pk}/change/"
     )
     send_mail(
         subject,
