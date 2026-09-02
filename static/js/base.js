@@ -15,6 +15,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 nav.classList.remove("is-open");
                 toggle.classList.remove("is-open");
                 toggle.setAttribute("aria-expanded", "false");
+                nav.querySelectorAll(".navbar__item--dropdown.is-open").forEach((item) => {
+                    item.classList.remove("is-open");
+                });
+            });
+        });
+
+        nav.querySelectorAll(".navbar__sub-toggle").forEach((btn) => {
+            btn.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const item = btn.closest(".navbar__item--dropdown");
+                const isOpen = item.classList.toggle("is-open");
+                btn.setAttribute("aria-expanded", String(isOpen));
             });
         });
     }

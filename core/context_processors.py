@@ -12,7 +12,5 @@ def global_context(request):
     return {
         "website_config": Website.objects.get_config(),
         "cart_count": cart_count,
-        "nav_categories": Category.objects.filter(
-            parent__isnull=True, is_active=True
-        ),
+        "nav_categories": Category.objects.active().order_by("level", "name"),
     }
