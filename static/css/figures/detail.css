@@ -270,6 +270,13 @@
     border: 1px solid var(--border);
 }
 
+.shipping__dest {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 2px 2px 0;
+}
+
 .shipping__option-name {
     font-weight: 600;
     color: var(--text);

@@ -73,8 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const formatPrice = (value) =>
         `R$ ${value.toFixed(2).replace(".", ",")}`;
 
-    const renderOptions = (options) => {
+    const renderOptions = (zipcode, options) => {
         results.innerHTML = "";
+        const dest = document.createElement("div");
+        dest.className = "shipping__dest";
+        dest.textContent = `Destino: ${zipcode.slice(0, 5)}-${zipcode.slice(5)}`;
+        results.appendChild(dest);
         options.forEach((option) => {
             const div = document.createElement("div");
             div.className = "shipping__option";
@@ -114,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (!data.options || data.options.length === 0) {
                 showMessage("Nenhuma opção de frete disponível para este CEP.");
             } else {
-                renderOptions(data.options);
+                renderOptions(zipcode, data.options);
             }
         } catch (err) {
             showMessage("Erro de conexão. Tente novamente.", true);
