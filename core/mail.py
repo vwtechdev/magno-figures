@@ -1,4 +1,22 @@
+import logging
+import threading
+
+from django.core.mail import send_mail
 from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
+
+logger = logging.getLogger(__name__)
+
+
+def send_mail_async(subject, message, recipient_list, from_email=None):
+    """Envia e-mail em uma thread daemon para não bloquear a resposta HTTP."""
+
+    def _send():
+        try:
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+        except Exception:
+            logger.exception("Falha ao enviar e-mail em background")
+
+    threading.Thread(target=_send, daemon=True).start()
 
 
 class EmailBackend(ConsoleEmailBackend):

@@ -1,15 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import PasswordResetForm as DjangoPasswordResetForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from apps.accounts.models import User
 from apps.addresses.models import Address
 from apps.orders.models import Order
+from core.mail import send_mail_async
 
 
 def login_view(request):
@@ -103,11 +106,28 @@ def profile_view(request):
     )
 
 
+class AsyncPasswordResetForm(DjangoPasswordResetForm):
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        subject = render_to_string(subject_template_name, context)
+        subject = "".join(subject.splitlines())
+        body = render_to_string(email_template_name, context)
+        send_mail_async(subject, body, [to_email], from_email=from_email)
+
+
 class PasswordResetView(auth_views.PasswordResetView):
     template_name = "accounts/password_reset.html"
     email_template_name = "accounts/password_reset_email.html"
     subject_template_name = "accounts/password_reset_subject.txt"
     success_url = reverse_lazy("accounts:password_reset_done")
+    form_class = AsyncPasswordResetForm
 
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView):

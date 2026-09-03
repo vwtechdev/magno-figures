@@ -1,3 +1,5 @@
+import time
+
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -12,6 +14,15 @@ class PasswordResetEmailTest(TestCase):
             password="senha-forte-123",
             name="Cliente Teste",
         )
+        mail.outbox.clear()
+
+    def _wait_for_email(self, timeout=2.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if mail.outbox:
+                return True
+            time.sleep(0.01)
+        return False
 
     def test_password_reset_sends_email(self):
         response = self.client.post(
@@ -20,7 +31,7 @@ class PasswordResetEmailTest(TestCase):
         )
 
         self.assertRedirects(response, reverse("accounts:password_reset_done"))
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
         message = mail.outbox[0]
         self.assertEqual(message.to, [self.user.email])
         self.assertTrue(message.subject.startswith("Redefinição de senha"))
@@ -33,4 +44,5 @@ class PasswordResetEmailTest(TestCase):
             {"email": "nao-existe@example.com"},
         )
 
+        time.sleep(0.1)
         self.assertEqual(len(mail.outbox), 0)

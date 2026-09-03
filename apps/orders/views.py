@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -10,6 +9,7 @@ from apps.addresses.models import Address
 from apps.carts.views import clear_cart, get_cart_items, merge_session_cart
 from apps.orders.models import Order, OrderItem, OrderStatus
 from apps.website.models import Website
+from core.mail import send_mail_async
 from core.utils import site_base_url
 
 
@@ -62,12 +62,11 @@ def _notify_admin_new_order(order):
         f"Total: R$ {order.total:.2f}\n\n"
         f"Gerencie em: {site_base_url()}/admin/orders/order/{order.pk}/change/"
     )
-    send_mail(
+    send_mail_async(
         subject,
         body,
-        settings.DEFAULT_FROM_EMAIL,
         [recipient],
-        fail_silently=True,
+        from_email=settings.DEFAULT_FROM_EMAIL,
     )
 
 
