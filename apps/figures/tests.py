@@ -184,7 +184,7 @@ class SuperFreteShippingTest(TestCase):
     @override_settings(
         SUPERFRETE_TOKEN="token-teste",
         SUPERFRETE_SANDBOX=True,
-        SUPERFRETE_SERVICES="PAC,SEDEX,SEDEX12",
+        SUPERFRETE_SERVICES="1,2,17",
     )
     def test_payload_includes_configured_services(self):
         with mock.patch(
@@ -193,7 +193,7 @@ class SuperFreteShippingTest(TestCase):
         ) as post:
             calculate_shipping(self.figure, "01310100", "05311900")
         payload = post.call_args.kwargs["json"]
-        self.assertEqual(payload["services"], "PAC,SEDEX,SEDEX12")
+        self.assertEqual(payload["services"], "1,2,17")
 
     @override_settings(
         SUPERFRETE_TOKEN="token-teste", SUPERFRETE_SANDBOX=True

@@ -145,7 +145,7 @@ SUPERFRETE_SANDBOX = os.getenv("SUPERFRETE_SANDBOX", "0") == "1"
 SUPERFRETE_USER_AGENT_EMAIL = os.getenv(
     "SUPERFRETE_USER_AGENT_EMAIL"
 ) or "example@example.com"
-SUPERFRETE_SERVICES = os.getenv("SUPERFRETE_SERVICES", "PAC,SEDEX")
+SUPERFRETE_SERVICES = os.getenv("SUPERFRETE_SERVICES", "1,2")
 
 JAZZMIN_SETTINGS = {
     "site_title": "Magno Figures",
