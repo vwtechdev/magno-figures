@@ -92,6 +92,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    const enrichDestination = async (zipcode) => {
+        const dest = results.querySelector(".shipping__dest");
+        if (!dest) return;
+        const base = `Destino: ${zipcode.slice(0, 5)}-${zipcode.slice(5)}`;
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${zipcode}/json/`);
+            const data = await response.json();
+            if (data && !data.erro && data.localidade) {
+                dest.textContent = `${base} — ${data.localidade}/${data.uf}`;
+            }
+        } catch (err) {
+            // mantém apenas o CEP
+        }
+    };
+
     const showMessage = (message, isError) => {
         results.innerHTML = "";
         const div = document.createElement("div");
@@ -119,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 showMessage("Nenhuma opção de frete disponível para este CEP.");
             } else {
                 renderOptions(zipcode, data.options);
+                enrichDestination(zipcode);
             }
         } catch (err) {
             showMessage("Erro de conexão. Tente novamente.", true);
