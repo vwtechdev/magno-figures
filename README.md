@@ -39,3 +39,9 @@ sh scripts/deploy.sh
 ```
 
 VPS com Docker Compose + Traefik (nginx + gunicorn, PostgreSQL + Redis).
+
+---
+
+## Desenvolvido por
+
+VWTech Dev | Soluções em Tecnologia
