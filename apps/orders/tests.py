@@ -151,6 +151,25 @@ class CheckoutFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Order.objects.exists())
 
+    def test_checkout_blocked_with_sold_out_item(self):
+        self._add_to_cart(quantity=1)
+        self.figure.sold_out = True
+        self.figure.save()
+
+        response = self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+                "cpf": "12345678909",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "esgotado")
+        self.assertFalse(Order.objects.exists())
+        self.assertTrue(self.user.cart.items.exists())
+
     def test_checkout_shipping_endpoint_aggregates_cart(self):
         self._add_to_cart(quantity=2)
 

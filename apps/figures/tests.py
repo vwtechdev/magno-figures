@@ -149,6 +149,16 @@ class FigureDetailSeoTest(TestCase):
         )
         self.assertContains(response, "https://schema.org/OutOfStock")
 
+    def test_detail_sold_out_shows_esgotado(self):
+        self.figure.sold_out = True
+        self.figure.save()
+
+        response = self.client.get(
+            reverse("figures:detail", args=[self.figure.slug])
+        )
+        self.assertContains(response, "Esgotado")
+        self.assertNotContains(response, 'class="product__cta product__cta--buy"')
+
 
 class SuperFreteShippingTest(TestCase):
     def setUp(self):

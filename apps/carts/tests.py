@@ -71,3 +71,30 @@ class CartLogicTest(TestCase):
         self.client.get(reverse("carts:remove", args=[self.figure.pk]))
 
         self.assertFalse(self.user.cart.items.exists())
+
+    def test_add_sold_out_figure_blocked(self):
+        self.figure.sold_out = True
+        self.figure.save()
+
+        self.client.get(reverse("carts:add", args=[self.figure.pk]))
+
+        self.assertFalse(self.user.cart.items.exists())
+
+    def test_update_inc_sold_out_keeps_quantity(self):
+        self.user.cart.items.create(figure=self.figure, quantity=2)
+        self.figure.sold_out = True
+        self.figure.save()
+
+        self.client.post(
+            reverse("carts:update", args=[self.figure.pk]), {"action": "inc"}
+        )
+
+        self.assertEqual(self.user.cart.items.get().quantity, 2)
+
+    def test_add_preorder_stock_zero_allowed(self):
+        self.figure.stock = 0
+        self.figure.save()
+
+        self.client.get(reverse("carts:add", args=[self.figure.pk]))
+
+        self.assertEqual(self.user.cart.items.get().quantity, 1)
