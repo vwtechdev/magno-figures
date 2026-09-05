@@ -3,11 +3,16 @@
     {% for order in orders %}
     <a href="{% url 'orders:detail' order.pk %}" class="order">
         {% with first_item=order.items.all.0 %}
-        {% if first_item.figure.first_image %}
-        <img class="order__thumb" src="{{ first_item.figure.first_image.url }}" alt="{{ first_item.figure.name }}" loading="lazy">
-        {% else %}
-        <div class="order__thumb order__thumb--empty"></div>
-        {% endif %}
+        <div class="order__thumb-wrap">
+            {% if first_item.figure.first_image %}
+            <img class="order__thumb" src="{{ first_item.figure.first_image.url }}" alt="{{ first_item.figure.name }}" loading="lazy">
+            {% else %}
+            <div class="order__thumb order__thumb--empty"></div>
+            {% endif %}
+            {% if order.item_count > 1 %}
+            <span class="order__thumb-badge">+{{ order.item_count|add:"-1" }}</span>
+            {% endif %}
+        </div>
         {% endwith %}
         <div class="order__info">
             <span class="order__id">Pedido #{{ order.pk }}</span>
