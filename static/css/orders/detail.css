@@ -156,14 +156,26 @@
     white-space: nowrap;
 }
 
-.order-page__total {
-    display: flex;
-    justify-content: space-between;
+.order-page__totals {
+    display: grid;
+    gap: 8px;
     border-top: 1px solid var(--border);
     margin-top: 16px;
     padding-top: 16px;
+}
+
+.order-page__total-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.order-page__total-row--total {
+    color: var(--text);
     font-weight: 700;
     font-size: 1.05rem;
+    padding-top: 6px;
 }
 
 .order-page__address {

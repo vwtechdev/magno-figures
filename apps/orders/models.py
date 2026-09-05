@@ -72,6 +72,10 @@ class Order(BaseModel):
         )["total"] or 0.0
 
     @property
+    def total_with_shipping(self):
+        return self.total + (self.shipping_price or 0)
+
+    @property
     def item_count(self):
         return self.items.aggregate(total=Sum("quantity"))["total"] or 0
 

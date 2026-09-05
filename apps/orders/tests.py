@@ -99,6 +99,11 @@ class CheckoutFlowTest(TestCase):
         self.assertIn("*Frete:* R$ 59.80 (PAC)", message)
         self.assertIn("*Total:* R$ 259.60", message)
 
+        detail = self.client.get(reverse("orders:detail", args=[order.pk]))
+        self.assertContains(detail, "Frete")
+        self.assertContains(detail, "R$ 59,80 (PAC)")
+        self.assertContains(detail, "R$ 259,60")
+
     def test_checkout_uses_existing_cpf_without_asking(self):
         self.user.cpf = "11122233344"
         self.user.save(update_fields=["cpf"])
