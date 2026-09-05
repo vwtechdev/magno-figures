@@ -133,3 +133,62 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
 }
+
+.profile__data {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.profile__data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.profile__data-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.profile__data-value {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.profile__cpf-fields {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.profile__cpf-input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: inherit;
+}
+
+.profile__cpf-btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile__cpf-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}

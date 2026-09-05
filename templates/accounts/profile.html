@@ -20,6 +20,30 @@
         </a>
     </div>
 
+    <div class="profile__data">
+        <div class="profile__data-row">
+            <span class="profile__data-label">Nome</span>
+            <span class="profile__data-value">{{ user.name }}</span>
+        </div>
+        <div class="profile__data-row">
+            <span class="profile__data-label">Email</span>
+            <span class="profile__data-value">{{ user.email }}</span>
+        </div>
+        <div class="profile__data-row">
+            <span class="profile__data-label">Telefone</span>
+            <span class="profile__data-value">{{ user.phone|default:"—" }}</span>
+        </div>
+        <form method="post" action="{% url 'accounts:profile_cpf' %}" class="profile__cpf">
+            {% csrf_token %}
+            <span class="profile__data-label">CPF</span>
+            <div class="profile__cpf-fields">
+                <input type="text" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__cpf-input">
+                <button type="submit" class="profile__cpf-btn">Salvar</button>
+            </div>
+            <span class="profile__cpf-hint">Usado no pedido via WhatsApp. Se preenchido, não é solicitado de novo no checkout.</span>
+        </form>
+    </div>
+
     <div class="profile__tabs" role="tablist">
         <button class="profile__tab{% if active_tab == 'orders' %} is-active{% endif %}" data-tab="orders" role="tab" aria-selected="{% if active_tab == 'orders' %}true{% else %}false{% endif %}">Meus Pedidos</button>
         <button class="profile__tab{% if active_tab == 'addresses' %} is-active{% endif %}" data-tab="addresses" role="tab" aria-selected="{% if active_tab == 'addresses' %}true{% else %}false{% endif %}">Endereços</button>

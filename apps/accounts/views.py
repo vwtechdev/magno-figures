@@ -1,6 +1,9 @@
+import re
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm as DjangoPasswordResetForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -104,6 +107,18 @@ def profile_view(request):
             "active_tab": tab,
         },
     )
+
+
+@login_required
+def profile_cpf_view(request):
+    cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
+    if len(cpf) != 11:
+        messages.error(request, "CPF inválido. Informe os 11 dígitos.")
+    else:
+        request.user.cpf = cpf
+        request.user.save(update_fields=["cpf"])
+        messages.success(request, "CPF atualizado com sucesso.")
+    return redirect("accounts:profile")
 
 
 class AsyncPasswordResetForm(DjangoPasswordResetForm):
