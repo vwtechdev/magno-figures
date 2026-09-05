@@ -7,3 +7,9 @@ def site_base_url():
     if domain.startswith(("localhost", "127.")):
         return f"http://{domain}"
     return f"https://{domain}"
+
+
+def delete_storage_file(storage, name):
+    """Apaga um arquivo do storage se existir (não falha se ausente)."""
+    if name and storage.exists(name):
+        storage.delete(name)

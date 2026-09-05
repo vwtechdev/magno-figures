@@ -1,16 +1,18 @@
 import json
+import os
 import re
+import tempfile
 from decimal import Decimal
 from io import BytesIO
 
 from PIL import Image
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.figures.models import Figure
-from apps.website.models import Website
+from apps.website.models import Banner, Website
 from core.utils import site_base_url
 
 
@@ -145,3 +147,30 @@ class WebsiteEmptySeoTest(TestCase):
         self.assertNotIn('<meta name="keywords"', html)
         self.assertNotIn("googletagmanager.com", html)
         self.assertNotIn('aria-label="X (Twitter)"', html)
+
+
+class BannerFileStorageTest(TestCase):
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_delete_banner_removes_file(self):
+        banner = Banner.objects.create(
+            title="Banner", image=make_image("banner.png")
+        )
+        path = banner.image.path
+        self.assertTrue(os.path.exists(path))
+
+        banner.delete()
+
+        self.assertFalse(os.path.exists(path))
+
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_update_banner_removes_old_file(self):
+        banner = Banner.objects.create(
+            title="Banner", image=make_image("b1.png")
+        )
+        old_path = banner.image.path
+
+        banner.image = make_image("b2.png")
+        banner.save()
+
+        self.assertFalse(os.path.exists(old_path))
+        self.assertTrue(os.path.exists(banner.image.path))

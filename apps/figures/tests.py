@@ -1,7 +1,9 @@
 from decimal import Decimal
 from io import BytesIO
 import json
+import os
 import re
+import tempfile
 from unittest import mock
 
 import requests
@@ -12,7 +14,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.categories.models import Category
-from apps.figures.models import Figure
+from apps.figures.models import Figure, FigureImage
 from apps.figures.services import calculate_shipping
 from apps.website.models import Website
 from core.utils import site_base_url
@@ -158,6 +160,36 @@ class FigureDetailSeoTest(TestCase):
         )
         self.assertContains(response, "Esgotado")
         self.assertNotContains(response, 'class="product__cta product__cta--buy"')
+
+
+class FigureFileStorageTest(TestCase):
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_delete_figure_removes_image_and_gallery(self):
+        figure = Figure.objects.create(
+            name="Figura A", slug="figura-a", description="d",
+            price=Decimal("10.00"), stock=1, image=make_image("f.png"),
+        )
+        gallery = FigureImage.objects.create(figure=figure, image=make_image("g.png"))
+        paths = [figure.image.path, gallery.image.path]
+        self.assertTrue(all(os.path.exists(path) for path in paths))
+
+        figure.delete()
+
+        self.assertFalse(any(os.path.exists(path) for path in paths))
+
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_update_figure_image_removes_old_file(self):
+        figure = Figure.objects.create(
+            name="Figura B", slug="figura-b", description="d",
+            price=Decimal("10.00"), stock=1, image=make_image("f1.png"),
+        )
+        old_path = figure.image.path
+
+        figure.image = make_image("f2.png")
+        figure.save()
+
+        self.assertFalse(os.path.exists(old_path))
+        self.assertTrue(os.path.exists(figure.image.path))
 
 
 class SuperFreteShippingTest(TestCase):
