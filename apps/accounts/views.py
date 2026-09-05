@@ -96,9 +96,9 @@ def profile_view(request):
         if request.user.is_authenticated
         else Address.objects.none()
     )
-    tab = request.GET.get("tab", "orders")
-    if tab not in ("orders", "addresses"):
-        tab = "orders"
+    tab = request.GET.get("tab", "profile")
+    if tab not in ("profile", "orders", "addresses"):
+        tab = "profile"
     return render(
         request,
         "accounts/profile.html",

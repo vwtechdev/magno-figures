@@ -20,38 +20,40 @@
         </a>
     </div>
 
-    <form method="post" action="{% url 'accounts:profile_data' %}" class="profile__data">
-        {% csrf_token %}
-        <h2 class="profile__panel-title">Dados pessoais</h2>
-        <div class="profile__field">
-            <label class="profile__data-label" for="id_name">Nome</label>
-            <input type="text" id="id_name" name="name" value="{{ user.name }}" class="profile__input">
-        </div>
-        <div class="profile__field">
-            <span class="profile__data-label">Email</span>
-            <span class="profile__data-value">{{ user.email }}</span>
-        </div>
-        <div class="profile__field">
-            <label class="profile__data-label" for="id_phone">Telefone</label>
-            <input type="text" id="id_phone" name="phone" value="{{ user.phone }}" class="profile__input" placeholder="(00) 00000-0000">
-        </div>
-        <div class="profile__field">
-            <label class="profile__data-label" for="id_cpf">CPF</label>
-            <input type="text" id="id_cpf" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__input">
-        </div>
-        <button type="submit" class="profile__cpf-btn">Salvar</button>
-    </form>
-
     <div class="profile__tabs" role="tablist">
-        <button class="profile__tab{% if active_tab == 'orders' %} is-active{% endif %}" data-tab="orders" role="tab" aria-selected="{% if active_tab == 'orders' %}true{% else %}false{% endif %}">Meus Pedidos</button>
+        <button class="profile__tab{% if active_tab == 'profile' %} is-active{% endif %}" data-tab="profile" role="tab" aria-selected="{% if active_tab == 'profile' %}true{% else %}false{% endif %}">Meu Perfil</button>
         <button class="profile__tab{% if active_tab == 'addresses' %} is-active{% endif %}" data-tab="addresses" role="tab" aria-selected="{% if active_tab == 'addresses' %}true{% else %}false{% endif %}">Endereços</button>
+        <button class="profile__tab{% if active_tab == 'orders' %} is-active{% endif %}" data-tab="orders" role="tab" aria-selected="{% if active_tab == 'orders' %}true{% else %}false{% endif %}">Meus Pedidos</button>
     </div>
 
-    <div class="profile__panel{% if active_tab == 'orders' %} is-active{% endif %}" data-panel="orders" role="tabpanel"{% if active_tab != 'orders' %} hidden{% endif %}>
-        <div class="orders__header">
-            <h2 class="profile__panel-title">Meus Pedidos</h2>
+    <div class="profile__panel{% if active_tab == 'profile' %} is-active{% endif %}" data-panel="profile" role="tabpanel"{% if active_tab != 'profile' %} hidden{% endif %}>
+        {% if messages %}
+        <div class="profile__messages">
+            {% for message in messages %}<p class="profile__message">{{ message }}</p>{% endfor %}
         </div>
-        {% include "accounts/_orders_tab.html" %}
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:profile_data' %}" class="profile__data">
+            {% csrf_token %}
+            <h2 class="profile__panel-title">Dados pessoais</h2>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_name">Nome</label>
+                <input type="text" id="id_name" name="name" value="{{ user.name }}" class="profile__input">
+            </div>
+            <div class="profile__field">
+                <span class="profile__data-label">Email</span>
+                <span class="profile__data-value">{{ user.email }}</span>
+            </div>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_phone">Telefone</label>
+                <input type="text" id="id_phone" name="phone" value="{{ user.phone }}" class="profile__input" placeholder="(00) 00000-0000">
+            </div>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_cpf">CPF</label>
+                <input type="text" id="id_cpf" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__input">
+            </div>
+            <button type="submit" class="profile__cpf-btn">Salvar</button>
+        </form>
     </div>
 
     <div class="profile__panel{% if active_tab == 'addresses' %} is-active{% endif %}" data-panel="addresses" role="tabpanel"{% if active_tab != 'addresses' %} hidden{% endif %}>
@@ -60,6 +62,13 @@
             <a href="{% url 'addresses:create' %}" class="addr__btn">Novo endereço</a>
         </div>
         {% include "accounts/_addresses_tab.html" %}
+    </div>
+
+    <div class="profile__panel{% if active_tab == 'orders' %} is-active{% endif %}" data-panel="orders" role="tabpanel"{% if active_tab != 'orders' %} hidden{% endif %}>
+        <div class="orders__header">
+            <h2 class="profile__panel-title">Meus Pedidos</h2>
+        </div>
+        {% include "accounts/_orders_tab.html" %}
     </div>
     {% else %}
     <div class="auth__box">

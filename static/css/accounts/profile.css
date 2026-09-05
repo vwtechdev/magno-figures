@@ -178,3 +178,18 @@
     font-weight: 700;
     cursor: pointer;
 }
+
+.profile__messages {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.profile__message {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: rgba(234, 201, 121, 0.08);
+}
