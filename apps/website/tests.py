@@ -109,6 +109,17 @@ class WebsiteSeoTest(TestCase):
             f"Sitemap: {site_base_url()}/sitemap.xml", response.content.decode()
         )
 
+    def test_navbar_logo_and_favicon_use_website_config(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(
+            response,
+            f'<img src="{self.website.logo.url}" alt="Magno Figures" class="navbar__logo">',
+        )
+        self.assertContains(
+            response,
+            f'<link rel="icon" type="image/png" href="{self.website.favicon.url}">',
+        )
+
     def test_sitemap_xml(self):
         Figure.objects.create(
             name="Figure SEO",

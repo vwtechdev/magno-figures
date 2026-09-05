@@ -68,5 +68,18 @@ img.brand-image {
 
 {% block extrajs %}
 <script src="{% static 'js/admin/row-open.js' %}"></script>
+<script>
+(function () {
+    var logo = {% if website_config.logo %}"{{ website_config.logo.url|escapejs }}"{% else %}""{% endif %};
+    var favicon = {% if website_config.favicon %}"{{ website_config.favicon.url|escapejs }}"{% else %}""{% endif %};
+    if (logo) {
+        document.querySelectorAll("img.brand-image").forEach(function (img) { img.src = logo; });
+    }
+    if (favicon) {
+        var link = document.querySelector('link[rel="shortcut icon"]') || document.querySelector('link[rel="icon"]');
+        if (link) { link.href = favicon; }
+    }
+})();
+</script>
 {{ block.super }}
 {% endblock %}
