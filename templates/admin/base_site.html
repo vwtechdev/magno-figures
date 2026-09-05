@@ -57,6 +57,11 @@ img.brand-image {
 #result_list tbody tr {
     cursor: pointer;
 }
+
+#result_list tbody tr:hover > td,
+#result_list tbody tr:hover > th {
+    background-color: rgba(52, 152, 219, 0.10) !important;
+}
 </style>
 {{ block.super }}
 {% endblock %}
