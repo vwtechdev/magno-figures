@@ -87,9 +87,16 @@
                 <div class="checkout__summary-items" id="summaryItems">
                     {% for item in cart_items %}
                     <div class="checkout__summary-item">
-                        <span class="checkout__summary-qty">{{ item.quantity }}x</span>
-                        <span class="checkout__summary-name">{{ item.figure.name }}</span>
-                        <span class="checkout__summary-price">R$ {{ item.figure.price|floatformat:2 }}</span>
+                        {% if item.figure.first_image %}
+                        <img src="{{ item.figure.first_image.url }}" alt="{{ item.figure.name }}" class="checkout__summary-image">
+                        {% else %}
+                        <div class="checkout__summary-image checkout__summary-image--empty"></div>
+                        {% endif %}
+                        <div class="checkout__summary-info">
+                            <span class="checkout__summary-name">{{ item.figure.name }}</span>
+                            <span class="checkout__summary-qty">{{ item.quantity }}x R$ {{ item.figure.price|floatformat:2 }}</span>
+                        </div>
+                        <span class="checkout__summary-price">R$ {{ item.total|floatformat:2 }}</span>
                     </div>
                     {% empty %}
                     <p class="checkout__hint">Seu carrinho está vazio.</p>

@@ -289,35 +289,54 @@
 }
 
 .checkout__summary-items {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .checkout__summary-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 14px;
+    padding: 14px 16px;
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--card);
     border: 1px solid var(--border);
 }
 
-.checkout__summary-qty {
-    font-weight: 700;
-    color: var(--gold-2);
-    min-width: 26px;
+.checkout__summary-image {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.checkout__summary-image--empty {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.checkout__summary-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .checkout__summary-name {
-    flex: 1;
+    font-weight: 600;
     color: var(--text);
 }
 
+.checkout__summary-qty {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
 .checkout__summary-price {
-    color: var(--text);
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--gold-2);
     white-space: nowrap;
 }
 
