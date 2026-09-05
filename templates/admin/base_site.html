@@ -56,3 +56,8 @@ img.brand-image {
 </style>
 {{ block.super }}
 {% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/admin/row-open.js' %}"></script>
+{{ block.super }}
+{% endblock %}
