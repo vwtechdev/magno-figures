@@ -110,14 +110,21 @@ def profile_view(request):
 
 
 @login_required
-def profile_cpf_view(request):
-    cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
-    if len(cpf) != 11:
-        messages.error(request, "CPF inválido. Informe os 11 dígitos.")
-    else:
-        request.user.cpf = cpf
-        request.user.save(update_fields=["cpf"])
-        messages.success(request, "CPF atualizado com sucesso.")
+def profile_data_view(request):
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
+        if not name:
+            messages.error(request, "Informe seu nome.")
+        elif cpf and len(cpf) != 11:
+            messages.error(request, "CPF inválido. Informe os 11 dígitos.")
+        else:
+            request.user.name = name
+            request.user.phone = phone
+            request.user.cpf = cpf
+            request.user.save(update_fields=["name", "phone", "cpf"])
+            messages.success(request, "Dados atualizados com sucesso.")
     return redirect("accounts:profile")
 
 
