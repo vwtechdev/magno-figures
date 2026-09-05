@@ -50,7 +50,7 @@
             </div>
             <div class="profile__field">
                 <label class="profile__data-label" for="id_cpf">CPF</label>
-                <input type="text" id="id_cpf" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__input">
+                <input type="text" id="id_cpf" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__input" data-cpf-mask>
             </div>
             <button type="submit" class="profile__cpf-btn">Salvar</button>
         </form>
@@ -88,4 +88,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/accounts/profile-tabs.js' %}" defer></script>
+<script src="{% static 'js/cpf-mask.js' %}" defer></script>
 {% endblock %}

@@ -73,7 +73,7 @@
                 {% else %}
                 <label class="checkout__field">
                     <span class="checkout__label">CPF</span>
-                    <input type="text" name="cpf" id="id_checkout_cpf" class="checkout__input" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off">
+                    <input type="text" name="cpf" id="id_checkout_cpf" class="checkout__input" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off" data-cpf-mask>
                     <span class="checkout__status" id="cpfStatus"></span>
                 </label>
                 {% endif %}
@@ -121,5 +121,6 @@
 
 {% block extra_js %}
 <script src="{% static 'js/cep.js' %}"></script>
+<script src="{% static 'js/cpf-mask.js' %}"></script>
 <script src="{% static 'js/orders/checkout.js' %}"></script>
 {% endblock %}
