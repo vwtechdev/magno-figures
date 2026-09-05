@@ -1,12 +1,18 @@
+import re
+from decimal import Decimal
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.addresses.forms import AddressForm
 from apps.addresses.models import Address
 from apps.carts.views import clear_cart, get_cart_items, merge_session_cart
+from apps.figures.services import cart_shipping_options
+from apps.figures.views import ZIP_CODE_RE
 from apps.orders.models import Order, OrderItem, OrderStatus
 from apps.website.models import Website
 from core.mail import send_mail_async
@@ -70,6 +76,36 @@ def _notify_admin_new_order(order):
     )
 
 
+def _checkout_context(request, addresses, address_form, selected_id, selected_address=None):
+    items = get_cart_items(request)
+    subtotal = sum(item["figure"].price * item["quantity"] for item in items)
+    return {
+        "addresses": addresses,
+        "selected_id": selected_id,
+        "selected_address": selected_address,
+        "address_form": address_form,
+        "cart_items": items,
+        "subtotal": subtotal,
+        "has_cpf": bool(request.user.cpf),
+    }
+
+
+@login_required
+def checkout_shipping_view(request):
+    merge_session_cart(request)
+    zipcode = (request.GET.get("zipcode") or "").strip()
+    if not ZIP_CODE_RE.fullmatch(zipcode):
+        return JsonResponse({"error": "Informe um CEP válido."}, status=400)
+    items = get_cart_items(request)
+    if not items:
+        return JsonResponse({"error": "Seu carrinho está vazio."}, status=400)
+    origin = Website.objects.get_config().origin_zip_code or ""
+    options, error = cart_shipping_options(items, zipcode, origin)
+    if error:
+        return JsonResponse({"error": error}, status=503)
+    return JsonResponse({"options": options})
+
+
 @login_required
 def checkout_view(request):
     merge_session_cart(request)
@@ -86,16 +122,11 @@ def checkout_view(request):
         else:
             address_form = AddressForm(request.POST)
             if not address_form.is_valid():
-                return render(
-                    request,
-                    "orders/checkout.html",
-                    {
-                        "addresses": addresses,
-                        "address_form": address_form,
-                        "selected_id": "new",
-                        "error": "Verifique os dados do endereço.",
-                    },
+                context = _checkout_context(
+                    request, addresses, address_form, "new"
                 )
+                context["error"] = "Verifique os dados do endereço."
+                return render(request, "orders/checkout.html", context)
             address = address_form.save(commit=False)
             address.user = request.user
             address.save()
@@ -106,8 +137,41 @@ def checkout_view(request):
             messages.info(request, "Seu carrinho está vazio.")
             return redirect("carts:detail")
 
+        if request.user.cpf:
+            cpf = request.user.cpf
+        else:
+            cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
+            if len(cpf) != 11:
+                context = _checkout_context(request, addresses, address_form, "new")
+                context["error"] = "Informe um CPF válido (11 dígitos)."
+                return render(request, "orders/checkout.html", context)
+            request.user.cpf = cpf
+            request.user.save(update_fields=["cpf"])
+
+        shipping_service = request.POST.get("shipping_service", "").strip()
+        origin = Website.objects.get_config().origin_zip_code or ""
+        options, error = cart_shipping_options(items, address.zip_code, origin)
+        if error:
+            context = _checkout_context(request, addresses, address_form, "new")
+            context["error"] = error
+            return render(request, "orders/checkout.html", context)
+        shipping_option = next(
+            (option for option in options if option["name"] == shipping_service),
+            None,
+        )
+        if not shipping_option:
+            context = _checkout_context(request, addresses, address_form, "new")
+            context["error"] = "Selecione uma opção de frete válida."
+            return render(request, "orders/checkout.html", context)
+        shipping_price = Decimal(str(shipping_option["price"]))
+
         with transaction.atomic():
-            order = Order.objects.create(user=request.user, address=address)
+            order = Order.objects.create(
+                user=request.user,
+                address=address,
+                shipping_service=shipping_service,
+                shipping_price=shipping_price,
+            )
             for item in items:
                 OrderItem.objects.create(
                     order=order,
@@ -129,10 +193,11 @@ def checkout_view(request):
     return render(
         request,
         "orders/checkout.html",
-        {
-            "addresses": addresses,
-            "selected_id": selected_address.pk if selected_address else None,
-            "selected_address": selected_address,
-            "address_form": address_form,
-        },
+        _checkout_context(
+            request,
+            addresses,
+            address_form,
+            selected_address.pk if selected_address else None,
+            selected_address,
+        ),
     )
