@@ -138,6 +138,17 @@ def checkout_view(request):
             messages.info(request, "Seu carrinho está vazio.")
             return redirect("carts:detail")
 
+        sold_item = next(
+            (item["figure"] for item in items if item["figure"].sold_out), None
+        )
+        if sold_item:
+            context = _checkout_context(request, addresses, address_form, "new")
+            context["error"] = (
+                f"O item {sold_item.name} está esgotado e não pode ser comprado. "
+                "Remova-o do carrinho."
+            )
+            return render(request, "orders/checkout.html", context)
+
         if request.user.cpf:
             cpf = request.user.cpf
         else:

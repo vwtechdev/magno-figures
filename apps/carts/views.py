@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.carts.models import Cart, CartItem
@@ -27,6 +28,8 @@ def merge_session_cart(request):
             figure = Figure.objects.get(pk=int(figure_id), is_active=True)
         except (Figure.DoesNotExist, ValueError):
             continue
+        if figure.sold_out:
+            continue
         item, created = CartItem.objects.get_or_create(
             cart=cart, figure=figure, defaults={"quantity": quantity}
         )
@@ -45,6 +48,12 @@ def cart_is_empty(request):
 
 def add_to_cart_view(request, figure_id):
     figure = get_object_or_404(Figure, pk=figure_id, is_active=True)
+    if figure.sold_out:
+        messages.error(
+            request,
+            "Este item está esgotado e não pode ser adicionado ao carrinho.",
+        )
+        return redirect(request.META.get("HTTP_REFERER") or "figures:list")
     was_empty = cart_is_empty(request)
 
     if request.user.is_authenticated:
@@ -119,8 +128,12 @@ def _apply_quantity(current, action, qty, figure):
         new_quantity = max(int(qty), 1)
         if figure.in_stock:
             new_quantity = min(new_quantity, figure.stock)
+        if figure.sold_out and new_quantity > current:
+            return current
         return new_quantity
     if action == "inc":
+        if figure.sold_out:
+            return current
         new_quantity = current + 1
         if figure.in_stock:
             new_quantity = min(new_quantity, figure.stock)
