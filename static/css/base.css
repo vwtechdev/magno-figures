@@ -544,6 +544,12 @@ ul {
     z-index: 2;
 }
 
+.card__badge--soldout {
+    background: rgba(248, 113, 113, 0.15);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #f87171;
+}
+
 /* ============ FAB ============ */
 .fab-group {
     position: fixed;

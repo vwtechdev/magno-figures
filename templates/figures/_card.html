@@ -1,7 +1,9 @@
 <a href="{% url 'figures:detail' figure.slug %}" class="card">
     <div class="card__media">
         <img src="{{ figure.first_image.url }}" alt="{{ figure.name }}" class="card__image" loading="lazy">
-        {% if not figure.in_stock %}
+        {% if figure.sold_out %}
+        <span class="card__badge card__badge--soldout">Esgotado</span>
+        {% elif not figure.in_stock %}
         <span class="card__badge card__badge--sold">Sob encomenda</span>
         {% endif %}
     </div>

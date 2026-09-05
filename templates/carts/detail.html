@@ -20,9 +20,11 @@
                 {% csrf_token %}
                 <button type="submit" name="action" value="dec" class="cart-item__qty-btn" aria-label="Diminuir quantidade" {% if item.quantity <= 1 %}disabled{% endif %}>−</button>
                 <span class="cart-item__qty-value">{{ item.quantity }}</span>
-                <button type="submit" name="action" value="inc" class="cart-item__qty-btn" aria-label="Aumentar quantidade" {% if item.figure.in_stock and item.quantity >= item.figure.stock %}disabled{% endif %}>+</button>
+                <button type="submit" name="action" value="inc" class="cart-item__qty-btn" aria-label="Aumentar quantidade" {% if item.figure.sold_out or item.figure.in_stock and item.quantity >= item.figure.stock %}disabled{% endif %}>+</button>
             </form>
-            {% if not item.figure.in_stock %}
+            {% if item.figure.sold_out %}
+            <span class="cart-item__preorder cart-item__preorder--sold">Esgotado</span>
+            {% elif not item.figure.in_stock %}
             <span class="cart-item__preorder">Sob encomenda</span>
             {% endif %}
             <div class="cart-item__total">R$ {{ item.total|floatformat:2 }}</div>

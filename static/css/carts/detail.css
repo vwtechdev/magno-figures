@@ -100,6 +100,11 @@
     white-space: nowrap;
 }
 
+.cart-item__preorder--sold {
+    background: rgba(248, 113, 113, 0.1);
+    font-weight: 700;
+}
+
 .cart-item__total {
     min-width: 90px;
     text-align: right;
