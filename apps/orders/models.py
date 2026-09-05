@@ -42,6 +42,18 @@ class Order(BaseModel):
         db_index=True,
         verbose_name="Status",
     )
+    shipping_service = models.CharField(
+        max_length=30,
+        blank=True,
+        verbose_name="Serviço de Envio",
+    )
+    shipping_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Valor do Frete",
+    )
 
     objects = OrderManager()
 
@@ -92,19 +104,35 @@ class Order(BaseModel):
         )
 
     def generate_whatsapp_message(self):
-        message = (
-            f"Olá!\n\n"
-            f"*Novo Pedido #{self.pk}*\n\n"
-            f"*Cliente:* {self.user.name}\n"
-            f"*Telefone:* {self.user.phone}\n\n"
-            f"*Itens:*\n"
-            f"{self._items_text()}\n"
-            f"*Endereço:*\n"
-            f"{self.address.full_address}\n\n"
-            f"*Total:* R$ {self.total:.2f}\n\n"
-            f"Gostaria de finalizar este pedido?"
-        )
-        return message
+        lines = [
+            "Olá!",
+            "",
+            f"*Novo Pedido #{self.pk}*",
+            "",
+            f"*Cliente:* {self.user.name}",
+            f"*Telefone:* {self.user.phone}",
+        ]
+        if self.user.cpf:
+            lines.append(f"*CPF:* {self.user.cpf}")
+        lines += [
+            "",
+            "*Itens:*",
+            self._items_text(),
+            "*Endereço:*",
+            self.address.full_address,
+            "",
+        ]
+        subtotal = self.total
+        if self.shipping_service and self.shipping_price is not None:
+            lines += [
+                f"*Subtotal:* R$ {subtotal:.2f}",
+                f"*Frete:* R$ {self.shipping_price:.2f} ({self.shipping_service})",
+                f"*Total:* R$ {subtotal + self.shipping_price:.2f}",
+            ]
+        else:
+            lines.append(f"*Total:* R$ {subtotal:.2f}")
+        lines += ["", "Gostaria de finalizar este pedido?"]
+        return "\n".join(lines)
 
     def generate_confirmation_message(self):
         message = (
