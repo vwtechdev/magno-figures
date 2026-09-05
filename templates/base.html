@@ -76,7 +76,7 @@
                     </a>
                     {% if user.is_authenticated %}
                     <a href="{% url 'accounts:profile' %}" class="navbar__mobile-link">Minha conta</a>
-                    <a href="{% url 'orders:list' %}" class="navbar__mobile-link">Meus Pedidos</a>
+                    <a href="{% url 'accounts:profile' %}?tab=orders" class="navbar__mobile-link">Meus Pedidos</a>
                     <a href="{% url 'accounts:logout' %}" class="navbar__mobile-link">Sair</a>
                     {% else %}
                     <a href="{% url 'accounts:login' %}" class="navbar__mobile-link">Entrar</a>
@@ -132,7 +132,7 @@
                     </button>
                     <div class="navbar__user-menu">
                         <a href="{% url 'accounts:profile' %}" class="navbar__user-link">Minha conta</a>
-                        <a href="{% url 'orders:list' %}" class="navbar__user-link">Meus Pedidos</a>
+                        <a href="{% url 'accounts:profile' %}?tab=orders" class="navbar__user-link">Meus Pedidos</a>
                         <a href="{% url 'accounts:logout' %}" class="navbar__user-link">Sair</a>
                     </div>
                 </div>
