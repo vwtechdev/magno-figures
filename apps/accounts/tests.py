@@ -78,3 +78,12 @@ class ProfileDataTest(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.name, "Nome Antigo")
         self.assertEqual(self.user.cpf, "")
+
+    def test_profile_data_rejects_invalid_check_digits(self):
+        self.client.post(
+            reverse("accounts:profile_data"),
+            {"name": "Nome Novo", "phone": "", "cpf": "12345678900"},
+        )
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.cpf, "")

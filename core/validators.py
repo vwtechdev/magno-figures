@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -52,3 +53,18 @@ def validate_image_extension(image):
         raise ValidationError(_("O arquivo enviado não é uma imagem válida."))
     finally:
         image.seek(0)
+
+
+def is_valid_cpf(cpf):
+    """Valida um CPF pelos dígitos verificadores (aceita com/sem máscara)."""
+    cpf = re.sub(r"\D", "", cpf or "")
+    if len(cpf) != 11 or cpf == cpf[0] * 11:
+        return False
+    for length in (9, 10):
+        total = sum(int(cpf[i]) * (length + 1 - i) for i in range(length))
+        digit = (total * 10) % 11
+        if digit == 10:
+            digit = 0
+        if int(cpf[length]) != digit:
+            return False
+    return True

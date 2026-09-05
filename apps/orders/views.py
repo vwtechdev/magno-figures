@@ -17,6 +17,7 @@ from apps.orders.models import Order, OrderItem, OrderStatus
 from apps.website.models import Website
 from core.mail import send_mail_async
 from core.utils import site_base_url
+from core.validators import is_valid_cpf
 
 
 @login_required
@@ -141,9 +142,9 @@ def checkout_view(request):
             cpf = request.user.cpf
         else:
             cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
-            if len(cpf) != 11:
+            if not is_valid_cpf(cpf):
                 context = _checkout_context(request, addresses, address_form, "new")
-                context["error"] = "Informe um CPF válido (11 dígitos)."
+                context["error"] = "Informe um CPF válido."
                 return render(request, "orders/checkout.html", context)
             request.user.cpf = cpf
             request.user.save(update_fields=["cpf"])

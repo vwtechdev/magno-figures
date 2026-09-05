@@ -16,6 +16,7 @@ from apps.accounts.models import User
 from apps.addresses.models import Address
 from apps.orders.models import Order
 from core.mail import send_mail_async
+from core.validators import is_valid_cpf
 
 
 def login_view(request):
@@ -117,8 +118,8 @@ def profile_data_view(request):
         cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
         if not name:
             messages.error(request, "Informe seu nome.")
-        elif cpf and len(cpf) != 11:
-            messages.error(request, "CPF inválido. Informe os 11 dígitos.")
+        elif cpf and not is_valid_cpf(cpf):
+            messages.error(request, "CPF inválido.")
         else:
             request.user.name = name
             request.user.phone = phone

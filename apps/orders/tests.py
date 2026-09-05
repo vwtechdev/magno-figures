@@ -131,6 +131,21 @@ class CheckoutFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Order.objects.exists())
 
+    def test_checkout_rejects_invalid_cpf(self):
+        self._add_to_cart(quantity=1)
+
+        response = self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+                "cpf": "12345678900",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Order.objects.exists())
+
     def test_checkout_shipping_endpoint_aggregates_cart(self):
         self._add_to_cart(quantity=2)
 
