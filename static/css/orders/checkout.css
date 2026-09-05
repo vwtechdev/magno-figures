@@ -227,3 +227,124 @@
     height: 17px;
     cursor: pointer;
 }
+.checkout__step {
+    padding: 6px 0 18px;
+    border-bottom: 1px solid rgba(234, 201, 121, 0.12);
+}
+
+.checkout__step[hidden] {
+    display: none;
+}
+
+.checkout__shipping {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.checkout__ship {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color var(--transition);
+}
+
+.checkout__ship:has(input:checked) {
+    border-color: var(--gold-2);
+    background: rgba(234, 201, 121, 0.08);
+}
+
+.checkout__ship input {
+    accent-color: var(--gold-2);
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+}
+
+.checkout__ship-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.checkout__ship-name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.checkout__ship-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.checkout__ship-price {
+    font-weight: 700;
+    color: var(--gold-2);
+    white-space: nowrap;
+}
+
+.checkout__summary-items {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.checkout__summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+}
+
+.checkout__summary-qty {
+    font-weight: 700;
+    color: var(--gold-2);
+    min-width: 26px;
+}
+
+.checkout__summary-name {
+    flex: 1;
+    color: var(--text);
+}
+
+.checkout__summary-price {
+    color: var(--text);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.checkout__totals {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.checkout__total-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.checkout__total-row--total {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-top: 1px solid rgba(234, 201, 121, 0.15);
+    padding-top: 10px;
+}
+
+.checkout__submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

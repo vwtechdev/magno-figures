@@ -8,55 +8,89 @@
     <h1 class="checkout__title"><span class="text-gold">Finalizar</span> Pedido</h1>
 
     <div class="checkout__box">
-        {% if selected_address %}
-        <div class="checkout__selected">
-            <p class="checkout__selected-label">Enviar para:</p>
-            <p class="checkout__selected-address">{{ selected_address.full_address|linebreaksbr }}</p>
-            <p class="checkout__selected-hint">Você pode alterar o endereço abaixo antes de enviar o pedido.</p>
-        </div>
-        {% endif %}
-
         {% if error %}
         <div class="checkout__error">{{ error }}</div>
         {% endif %}
 
-        <form class="checkout__form" method="post" action="{% url 'orders:checkout' %}">
+        <form class="checkout__form" method="post" action="{% url 'orders:checkout' %}"
+            data-has-cpf="{% if has_cpf %}1{% else %}0{% endif %}" data-subtotal="{{ subtotal }}">
             {% csrf_token %}
 
-            <h2 class="checkout__subtitle">Endereço de entrega</h2>
+            <section class="checkout__step" data-step="address">
+                <h2 class="checkout__subtitle">1. Endereço de entrega</h2>
 
-            {% if addresses %}
-            <div class="checkout__addresses">
-                {% for address in addresses %}
-                <label class="checkout__address{% if selected_id == address.pk %} checkout__address--selected{% endif %}">
-                    <input type="radio" name="address_id" value="{{ address.pk }}" class="checkout__radio"
-                        {% if selected_id == address.pk %}checked{% elif selected_id is None and address.is_primary %}checked{% endif %}>
-                    <div class="checkout__address-body">
-                        <strong>{{ address.street }}, {{ address.number }}{% if address.complement %} - {{ address.complement }}{% endif %}</strong>
-                        <span>{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</span>
-                        <span>CEP: {{ address.zip_code }}</span>
-                        {% if address.is_primary %}<span class="checkout__badge">Principal</span>{% endif %}
+                {% if addresses %}
+                <div class="checkout__addresses">
+                    {% for address in addresses %}
+                    <label class="checkout__address{% if selected_id == address.pk %} checkout__address--selected{% endif %}" data-cep="{{ address.zip_code }}">
+                        <input type="radio" name="address_id" value="{{ address.pk }}" class="checkout__radio"
+                            {% if selected_id == address.pk %}checked{% elif selected_id is None and address.is_primary %}checked{% endif %}>
+                        <div class="checkout__address-body">
+                            <strong>{{ address.street }}, {{ address.number }}{% if address.complement %} - {{ address.complement }}{% endif %}</strong>
+                            <span>{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</span>
+                            <span>CEP: {{ address.zip_code }}</span>
+                            {% if address.is_primary %}<span class="checkout__badge">Principal</span>{% endif %}
+                        </div>
+                    </label>
+                    {% endfor %}
+
+                    <label class="checkout__address checkout__address--new{% if selected_id == 'new' %} checkout__address--selected{% endif %}">
+                        <input type="radio" name="address_id" value="new" class="checkout__radio" id="id_use_new" {% if selected_id == 'new' %}checked{% endif %}>
+                        <div class="checkout__address-body"><strong>+ Usar novo endereço</strong></div>
+                    </label>
+                </div>
+
+                <div class="checkout__new" id="newAddressBox" {% if selected_id != 'new' %}hidden{% endif %}>
+                    {% include "orders/_address_fields.html" %}
+                </div>
+                {% else %}
+                <p class="checkout__hint">Cadastre o endereço de entrega:</p>
+                <div class="checkout__new">
+                    {% include "orders/_address_fields.html" %}
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="checkout__step" data-step="shipping" hidden>
+                <h2 class="checkout__subtitle">2. Frete</h2>
+                <p class="checkout__hint" id="shippingStatus">Escolha o endereço para calcular o frete.</p>
+                <div class="checkout__shipping" id="shippingOptions"></div>
+            </section>
+
+            <section class="checkout__step" data-step="cpf" hidden>
+                <h2 class="checkout__subtitle">3. CPF</h2>
+                {% if has_cpf %}
+                <p class="checkout__hint">CPF já cadastrado: <strong>{{ user.cpf }}</strong></p>
+                {% else %}
+                <label class="checkout__field">
+                    <span class="checkout__label">CPF</span>
+                    <input type="text" name="cpf" id="id_checkout_cpf" class="checkout__input" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off">
+                    <span class="checkout__status" id="cpfStatus"></span>
+                </label>
+                {% endif %}
+            </section>
+
+            <section class="checkout__step" data-step="summary" hidden>
+                <h2 class="checkout__subtitle">4. Resumo do pedido</h2>
+                <div class="checkout__summary-items" id="summaryItems">
+                    {% for item in cart_items %}
+                    <div class="checkout__summary-item">
+                        <span class="checkout__summary-qty">{{ item.quantity }}x</span>
+                        <span class="checkout__summary-name">{{ item.figure.name }}</span>
+                        <span class="checkout__summary-price">R$ {{ item.figure.price|floatformat:2 }}</span>
                     </div>
-                </label>
-                {% endfor %}
-
-                <label class="checkout__address checkout__address--new{% if selected_id == 'new' %} checkout__address--selected{% endif %}">
-                    <input type="radio" name="address_id" value="new" class="checkout__radio" id="id_use_new" {% if selected_id == 'new' %}checked{% endif %}>
-                    <div class="checkout__address-body"><strong>+ Usar novo endereço</strong></div>
-                </label>
-            </div>
-
-            <div class="checkout__new" id="newAddressBox" {% if selected_id != 'new' %}hidden{% endif %}>
-                {% include "orders/_address_fields.html" %}
-            </div>
-            {% else %}
-            <p class="checkout__hint">Cadastre o endereço de entrega:</p>
-            <div class="checkout__new">
-                {% include "orders/_address_fields.html" %}
-            </div>
-            {% endif %}
-
-            <button class="checkout__submit" type="submit">Enviar pedido pelo WhatsApp</button>
+                    {% empty %}
+                    <p class="checkout__hint">Seu carrinho está vazio.</p>
+                    {% endfor %}
+                </div>
+                <div class="checkout__totals">
+                    <div class="checkout__total-row"><span>Subtotal</span><span id="summarySubtotal">R$ {{ subtotal|floatformat:2 }}</span></div>
+                    <div class="checkout__total-row"><span>Frete</span><span id="summaryFrete">—</span></div>
+                    <div class="checkout__total-row checkout__total-row--total"><span>Total</span><span id="summaryTotal">—</span></div>
+                </div>
+                <input type="hidden" name="shipping_service" id="shippingServiceInput">
+                <button class="checkout__submit" type="submit" id="checkoutSubmit" disabled>Enviar Pedido pelo WhatsApp</button>
+            </section>
         </form>
     </div>
 </section>
