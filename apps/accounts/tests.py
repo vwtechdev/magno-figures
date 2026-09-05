@@ -46,3 +46,31 @@ class PasswordResetEmailTest(TestCase):
 
         time.sleep(0.1)
         self.assertEqual(len(mail.outbox), 0)
+
+
+class ProfileCpfTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="cpf@example.com",
+            password="senha-forte-123",
+            name="CPF Teste",
+        )
+        self.client.force_login(self.user)
+
+    def test_profile_cpf_saves_valid_cpf(self):
+        response = self.client.post(
+            reverse("accounts:profile_cpf"), {"cpf": "123.456.789-09"}
+        )
+
+        self.assertRedirects(response, reverse("accounts:profile"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.cpf, "12345678909")
+
+    def test_profile_cpf_rejects_invalid(self):
+        response = self.client.post(
+            reverse("accounts:profile_cpf"), {"cpf": "123"}
+        )
+
+        self.assertRedirects(response, reverse("accounts:profile"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.cpf, "")

@@ -4,7 +4,7 @@ from io import BytesIO
 from PIL import Image
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -21,6 +21,7 @@ def make_image(name="figure.png"):
     return SimpleUploadedFile(name, buffer.getvalue(), content_type="image/png")
 
 
+@override_settings(SUPERFRETE_TOKEN="", DEBUG=True)
 class CheckoutFlowTest(TestCase):
     def setUp(self):
         cache.clear()
@@ -65,7 +66,12 @@ class CheckoutFlowTest(TestCase):
         self._add_to_cart(quantity=2)
 
         response = self.client.post(
-            reverse("orders:checkout"), {"address_id": self.address.pk}
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+                "cpf": "12345678909",
+            },
         )
 
         self.assertEqual(response.status_code, 302)
@@ -77,6 +83,10 @@ class CheckoutFlowTest(TestCase):
         order = Order.objects.get(user=self.user)
         self.assertEqual(order.status, OrderStatus.NEW)
         self.assertEqual(order.address, self.address)
+        self.assertEqual(order.shipping_service, "PAC")
+        self.assertEqual(order.shipping_price, Decimal("59.80"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.cpf, "12345678909")
         self.assertEqual(order.items.count(), 1)
         item = order.items.get()
         self.assertEqual(item.figure, self.figure)
@@ -84,12 +94,70 @@ class CheckoutFlowTest(TestCase):
         self.assertEqual(item.quantity, 2)
         self.assertEqual(order.total, Decimal("199.80"))
         self.assertFalse(self.user.cart.items.exists())
+        message = order.generate_whatsapp_message()
+        self.assertIn("*CPF:* 12345678909", message)
+        self.assertIn("*Frete:* R$ 59.80 (PAC)", message)
+        self.assertIn("*Total:* R$ 259.60", message)
+
+    def test_checkout_uses_existing_cpf_without_asking(self):
+        self.user.cpf = "11122233344"
+        self.user.save(update_fields=["cpf"])
+        self._add_to_cart(quantity=1)
+
+        response = self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "SEDEX",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.shipping_service, "SEDEX")
+        self.assertEqual(self.user.cpf, "11122233344")
+
+    def test_checkout_requires_cpf(self):
+        self._add_to_cart(quantity=1)
+
+        response = self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Order.objects.exists())
+
+    def test_checkout_shipping_endpoint_aggregates_cart(self):
+        self._add_to_cart(quantity=2)
+
+        response = self.client.get(
+            reverse("orders:checkout_shipping"), {"zipcode": "01310-100"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(
+            data["options"],
+            [
+                {"name": "PAC", "price": 59.80, "delivery_time": 7},
+                {"name": "SEDEX", "price": 99.80, "delivery_time": 3},
+            ],
+        )
 
     def test_checkout_freezes_figure_price(self):
         self._add_to_cart(quantity=1)
 
         self.client.post(
-            reverse("orders:checkout"), {"address_id": self.address.pk}
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+                "cpf": "12345678909",
+            },
         )
 
         self.figure.price = Decimal("150.00")
