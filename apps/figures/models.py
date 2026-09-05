@@ -28,6 +28,9 @@ class Figure(BaseModel):
     stock = models.PositiveIntegerField(
         default=0, verbose_name="Estoque"
     )
+    sold_out = models.BooleanField(
+        default=False, verbose_name="Esgotado"
+    )
     weight_kg = models.DecimalField(
         max_digits=5,
         decimal_places=3,
@@ -76,6 +79,14 @@ class Figure(BaseModel):
     @property
     def in_stock(self):
         return self.stock > 0
+
+    @property
+    def stock_status(self):
+        if self.sold_out:
+            return "sold"
+        if self.in_stock:
+            return "in"
+        return "preorder"
 
     @property
     def first_image(self):

@@ -26,7 +26,7 @@ class FigureImageInline(admin.TabularInline):
 @admin.register(Figure)
 class FigureAdmin(admin.ModelAdmin):
     form = FigureAdminForm
-    list_display = ("name", "price", "stock", "in_stock", "is_active", "created_at")
+    list_display = ("name", "price", "stock", "sold_out", "in_stock", "is_active", "created_at")
     list_filter = ("is_active", "categories", "created_at")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
@@ -37,7 +37,7 @@ class FigureAdmin(admin.ModelAdmin):
         (None, {"fields": ("name", "slug", "description", "image", "batch_upload", "price", "stock")}),
         ("Envio", {"fields": ("weight_kg", "height_cm", "width_cm", "length_cm")}),
         ("Categorias", {"fields": ("categories",)}),
-        ("Status", {"fields": ("is_active",)}),
+        ("Status", {"fields": ("is_active", "sold_out")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
 
