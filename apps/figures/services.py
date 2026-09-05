@@ -77,3 +77,31 @@ def calculate_shipping(figure, destination_zip, origin_zip):
 
     options.sort(key=lambda o: o["price"])
     return options, None
+
+
+def cart_shipping_options(items, destination_zip, origin_zip):
+    """Agrega o frete do carrinho por serviço (cada item em sua própria caixa).
+
+    items: lista de dicts {"figure": Figure, "quantity": int}.
+    Retorna (options, error); options = [{name, price, delivery_time}], com
+    preço total por serviço e prazo máximo entre os itens.
+    """
+    totals = {}
+    prazos = {}
+    for item in items:
+        options, error = calculate_shipping(
+            item["figure"], destination_zip, origin_zip
+        )
+        if error:
+            return [], error
+        for option in options:
+            name = option["name"]
+            totals[name] = totals.get(name, 0.0) + option["price"] * item["quantity"]
+            prazos[name] = max(
+                prazos.get(name, 0), option.get("delivery_time") or 0
+            )
+    options = [
+        {"name": name, "price": round(price, 2), "delivery_time": prazos[name]}
+        for name, price in sorted(totals.items(), key=lambda kv: kv[1])
+    ]
+    return options, None
