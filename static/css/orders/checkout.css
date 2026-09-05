@@ -348,3 +348,41 @@
     transform: none;
     box-shadow: none;
 }
+
+.checkout__stepper {
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gold-2);
+    letter-spacing: 0.03em;
+}
+
+.checkout__step-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.checkout__continue {
+    padding: 12px 26px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.checkout__continue:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+}
+
+.checkout__continue:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

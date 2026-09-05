@@ -12,6 +12,8 @@
         <div class="checkout__error">{{ error }}</div>
         {% endif %}
 
+        <div class="checkout__stepper"><span id="stepLabel">Etapa 1 de 4 — Endereço</span></div>
+
         <form class="checkout__form" method="post" action="{% url 'orders:checkout' %}"
             data-has-cpf="{% if has_cpf %}1{% else %}0{% endif %}" data-subtotal="{{ subtotal }}">
             {% csrf_token %}
@@ -49,12 +51,19 @@
                     {% include "orders/_address_fields.html" %}
                 </div>
                 {% endif %}
+
+                <div class="checkout__step-actions">
+                    <button type="button" class="checkout__continue" id="continueAddress" disabled>Continuar</button>
+                </div>
             </section>
 
             <section class="checkout__step" data-step="shipping" hidden>
                 <h2 class="checkout__subtitle">2. Frete</h2>
-                <p class="checkout__hint" id="shippingStatus">Escolha o endereço para calcular o frete.</p>
+                <p class="checkout__hint" id="shippingStatus">Calculando o frete...</p>
                 <div class="checkout__shipping" id="shippingOptions"></div>
+                <div class="checkout__step-actions">
+                    <button type="button" class="checkout__continue" id="continueShipping" disabled>Continuar</button>
+                </div>
             </section>
 
             <section class="checkout__step" data-step="cpf" hidden>
@@ -68,6 +77,9 @@
                     <span class="checkout__status" id="cpfStatus"></span>
                 </label>
                 {% endif %}
+                <div class="checkout__step-actions">
+                    <button type="button" class="checkout__continue" id="continueCpf" disabled>Continuar</button>
+                </div>
             </section>
 
             <section class="checkout__step" data-step="summary" hidden>

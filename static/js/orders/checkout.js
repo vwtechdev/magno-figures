@@ -18,9 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('input[name="address_id"]')
     );
 
-    const shippingStep = document.querySelector('[data-step="shipping"]');
-    const cpfStep = document.querySelector('[data-step="cpf"]');
-    const summaryStep = document.querySelector('[data-step="summary"]');
+    const steps = {
+        address: document.querySelector('[data-step="address"]'),
+        shipping: document.querySelector('[data-step="shipping"]'),
+        cpf: document.querySelector('[data-step="cpf"]'),
+        summary: document.querySelector('[data-step="summary"]'),
+    };
+    const stepLabel = document.getElementById("stepLabel");
+    const continueAddress = document.getElementById("continueAddress");
+    const continueShipping = document.getElementById("continueShipping");
+    const continueCpf = document.getElementById("continueCpf");
     const shippingStatus = document.getElementById("shippingStatus");
     const shippingOptions = document.getElementById("shippingOptions");
     const cpfInput = document.getElementById("id_checkout_cpf");
@@ -30,20 +37,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const serviceInput = document.getElementById("shippingServiceInput");
     const submitBtn = document.getElementById("checkoutSubmit");
 
+    const STEP_ORDER = ["address", "shipping", "cpf", "summary"];
+    const STEP_LABELS = {
+        address: "Endereço",
+        shipping: "Frete",
+        cpf: "CPF",
+        summary: "Resumo",
+    };
+
     const fmt = (value) => `R$ ${value.toFixed(2).replace(".", ",")}`;
 
     let selectedOption = null;
     let cpfOk = hasCpf;
     let loadingShipping = false;
 
-    const updateSubmit = () => {
-        submitBtn.disabled = !(selectedOption && cpfOk);
-    };
-
-    const refreshSummary = () => {
-        if (!selectedOption) return;
-        summaryFrete.textContent = `${fmt(selectedOption.price)} (${selectedOption.name})`;
-        summaryTotal.textContent = fmt(subtotal + selectedOption.price);
+    const showStep = (name) => {
+        Object.entries(steps).forEach(([key, el]) => {
+            if (el) el.hidden = key !== name;
+        });
+        const index = STEP_ORDER.indexOf(name) + 1;
+        if (stepLabel) {
+            stepLabel.textContent = `Etapa ${index} de ${STEP_ORDER.length} — ${STEP_LABELS[name]}`;
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const syncNewForm = () => {
@@ -81,6 +97,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    const addressReady = () => Boolean(addressCep()) && newFormReady();
+
+    const updateContinueState = () => {
+        continueAddress.disabled = !addressReady();
+        continueShipping.disabled = !selectedOption;
+        continueCpf.disabled = !cpfOk;
+    };
+
     const renderOptions = (options) => {
         shippingOptions.innerHTML = "";
         options.forEach((option) => {
@@ -96,24 +120,19 @@ document.addEventListener("DOMContentLoaded", () => {
             label.querySelector("input").addEventListener("change", () => {
                 selectedOption = option;
                 serviceInput.value = option.name;
-                refreshSummary();
-                summaryStep.hidden = false;
-                updateSubmit();
-                summaryStep.scrollIntoView({ behavior: "smooth", block: "center" });
+                updateContinueState();
             });
             shippingOptions.appendChild(label);
         });
-        cpfStep.hidden = false;
     };
 
     const loadShipping = async (cep) => {
         loadingShipping = true;
-        shippingStep.hidden = false;
         shippingStatus.textContent = "Calculando frete...";
         shippingOptions.innerHTML = "";
         selectedOption = null;
         serviceInput.value = "";
-        updateSubmit();
+        continueShipping.disabled = true;
         try {
             const response = await fetch(`/orders/checkout/shipping/?zipcode=${cep}`);
             const data = await response.json();
@@ -125,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 shippingStatus.textContent = "Nenhuma opção de frete disponível para este CEP.";
                 return;
             }
-            shippingStatus.textContent = "";
+            shippingStatus.textContent = "Escolha uma opção de frete:";
             renderOptions(data.options);
         } catch {
             shippingStatus.textContent = "Erro ao calcular o frete. Tente novamente.";
@@ -134,11 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    const maybeLoadShipping = () => {
-        if (loadingShipping) return;
-        const cep = addressCep();
-        if (!cep || !newFormReady()) return;
-        loadShipping(cep);
+    const refreshSummary = () => {
+        if (!selectedOption) return;
+        summaryFrete.textContent = `${fmt(selectedOption.price)} (${selectedOption.name})`;
+        summaryTotal.textContent = fmt(subtotal + selectedOption.price);
+        submitBtn.disabled = !(selectedOption && cpfOk);
     };
 
     const validateCpf = () => {
@@ -148,8 +167,25 @@ document.addEventListener("DOMContentLoaded", () => {
             cpfStatus.textContent = cpfOk ? "" : "Informe os 11 dígitos do CPF.";
             cpfStatus.classList.toggle("is-error", !cpfOk);
         }
-        updateSubmit();
+        updateContinueState();
     };
+
+    continueAddress.addEventListener("click", () => {
+        if (!addressReady()) return;
+        showStep("shipping");
+        loadShipping(addressCep());
+    });
+
+    continueShipping.addEventListener("click", () => {
+        if (!selectedOption) return;
+        showStep("cpf");
+    });
+
+    continueCpf.addEventListener("click", () => {
+        if (!cpfOk) return;
+        refreshSummary();
+        showStep("summary");
+    });
 
     if (cpfInput) {
         cpfInput.addEventListener("input", validateCpf);
@@ -158,17 +194,17 @@ document.addEventListener("DOMContentLoaded", () => {
     radios.forEach((radio) => {
         radio.addEventListener("change", () => {
             syncNewForm();
-            cpfStep.hidden = false;
-            maybeLoadShipping();
+            updateContinueState();
         });
     });
 
     if (newBox) {
         newBox.querySelectorAll("input, select").forEach((el) => {
-            el.addEventListener("input", maybeLoadShipping);
+            el.addEventListener("input", updateContinueState);
         });
     }
 
     syncNewForm();
-    maybeLoadShipping();
+    showStep("address");
+    updateContinueState();
 });
