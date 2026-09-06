@@ -102,9 +102,7 @@
         </div>
 
         <div class="product__cta-row">
-            {% if figure.sold_out %}
-            <p class="product__soldout">Esgotado — este item não pode ser comprado.</p>
-            {% else %}
+            {% if not figure.sold_out %}
             <a href="{% url 'carts:add' figure.id %}?buy=1" class="product__cta product__cta--buy">Comprar</a>
             <a href="{% url 'carts:add' figure.id %}" class="product__cta product__cta--ghost">Adicionar ao carrinho</a>
             {% endif %}
