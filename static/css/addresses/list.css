@@ -62,7 +62,7 @@
     display: inline-block;
     margin-top: 6px;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: 8px;
     background: rgba(234, 201, 121, 0.15);
     color: var(--gold-2);
     font-size: 0.75rem;
