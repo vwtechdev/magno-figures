@@ -20,14 +20,23 @@
                 {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
                 <fieldset class="filters__group">
                     <legend class="filters__title">Categorias</legend>
-                    {% for category in filter_categories %}
-                    <label class="filters__check filters__check--level-{{ category.level }}">
-                        <input type="checkbox" name="cat" value="{{ category.slug }}"{% if category.slug in selected_cats %} checked{% endif %}>
-                        <span>{{ category.name }}</span>
-                    </label>
-                    {% empty %}
-                    <p class="filters__empty">Nenhuma categoria.</p>
-                    {% endfor %}
+                    <details class="filters__dropdown" id="categoryDropdown">
+                        <summary class="filters__dropdown-toggle">
+                            <span>Selecionar categorias</span>
+                            <span class="filters__dropdown-count" id="categoryCount"{% if not selected_cats %} hidden{% endif %}>{{ selected_cats|length }}</span>
+                            <svg class="filters__dropdown-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                        </summary>
+                        <div class="filters__dropdown-panel">
+                            {% for category in filter_categories %}
+                            <label class="filters__check filters__check--level-{{ category.level }}">
+                                <input type="checkbox" name="cat" value="{{ category.slug }}"{% if category.slug in selected_cats %} checked{% endif %}>
+                                <span>{{ category.name }}</span>
+                            </label>
+                            {% empty %}
+                            <p class="filters__empty">Nenhuma categoria.</p>
+                            {% endfor %}
+                        </div>
+                    </details>
                 </fieldset>
                 <fieldset class="filters__group">
                     <legend class="filters__title">Preço (R$)</legend>

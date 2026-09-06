@@ -64,11 +64,23 @@
         load(buildUrl(), false);
     });
 
+    function updateCategoryCount() {
+        var count = document.getElementById("categoryCount");
+        if (!count) {
+            return;
+        }
+        var total = form.querySelectorAll('input[name="cat"]:checked').length;
+        count.textContent = total;
+        count.hidden = total === 0;
+    }
+
     form.querySelectorAll('input[name="cat"]').forEach(function (box) {
         box.addEventListener("change", function () {
+            updateCategoryCount();
             load(buildUrl(), false);
         });
     });
+    updateCategoryCount();
 
     var debounceTimer = null;
     ["min_price", "max_price"].forEach(function (name) {
