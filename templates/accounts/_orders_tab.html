@@ -21,6 +21,7 @@
         <div class="order__middle">
             <span class="order__items">{{ order.item_count }} {{ order.item_count|pluralize:"item,itens" }}</span>
             <span class="order__total">R$ {{ order.total|floatformat:2 }}</span>
+            {% if order.tracking_code %}<span class="order__tracking">Rastreio: {{ order.tracking_code }}</span>{% endif %}
         </div>
         <span class="order__status order__status--{{ order.user_status }}">{{ order.user_status_display }}</span>
     </a>

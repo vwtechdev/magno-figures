@@ -14,9 +14,9 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("pk", "user", "status", "total", "created_at")
+    list_display = ("pk", "user", "status", "tracking_code", "total", "created_at")
     list_filter = ("status", "created_at")
-    search_fields = ("user__email", "user__name", "pk")
+    search_fields = ("user__email", "user__name", "pk", "tracking_code")
     readonly_fields = (
         "created_at",
         "updated_at",
@@ -28,7 +28,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
     inlines = [OrderItemInline]
     fieldsets = (
-        (None, {"fields": ("user", "address", "whatsapp_link", "status")}),
+        (None, {"fields": ("user", "address", "whatsapp_link", "status", "tracking_code")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
 

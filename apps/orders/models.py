@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 
@@ -54,8 +55,17 @@ class Order(BaseModel):
         blank=True,
         verbose_name="Valor do Frete",
     )
+    tracking_code = models.CharField(
+        max_length=60, blank=True, verbose_name="Código de Rastreio"
+    )
 
     objects = OrderManager()
+
+    TRACKING_PORTALS = {
+        "correios": "https://rastreamento.correios.com.br/",
+        "jadlog": "https://www.jadlog.com.br/jadlog/rastreie",
+        "loggi": "https://www.loggi.com/rastreador/",
+    }
 
     class Meta:
         verbose_name = "Pedido"
@@ -64,6 +74,31 @@ class Order(BaseModel):
 
     def __str__(self):
         return f"Pedido #{self.pk}"
+
+    def clean(self):
+        super().clean()
+        if self.status == OrderStatus.SENT and not self.tracking_code.strip():
+            raise ValidationError(
+                {
+                    "tracking_code": (
+                        "Informe o código de rastreio para marcar "
+                        "o pedido como enviado."
+                    )
+                }
+            )
+
+    @property
+    def tracking_url(self):
+        if not self.tracking_code.strip():
+            return None
+        service = (self.shipping_service or "").lower()
+        if "jadlog" in service:
+            return self.TRACKING_PORTALS["jadlog"]
+        if "loggi" in service:
+            return self.TRACKING_PORTALS["loggi"]
+        if any(key in service for key in ("pac", "sedex", "mini", "correios")):
+            return self.TRACKING_PORTALS["correios"]
+        return None
 
     @property
     def total(self):

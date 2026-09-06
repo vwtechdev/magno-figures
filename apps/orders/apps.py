@@ -4,3 +4,6 @@ from django.apps import AppConfig
 class OrdersConfig(AppConfig):
     name = 'apps.orders'
     verbose_name = 'Pedidos'
+
+    def ready(self):
+        from apps.orders import signals  # noqa: F401

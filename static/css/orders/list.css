@@ -100,6 +100,11 @@
     color: var(--gold-2);
 }
 
+.order__tracking {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
 .order__status {
     padding: 6px 14px;
     border-radius: 999px;

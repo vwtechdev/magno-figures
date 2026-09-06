@@ -1,9 +1,12 @@
 from decimal import Decimal
 from io import BytesIO
+import time
 from unittest import mock
 
 from PIL import Image
+from django.core import mail
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -399,3 +402,128 @@ class CheckoutCpfStepTest(TestCase):
         self.assertNotContains(response, 'data-step="cpf"')
         self.assertContains(response, "Etapa 1 de 3")
         self.assertContains(response, "3. Resumo do pedido")
+
+
+class OrderTrackingTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        mail.outbox.clear()
+        self.user = User.objects.create_user(
+            email="rastreio@example.com",
+            password="senha-forte-123",
+            name="Cliente Rastreio",
+            phone="(11) 99999-0000",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="(11) 99999-9999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.client.force_login(self.user)
+
+    def _make_order(self, **kwargs):
+        defaults = {"user": self.user, "address": self.address}
+        defaults.update(kwargs)
+        return Order.objects.create(**defaults)
+
+    def _wait_for_email(self, timeout=2.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if mail.outbox:
+                return True
+            time.sleep(0.01)
+        return False
+
+    def test_sent_without_code_rejected(self):
+        order = self._make_order(status=OrderStatus.SENT)
+        with self.assertRaises(ValidationError):
+            order.full_clean()
+
+    def test_sent_with_code_accepted(self):
+        order = self._make_order(
+            status=OrderStatus.SENT, tracking_code="BR123456789BR"
+        )
+        order.full_clean()
+
+    def test_new_without_code_accepted(self):
+        order = self._make_order(status=OrderStatus.NEW)
+        order.full_clean()
+
+    def test_transition_to_sent_sends_email(self):
+        order = self._make_order(
+            shipping_service="PAC", tracking_code="BR123456789BR"
+        )
+        order.status = OrderStatus.SENT
+        order.save()
+        self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["rastreio@example.com"])
+        self.assertIn("BR123456789BR", message.body)
+        self.assertIn("https://rastreamento.correios.com.br/", message.body)
+
+    def test_edit_without_status_change_sends_nothing(self):
+        order = self._make_order(
+            status=OrderStatus.SENT, tracking_code="BR123456789BR"
+        )
+        mail.outbox.clear()
+        order.tracking_code = "BR987654321BR"
+        order.save()
+        time.sleep(0.3)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_tracking_url_by_carrier(self):
+        order = self._make_order(tracking_code="ABC123")
+        order.shipping_service = "SEDEX"
+        self.assertEqual(
+            order.tracking_url, "https://rastreamento.correios.com.br/"
+        )
+        order.shipping_service = "Mini Envios"
+        self.assertEqual(
+            order.tracking_url, "https://rastreamento.correios.com.br/"
+        )
+        order.shipping_service = "Jadlog Package"
+        self.assertEqual(
+            order.tracking_url, "https://www.jadlog.com.br/jadlog/rastreie"
+        )
+        order.shipping_service = "Loggi"
+        self.assertEqual(
+            order.tracking_url, "https://www.loggi.com/rastreador/"
+        )
+        order.shipping_service = "A combinar"
+        self.assertIsNone(order.tracking_url)
+        order.shipping_service = ""
+        self.assertIsNone(order.tracking_url)
+        order.tracking_code = ""
+        order.shipping_service = "PAC"
+        self.assertIsNone(order.tracking_url)
+
+    def test_detail_shows_tracking_block(self):
+        order = self._make_order(
+            status=OrderStatus.SENT,
+            shipping_service="PAC",
+            tracking_code="BR123456789BR",
+        )
+        response = self.client.get(reverse("orders:detail", args=[order.pk]))
+        self.assertContains(response, "BR123456789BR")
+        self.assertContains(response, "Rastrear pedido")
+        self.assertContains(
+            response, "https://rastreamento.correios.com.br/"
+        )
+
+    def test_detail_hides_tracking_without_code(self):
+        order = self._make_order(status=OrderStatus.PAID)
+        response = self.client.get(reverse("orders:detail", args=[order.pk]))
+        self.assertNotContains(response, "Rastrear pedido")

@@ -49,6 +49,16 @@
         </div>
     </div>
 
+    {% if order.tracking_code %}
+    <div class="order-page__card">
+        <h2 class="order-page__subtitle">Envio</h2>
+        <p class="order-page__tracking">Código de rastreio: <strong>{{ order.tracking_code }}</strong></p>
+        {% if order.tracking_url %}
+        <a href="{{ order.tracking_url }}" target="_blank" rel="noopener" class="order-page__tracking-btn">Rastrear pedido</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <div class="order-page__card">
         <h2 class="order-page__subtitle">Endereço de entrega</h2>
         <div class="order-page__address">{{ order.address.full_address|linebreaks }}</div>
