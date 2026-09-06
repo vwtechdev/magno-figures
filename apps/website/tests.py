@@ -237,8 +237,10 @@ class HomeSectionsTest(TestCase):
     def test_new_releases_ordered_by_recent(self):
         response = self.client.get(reverse("website:home"))
         releases = list(response.context["new_releases"])
-        self.assertEqual(releases[0], self.sold_promo)
+        self.assertEqual(releases[0], self.new)
         self.assertIn(self.old, releases)
+        self.assertNotIn(self.promo, releases)
+        self.assertNotIn(self.sold_promo, releases)
         self.assertContains(response, "Novos")
         self.assertContains(response, "Lançamentos")
 

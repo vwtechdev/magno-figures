@@ -1,5 +1,6 @@
 from decimal import Decimal
 from io import BytesIO
+from unittest import mock
 
 from PIL import Image
 from django.core.cache import cache
@@ -266,3 +267,83 @@ class CheckoutDiscountTest(TestCase):
         item = order.items.get()
         self.assertEqual(item.price, Decimal("90.00"))
         self.assertEqual(order.total, Decimal("180.00"))
+
+
+@override_settings(SUPERFRETE_TOKEN="", DEBUG=True)
+class CheckoutShippingFailureTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = User.objects.create_user(
+            email="semfrete@example.com",
+            password="senha-forte-123",
+            name="Cliente Sem Frete",
+            phone="(11) 99999-0000",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        self.figure = Figure.objects.create(
+            name="Figure Sem Frete",
+            slug="figure-sem-frete",
+            description="Teste de falha de frete.",
+            price=Decimal("100.00"),
+            stock=5,
+            image=make_image(),
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="(11) 99999-9999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.client.force_login(self.user)
+        self.user.cart.items.create(figure=self.figure, quantity=1)
+
+    def _post(self, service):
+        return self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": service,
+                "cpf": "12345678909",
+            },
+        )
+
+    def test_combine_allowed_when_api_fails(self):
+        with mock.patch(
+            "apps.orders.views.cart_shipping_options",
+            return_value=([], "Não foi possível consultar o frete agora."),
+        ):
+            response = self._post("combine")
+        self.assertEqual(response.status_code, 302)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.shipping_service, "A combinar")
+        self.assertIsNone(order.shipping_price)
+        message = order.generate_whatsapp_message()
+        self.assertNotIn("*Frete:*", message)
+        self.assertIn("*Total:* R$ 100.00", message)
+        detail = self.client.get(reverse("orders:detail", args=[order.pk]))
+        self.assertContains(detail, "A combinar")
+
+    def test_other_value_blocked_when_api_fails(self):
+        with mock.patch(
+            "apps.orders.views.cart_shipping_options",
+            return_value=([], "Não foi possível consultar o frete agora."),
+        ):
+            response = self._post("PAC")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Order.objects.filter(user=self.user).exists())
+
+    def test_combine_rejected_when_api_works(self):
+        response = self._post("combine")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Order.objects.filter(user=self.user).exists())

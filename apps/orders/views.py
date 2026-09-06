@@ -21,6 +21,9 @@ from core.mail import send_mail_async
 from core.utils import site_base_url
 from core.validators import is_valid_cpf
 
+SHIPPING_COMBINE = "combine"
+SHIPPING_COMBINE_LABEL = "A combinar"
+
 
 def _cart_has_nsfw(request):
     return any(
@@ -185,18 +188,22 @@ def checkout_view(request):
         origin = Website.objects.get_config().origin_zip_code or ""
         options, error = cart_shipping_options(items, address.zip_code, origin)
         if error:
-            context = _checkout_context(request, addresses, address_form, "new")
-            context["error"] = error
-            return render(request, "orders/checkout.html", context)
-        shipping_option = next(
-            (option for option in options if option["name"] == shipping_service),
-            None,
-        )
-        if not shipping_option:
-            context = _checkout_context(request, addresses, address_form, "new")
-            context["error"] = "Selecione uma opção de frete válida."
-            return render(request, "orders/checkout.html", context)
-        shipping_price = Decimal(str(shipping_option["price"]))
+            if shipping_service != SHIPPING_COMBINE:
+                context = _checkout_context(request, addresses, address_form, "new")
+                context["error"] = error
+                return render(request, "orders/checkout.html", context)
+            shipping_service = SHIPPING_COMBINE_LABEL
+            shipping_price = None
+        else:
+            shipping_option = next(
+                (option for option in options if option["name"] == shipping_service),
+                None,
+            )
+            if not shipping_option:
+                context = _checkout_context(request, addresses, address_form, "new")
+                context["error"] = "Selecione uma opção de frete válida."
+                return render(request, "orders/checkout.html", context)
+            shipping_price = Decimal(str(shipping_option["price"]))
 
         with transaction.atomic():
             order = Order.objects.create(

@@ -126,7 +126,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const loadShipping = async (cep) => {
+    const renderShippingFallback = (cep, message) => {
+        shippingStatus.textContent = message;
+        shippingOptions.innerHTML = "";
+
+        const retryBtn = document.createElement("button");
+        retryBtn.type = "button";
+        retryBtn.className = "checkout__continue";
+        retryBtn.textContent = "Tentar novamente";
+        retryBtn.addEventListener("click", () => loadShipping(cep, 1));
+        shippingOptions.appendChild(retryBtn);
+
+        const label = document.createElement("label");
+        label.className = "checkout__ship";
+        label.innerHTML = `
+            <input type="radio" name="shipping_choice" value="combine" class="checkout__radio">
+            <div class="checkout__ship-body">
+                <span class="checkout__ship-name">Frete a combinar</span>
+                <span class="checkout__ship-meta">Acertamos o valor no WhatsApp</span>
+            </div>
+            <span class="checkout__ship-price">A combinar</span>`;
+        label.querySelector("input").addEventListener("change", () => {
+            selectedOption = {name: "combine", price: 0};
+            serviceInput.value = "combine";
+            updateContinueState();
+        });
+        shippingOptions.appendChild(label);
+    };
+
+    const loadShipping = async (cep, attempt = 0) => {
         loadingShipping = true;
         shippingStatus.textContent = "Calculando frete...";
         shippingOptions.innerHTML = "";
@@ -137,17 +165,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(`/orders/checkout/shipping/?zipcode=${cep}`);
             const data = await response.json();
             if (!response.ok || data.error) {
-                shippingStatus.textContent = data.error || "Não foi possível calcular o frete.";
+                if (attempt < 1) {
+                    shippingStatus.textContent = "Falha no cálculo. Tentando novamente...";
+                    setTimeout(() => loadShipping(cep, attempt + 1), 2000);
+                    return;
+                }
+                renderShippingFallback(cep, data.error || "Não foi possível calcular o frete.");
                 return;
             }
             if (!data.options || data.options.length === 0) {
-                shippingStatus.textContent = "Nenhuma opção de frete disponível para este CEP.";
+                renderShippingFallback(cep, "Nenhuma opção de frete disponível para este CEP.");
                 return;
             }
             shippingStatus.textContent = "Escolha uma opção de frete:";
             renderOptions(data.options);
         } catch {
-            shippingStatus.textContent = "Erro ao calcular o frete. Tente novamente.";
+            if (attempt < 1) {
+                shippingStatus.textContent = "Falha no cálculo. Tentando novamente...";
+                setTimeout(() => loadShipping(cep, attempt + 1), 2000);
+                return;
+            }
+            renderShippingFallback(cep, "Erro ao calcular o frete. Tente novamente.");
         } finally {
             loadingShipping = false;
         }
@@ -155,8 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const refreshSummary = () => {
         if (!selectedOption) return;
-        summaryFrete.textContent = `${fmt(selectedOption.price)} (${selectedOption.name})`;
-        summaryTotal.textContent = fmt(subtotal + selectedOption.price);
+        if (selectedOption.name === "combine") {
+            summaryFrete.textContent = "A combinar";
+            summaryTotal.textContent = fmt(subtotal);
+        } else {
+            summaryFrete.textContent = `${fmt(selectedOption.price)} (${selectedOption.name})`;
+            summaryTotal.textContent = fmt(subtotal + selectedOption.price);
+        }
         submitBtn.disabled = !(selectedOption && cpfOk);
     };
 
