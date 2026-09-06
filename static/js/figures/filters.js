@@ -13,8 +13,8 @@
         if (q && q.value.trim()) {
             params.set("q", q.value.trim());
         }
-        form.querySelectorAll('input[name="cat"]:checked').forEach(function (box) {
-            params.append("cat", box.value);
+        form.querySelectorAll('input[type="checkbox"]:checked').forEach(function (box) {
+            params.append(box.name, box.value);
         });
         ["min_price", "max_price"].forEach(function (name) {
             var input = form.querySelector('input[name="' + name + '"]');
@@ -64,7 +64,7 @@
         load(buildUrl(), false);
     });
 
-    form.querySelectorAll('input[name="cat"]').forEach(function (box) {
+    form.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
         box.addEventListener("change", function () {
             load(buildUrl(), false);
         });

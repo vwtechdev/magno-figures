@@ -52,6 +52,13 @@
                     {% endif %}
                 </fieldset>
                 <fieldset class="filters__group">
+                    <legend class="filters__title">Ofertas</legend>
+                    <label class="filters__check">
+                        <input type="checkbox" name="promo" value="1"{% if promo_only %} checked{% endif %}>
+                        <span>Promoções</span>
+                    </label>
+                </fieldset>
+                <fieldset class="filters__group">
                     <legend class="filters__title">Preço (R$)</legend>
                     <div class="filters__price-row">
                         <label class="filters__price">

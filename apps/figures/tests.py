@@ -514,6 +514,19 @@ class DiscountTest(TestCase):
         self.assertNotContains(response, "Sold Promo")
         self.assertContains(response, "Promoções")
 
+    def test_sidebar_promo_checkbox_checked_state(self):
+        response = self.client.get(reverse("figures:list"))
+        self.assertContains(response, 'name="promo" value="1"')
+        self.assertNotContains(response, 'name="promo" value="1" checked')
+        response = self.client.get(reverse("figures:list"), {"promo": "1"})
+        self.assertContains(response, 'name="promo" value="1" checked')
+
+    def test_promo_combines_with_category(self):
+        response = self.client.get(
+            reverse("figures:list"), {"promo": "1", "cat": "nope"}
+        )
+        self.assertContains(response, "Promo Figure")
+
     def test_detail_shows_old_and_sale_price(self):
         response = self.client.get(
             reverse("figures:detail", args=[self.promo.slug])
