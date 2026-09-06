@@ -382,7 +382,7 @@ ul {
 
 .footer__grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
     gap: 40px;
     padding-bottom: 32px;
 }
@@ -457,6 +457,51 @@ ul {
 
 .footer__whatsapp:hover {
     opacity: 0.8;
+}
+
+.footer__newsletter {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.footer__newsletter-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.footer__newsletter-input:focus {
+    outline: none;
+    border-color: var(--gold-2);
+}
+
+.footer__newsletter-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.footer__newsletter-btn:hover {
+    opacity: 0.9;
+}
+
+.footer__newsletter-msg {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--gold-2);
+    min-height: 1.2em;
 }
 
 .footer__bottom {

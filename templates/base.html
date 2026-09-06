@@ -202,6 +202,16 @@
                     {% endif %}
                     <a href="{{ website_config.whatsapp_link }}" target="_blank" rel="noopener" class="footer__whatsapp">Fale conosco no WhatsApp</a>
                 </div>
+                <div class="footer__col">
+                    <h3 class="footer__title">Novidades</h3>
+                    <p class="footer__text">Receba novidades e promoções por email.</p>
+                    <form class="footer__newsletter" id="newsletterForm" method="post" action="{% url 'newsletters:subscribe' %}">
+                        {% csrf_token %}
+                        <input class="footer__newsletter-input" type="email" name="email" placeholder="Seu email" required autocomplete="email" aria-label="Email para newsletter">
+                        <button class="footer__newsletter-btn" type="submit">Assinar</button>
+                    </form>
+                    <p class="footer__newsletter-msg" id="newsletterMsg" aria-live="polite"></p>
+                </div>
             </div>
             <div class="footer__bottom">
                 <p>&copy; {% now "Y" %} {{ website_config.company_name }}. Todos os direitos reservados.</p>
@@ -223,6 +233,7 @@
     </div>
 
     <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/website/newsletter.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

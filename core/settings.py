@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "apps.website",
     "apps.carts",
     "apps.orders",
+    "apps.newsletters",
 ]
 
 MIDDLEWARE = [
@@ -165,6 +166,7 @@ JAZZMIN_SETTINGS = {
         "apps.carts",
         "apps.addresses",
         "apps.website",
+        "apps.newsletters",
     ],
     "icons": {
         "accounts.User": "fas fa-users",
@@ -177,6 +179,9 @@ JAZZMIN_SETTINGS = {
         "carts.CartItem": "fas fa-cart-plus",
         "addresses.Address": "fas fa-map-marker-alt",
         "website.Website": "fas fa-cog",
+        "newsletters.NewsletterSubscriber": "fas fa-envelope",
+        "newsletters.NewsletterCampaign": "fas fa-paper-plane",
+        "newsletters.StockAlert": "fas fa-bell",
     },
 }
 

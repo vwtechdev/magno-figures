@@ -23,6 +23,7 @@ urlpatterns = [
     path("orders/", include("apps.orders.urls", namespace="orders")),
     path("addresses/", include("apps.addresses.urls", namespace="addresses")),
     path("accounts/", include("apps.accounts.urls", namespace="accounts")),
+    path("newsletter/", include("apps.newsletters.urls", namespace="newsletters")),
 ]
 
 if settings.DEBUG:

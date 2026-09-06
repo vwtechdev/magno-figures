@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.template.loader import get_template
 
 from apps.figures.forms import FigureAdminForm
-from apps.figures.models import Figure, FigureImage, StockAlert
-from apps.figures.notifications import notify_stock_alerts
+from apps.figures.models import Figure, FigureImage
 
 
 class FigureImageInline(admin.TabularInline):
@@ -49,32 +48,6 @@ class FigureAdmin(admin.ModelAdmin):
     @admin.display(description="Avisos pendentes")
     def pending_alerts_display(self, obj):
         return obj.stock_alerts.filter(is_notified=False).count()
-
-
-@admin.register(StockAlert)
-class StockAlertAdmin(admin.ModelAdmin):
-    list_display = ("email", "figure", "is_notified", "created_at")
-    list_filter = ("is_notified", "created_at")
-    search_fields = ("email", "figure__name")
-    autocomplete_fields = ("figure",)
-    readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
-    actions = ("resend_notification",)
-    fieldsets = (
-        (None, {"fields": ("figure", "email", "is_notified")}),
-        ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
-    )
-
-    @admin.action(description="Enviar aviso de disponibilidade")
-    def resend_notification(self, request, queryset):
-        figure_ids = (
-            queryset.filter(is_notified=False)
-            .values_list("figure_id", flat=True)
-            .distinct()
-        )
-        total = 0
-        for figure in Figure.objects.filter(pk__in=figure_ids):
-            total += notify_stock_alerts(figure)
-        self.message_user(request, f"{total} aviso(s) enviado(s).")
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

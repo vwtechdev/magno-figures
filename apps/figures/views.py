@@ -18,8 +18,9 @@ from apps.categories.gating import (
     redirect_to_age_gate,
 )
 from apps.categories.models import Category
-from apps.figures.models import Figure, StockAlert
+from apps.figures.models import Figure
 from apps.figures.services import calculate_shipping
+from apps.newsletters.models import StockAlert
 from apps.website.models import Website
 
 ZIP_CODE_RE = re.compile(r"^\d{5}-?\d{3}$")
@@ -179,21 +180,4 @@ def stock_alert_subscribe_view(request, slug):
 
 
 def stock_alert_unsubscribe_view(request, token):
-    from django.core import signing
-
-    from apps.figures.notifications import parse_stock_alert_token
-
-    try:
-        data = parse_stock_alert_token(token)
-    except signing.BadSignature:
-        return render(
-            request, "figures/unsubscribe.html", {"valid": False}, status=400
-        )
-    StockAlert.objects.filter(
-        figure_id=data.get("figure_id"), email=data.get("email")
-    ).delete()
-    return render(
-        request,
-        "figures/unsubscribe.html",
-        {"valid": True, "email": data.get("email")},
-    )
+    return redirect("newsletters:stock_alert_unsubscribe", token=token)

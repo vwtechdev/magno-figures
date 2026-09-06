@@ -59,6 +59,6 @@ def send_stock_alerts_on_restock(sender, instance, created, **kwargs):
     if created:
         return
     if getattr(instance, "_was_sold_out", None) and not instance.sold_out:
-        from apps.figures.notifications import notify_stock_alerts
+        from apps.newsletters.notifications import notify_stock_alerts
 
         notify_stock_alerts(instance)

@@ -128,32 +128,3 @@ class FigureImage(BaseModel):
 
     def __str__(self):
         return f"Imagem {self.order} - {self.figure.name}"
-
-
-class StockAlert(BaseModel):
-    figure = models.ForeignKey(
-        Figure,
-        on_delete=models.CASCADE,
-        related_name="stock_alerts",
-        verbose_name="Action Figure",
-    )
-    email = models.EmailField(
-        db_index=True, verbose_name="Email"
-    )
-    is_notified = models.BooleanField(
-        default=False, db_index=True, verbose_name="Avisado"
-    )
-
-    class Meta:
-        verbose_name = "Alerta de reposição"
-        verbose_name_plural = "Alertas de reposição"
-        ordering = ["-created_at"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["figure", "email"],
-                name="unique_stock_alert_per_figure_email",
-            )
-        ]
-
-    def __str__(self):
-        return f"{self.email} - {self.figure.name}"
