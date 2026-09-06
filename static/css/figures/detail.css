@@ -121,6 +121,13 @@
     color: #f87171;
 }
 
+.product__old-price {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 1rem;
+    margin-right: 8px;
+}
+
 .product__description {
     color: #E7E5E4;
     line-height: 1.7;

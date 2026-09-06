@@ -211,3 +211,58 @@ class CheckoutFlowTest(TestCase):
 
         self.assertRedirects(response, reverse("carts:detail"))
         self.assertFalse(Order.objects.exists())
+
+@override_settings(SUPERFRETE_TOKEN="", DEBUG=True)
+class CheckoutDiscountTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = User.objects.create_user(
+            email="promo@example.com",
+            password="senha-forte-123",
+            name="Cliente Promo",
+            phone="(11) 99999-0000",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        self.figure = Figure.objects.create(
+            name="Figure Promo",
+            slug="figure-promo",
+            description="Com desconto.",
+            price=Decimal("100.00"),
+            discount_percent=10,
+            stock=5,
+            image=make_image(),
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="(11) 99999-9999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.client.force_login(self.user)
+
+    def test_checkout_freezes_sale_price(self):
+        self.user.cart.items.create(figure=self.figure, quantity=2)
+        response = self.client.post(
+            reverse("orders:checkout"),
+            {
+                "address_id": self.address.pk,
+                "shipping_service": "PAC",
+                "cpf": "12345678909",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        order = Order.objects.get(user=self.user)
+        item = order.items.get()
+        self.assertEqual(item.price, Decimal("90.00"))
+        self.assertEqual(order.total, Decimal("180.00"))

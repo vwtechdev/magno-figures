@@ -87,7 +87,7 @@ def _notify_admin_new_order(order):
 
 def _checkout_context(request, addresses, address_form, selected_id, selected_address=None):
     items = get_cart_items(request)
-    subtotal = sum(item["figure"].price * item["quantity"] for item in items)
+    subtotal = sum(item["figure"].sale_price * item["quantity"] for item in items)
     return {
         "addresses": addresses,
         "selected_id": selected_id,
@@ -210,7 +210,7 @@ def checkout_view(request):
                     order=order,
                     figure=item["figure"],
                     quantity=item["quantity"],
-                    price=item["figure"].price,
+                    price=item["figure"].sale_price,
                 )
             clear_cart(request)
 

@@ -100,7 +100,7 @@ def get_cart_items(request):
             {
                 "figure": item.figure,
                 "quantity": item.quantity,
-                "total": item.figure.price * item.quantity,
+                "total": item.figure.sale_price * item.quantity,
             }
             for item in _get_user_cart(request.user).items.select_related("figure").order_by("-created_at")
         ]
@@ -119,7 +119,7 @@ def get_cart_items(request):
                     {
                         "figure": figure,
                         "quantity": quantity,
-                        "total": figure.price * quantity,
+                        "total": figure.sale_price * quantity,
                     }
                 )
     return items
@@ -128,7 +128,7 @@ def get_cart_items(request):
 def cart_detail_view(request):
     merge_session_cart(request)
     items = get_cart_items(request)
-    subtotal = sum(item["figure"].price * item["quantity"] for item in items)
+    subtotal = sum(item["figure"].sale_price * item["quantity"] for item in items)
     return render(
         request,
         "carts/detail.html",

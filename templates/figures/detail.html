@@ -28,7 +28,7 @@
     "brand": {"@type": "Brand", "name": "{{ website_config.company_name|escapejs }}"},
     "offers": {
         "@type": "Offer",
-        "price": "{{ figure.price|unlocalize }}",
+        "price": "{{ figure.sale_price|unlocalize }}",
         "priceCurrency": "BRL",
         "availability": "{% if figure.in_stock %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
     }
@@ -75,7 +75,13 @@
         </div>
         {% endif %}
         <div class="product__price">
+            {% if figure.has_discount %}
+            <del class="product__old-price">R$ {{ figure.old_price|floatformat:2 }}</del>
+            R$ {{ figure.sale_price|floatformat:2 }}
+            <span class="badge badge--off">{{ figure.discount_percent }}% OFF</span>
+            {% else %}
             R$ {{ figure.price|floatformat:2 }}
+            {% endif %}
         </div>
 
         {% if figure.sold_out %}

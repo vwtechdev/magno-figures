@@ -27,7 +27,7 @@ class Cart(BaseModel):
     @property
     def subtotal(self):
         items = self.items.select_related("figure").all()
-        return sum(item.figure.price * item.quantity for item in items)
+        return sum(item.figure.sale_price * item.quantity for item in items)
 
 
 class CartItem(BaseModel):

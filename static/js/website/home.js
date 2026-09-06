@@ -55,34 +55,39 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ============ CATALOG CAROUSEL ============
-    const catalog = document.getElementById("catalogScroll");
-    const catalogPrev = document.getElementById("catalogPrev");
-    const catalogNext = document.getElementById("catalogNext");
+    // ============ SCROLL CAROUSELS (catalog, releases, promos) ============
+    document.querySelectorAll("[data-scroll-carousel]").forEach((carousel) => {
+        const section = carousel.closest("section");
+        const arrows = section
+            ? section.querySelectorAll(".catalog__arrow")
+            : [];
+        const prevBtn = arrows[0];
+        const nextBtn = arrows[1];
+        if (!prevBtn || !nextBtn) return;
 
-    if (catalog && catalogPrev && catalogNext) {
         const step = () => {
-            const card = catalog.querySelector(".card");
+            const card = carousel.querySelector(".card");
             if (!card) return 0;
-            const gap = parseInt(getComputedStyle(catalog).columnGap, 10) || 24;
+            const gap = parseInt(getComputedStyle(carousel).columnGap, 10) || 24;
             return card.offsetWidth + gap;
         };
 
         const updateArrows = () => {
-            catalogPrev.disabled = catalog.scrollLeft <= 5;
-            catalogNext.disabled =
-                catalog.scrollLeft + catalog.clientWidth >= catalog.scrollWidth - 5;
+            prevBtn.disabled = carousel.scrollLeft <= 5;
+            nextBtn.disabled =
+                carousel.scrollLeft + carousel.clientWidth >=
+                carousel.scrollWidth - 5;
         };
 
-        catalogPrev.addEventListener("click", () =>
-            catalog.scrollBy({ left: -step(), behavior: "smooth" })
+        prevBtn.addEventListener("click", () =>
+            carousel.scrollBy({ left: -step(), behavior: "smooth" })
         );
-        catalogNext.addEventListener("click", () =>
-            catalog.scrollBy({ left: step(), behavior: "smooth" })
+        nextBtn.addEventListener("click", () =>
+            carousel.scrollBy({ left: step(), behavior: "smooth" })
         );
 
-        catalog.addEventListener("scroll", updateArrows, { passive: true });
+        carousel.addEventListener("scroll", updateArrows, { passive: true });
         window.addEventListener("resize", updateArrows);
         updateArrows();
-    }
+    });
 });

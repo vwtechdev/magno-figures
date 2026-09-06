@@ -3,12 +3,18 @@
         <img src="{{ figure.first_image.url }}" alt="{{ figure.name }}" class="card__image" loading="lazy">
         {% if figure.sold_out %}
         <span class="card__badge card__badge--soldout">Esgotado</span>
+        {% elif figure.has_discount %}
+        <span class="card__badge card__badge--off">{{ figure.discount_percent }}% OFF</span>
         {% elif not figure.in_stock %}
         <span class="card__badge card__badge--sold">Sob encomenda</span>
         {% endif %}
     </div>
     <div class="card__overlay">
         <h3 class="card__title">{{ figure.name }}</h3>
+        {% if figure.has_discount %}
+        <p class="card__price"><del class="card__old-price">R$ {{ figure.old_price|floatformat:2 }}</del> R$ {{ figure.sale_price|floatformat:2 }}</p>
+        {% else %}
         <p class="card__price">R$ {{ figure.price|floatformat:2 }}</p>
+        {% endif %}
     </div>
 </a>

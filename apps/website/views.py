@@ -14,12 +14,17 @@ from core.utils import site_base_url
 
 
 def home_view(request):
+    visible_figures = filter_nsfw_figures(
+        request,
+        Figure.objects.active().prefetch_related("categories", "images"),
+    )
     context = {
         "banners": Banner.objects.active(),
-        "figures": filter_nsfw_figures(
-            request,
-            Figure.objects.active().prefetch_related("categories", "images"),
-        ),
+        "figures": visible_figures,
+        "new_releases": visible_figures.order_by("-created_at")[:10],
+        "promotions": visible_figures.filter(
+            discount_percent__gt=0, sold_out=False
+        ).order_by("-discount_percent", "-created_at")[:10],
     }
     return render(request, "website/home.html", context)
 

@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from core.models import BaseModel
@@ -24,6 +27,12 @@ class Figure(BaseModel):
     )
     price = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Preço"
+    )
+    discount_percent = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        verbose_name="Desconto (%)",
+        help_text="Percentual de desconto sobre o preço. Ex.: 10 = 10% OFF.",
     )
     stock = models.PositiveIntegerField(
         default=0, verbose_name="Estoque"
@@ -79,6 +88,23 @@ class Figure(BaseModel):
     @property
     def in_stock(self):
         return self.stock > 0
+
+    @property
+    def has_discount(self):
+        return self.discount_percent > 0
+
+    @property
+    def sale_price(self):
+        if not self.has_discount:
+            return self.price
+        discounted = self.price * (
+            Decimal(100) - Decimal(self.discount_percent)
+        ) / Decimal(100)
+        return discounted.quantize(Decimal("0.01"))
+
+    @property
+    def old_price(self):
+        return self.price if self.has_discount else None
 
     @property
     def stock_status(self):

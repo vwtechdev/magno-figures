@@ -452,3 +452,72 @@ class CatalogFilterTest(TestCase):
             response, "Esta categoria contém conteúdo para maiores de 18 anos."
         )
         self.assertContains(response, reverse("categories:age_gate"))
+
+
+class DiscountTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.plain = Figure.objects.create(
+            name="Plain Figure",
+            slug="plain-figure",
+            description="Sem desconto.",
+            price=Decimal("100.00"),
+            stock=3,
+            image=make_image("plain.png"),
+        )
+        self.promo = Figure.objects.create(
+            name="Promo Figure",
+            slug="promo-figure",
+            description="Com desconto.",
+            price=Decimal("199.90"),
+            stock=3,
+            discount_percent=10,
+            image=make_image("promo.png"),
+        )
+        self.sold_promo = Figure.objects.create(
+            name="Sold Promo",
+            slug="sold-promo",
+            description="Esgotada com desconto.",
+            price=Decimal("50.00"),
+            stock=0,
+            sold_out=True,
+            discount_percent=20,
+            image=make_image("sold.png"),
+        )
+
+    def test_sale_price_math(self):
+        self.assertEqual(self.promo.sale_price, Decimal("179.91"))
+        self.assertTrue(self.promo.has_discount)
+        self.assertEqual(self.promo.old_price, Decimal("199.90"))
+        self.assertEqual(self.plain.sale_price, Decimal("100.00"))
+        self.assertFalse(self.plain.has_discount)
+        self.assertIsNone(self.plain.old_price)
+
+    def test_card_shows_discount_badge_and_prices(self):
+        response = self.client.get(reverse("figures:list"))
+        self.assertContains(response, "10% OFF")
+        self.assertContains(response, "R$ 179,91")
+
+    def test_promo_filter_returns_only_discounted_available(self):
+        response = self.client.get(reverse("figures:list"), {"promo": "1"})
+        self.assertContains(response, "Promo Figure")
+        self.assertNotContains(response, "Plain Figure")
+        self.assertNotContains(response, "Sold Promo")
+        self.assertContains(response, "Promoções")
+
+    def test_detail_shows_old_and_sale_price(self):
+        response = self.client.get(
+            reverse("figures:detail", args=[self.promo.slug])
+        )
+        self.assertContains(response, "R$ 199,90")
+        self.assertContains(response, "R$ 179,91")
+        self.assertContains(response, '"price": "179.91"')

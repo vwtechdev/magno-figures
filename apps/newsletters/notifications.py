@@ -53,7 +53,7 @@ def notify_stock_alerts(figure):
         message = (
             "Olá!\n\n"
             f"O item {figure.name} está disponível na Magno Figures "
-            f"por R$ {format_price(figure.price)}.\n\n"
+            f"por R$ {format_price(figure.sale_price)}.\n\n"
             f"Garanta o seu: {product_url}\n\n"
             "Não quer mais receber estes avisos? "
             f"Cancele aqui: {unsubscribe_url}"

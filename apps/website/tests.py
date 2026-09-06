@@ -185,3 +185,66 @@ class BannerFileStorageTest(TestCase):
 
         self.assertFalse(os.path.exists(old_path))
         self.assertTrue(os.path.exists(banner.image.path))
+
+class HomeSectionsTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.old = Figure.objects.create(
+            name="Old Figure",
+            slug="old-figure",
+            description="Antiga.",
+            price=Decimal("100.00"),
+            stock=3,
+            image=make_image("old.png"),
+        )
+        self.new = Figure.objects.create(
+            name="New Figure",
+            slug="new-figure",
+            description="Nova.",
+            price=Decimal("200.00"),
+            stock=3,
+            image=make_image("new.png"),
+        )
+        self.promo = Figure.objects.create(
+            name="Promo Figure",
+            slug="promo-figure",
+            description="Promo.",
+            price=Decimal("300.00"),
+            stock=3,
+            discount_percent=15,
+            image=make_image("promo.png"),
+        )
+        self.sold_promo = Figure.objects.create(
+            name="Sold Promo",
+            slug="sold-promo",
+            description="Esgotada.",
+            price=Decimal("400.00"),
+            stock=0,
+            sold_out=True,
+            discount_percent=50,
+            image=make_image("sold.png"),
+        )
+
+    def test_new_releases_ordered_by_recent(self):
+        response = self.client.get(reverse("website:home"))
+        releases = list(response.context["new_releases"])
+        self.assertEqual(releases[0], self.sold_promo)
+        self.assertIn(self.old, releases)
+        self.assertContains(response, "Novos")
+        self.assertContains(response, "Lançamentos")
+
+    def test_promotions_excludes_sold_out_and_plain(self):
+        response = self.client.get(reverse("website:home"))
+        promos = list(response.context["promotions"])
+        self.assertEqual(promos, [self.promo])
+        self.assertContains(response, "Promoções")
+        self.assertContains(response, "15% OFF")

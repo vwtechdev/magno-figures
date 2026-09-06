@@ -14,7 +14,7 @@
             <img src="{{ item.figure.first_image.url }}" alt="{{ item.figure.name }}" class="cart-item__image">
             <div class="cart-item__info">
                 <h3 class="cart-item__name">{{ item.figure.name }}</h3>
-                <p class="cart-item__price">R$ {{ item.figure.price|floatformat:2 }}</p>
+                <p class="cart-item__price">R$ {{ item.figure.sale_price|floatformat:2 }}</p>
             </div>
             <form class="cart-item__qty" method="post" action="{% url 'carts:update' item.figure.id %}">
                 {% csrf_token %}

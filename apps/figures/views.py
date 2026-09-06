@@ -70,6 +70,9 @@ def figure_list_view(request):
         figures = figures.filter(price__gte=min_price)
     if max_price is not None:
         figures = figures.filter(price__lte=max_price)
+    promo_only = request.GET.get("promo") == "1"
+    if promo_only:
+        figures = figures.filter(discount_percent__gt=0, sold_out=False)
     figures = filter_nsfw_figures(request, figures)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE
@@ -91,6 +94,7 @@ def figure_list_view(request):
         "min_price": (request.GET.get("min_price") or "").strip(),
         "max_price": (request.GET.get("max_price") or "").strip(),
         "needs_verification": needs_verification,
+        "promo_only": promo_only,
     }
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse(
