@@ -605,6 +605,46 @@ class OrderAdminActionsTest(TestCase):
         self.assertEqual(self.order.status, OrderStatus.NEW)
         self.assertEqual(response.status_code, 405)
 
+    def test_payment_sets_status_without_whatsapp(self):
+        response = self._post("admin:orders_order_send_payment")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.PAYMENT)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["ok"])
+        self.assertNotIn("url", data)
+        self.assertEqual(data["status_display"], "Aguardando Pagamento")
+
+    def test_paid_sets_status_without_whatsapp(self):
+        response = self._post("admin:orders_order_send_paid")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.PAID)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["ok"])
+        self.assertNotIn("url", data)
+        self.assertEqual(data["status_display"], "Pedido Pago")
+
+    def test_delivered_sets_status_without_whatsapp(self):
+        response = self._post("admin:orders_order_send_delivered")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.DELIVERED)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["ok"])
+        self.assertNotIn("url", data)
+        self.assertEqual(data["status_display"], "Pedido Entregue")
+
+    def test_canceled_sets_status_without_whatsapp(self):
+        response = self._post("admin:orders_order_send_canceled")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.CANCELED)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["ok"])
+        self.assertNotIn("url", data)
+        self.assertEqual(data["status_display"], "Pedido Cancelado")
+
     def test_requires_staff(self):
         self.client.logout()
         response = self.client.post(
@@ -634,25 +674,31 @@ class OrderAdminActionsTest(TestCase):
             reverse("admin:orders_order_change", args=[self.order.pk])
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            reverse(
-                "admin:orders_order_send_confirmation", args=[self.order.pk]
-            ),
-        )
-        self.assertContains(
-            response,
-            reverse(
-                "admin:orders_order_send_production", args=[self.order.pk]
-            ),
-        )
-        self.assertContains(
-            response,
-            reverse("admin:orders_order_send_shipment", args=[self.order.pk]),
-        )
+        for name in (
+            "admin:orders_order_send_confirmation",
+            "admin:orders_order_send_production",
+            "admin:orders_order_send_shipment",
+            "admin:orders_order_send_payment",
+            "admin:orders_order_send_paid",
+            "admin:orders_order_send_delivered",
+            "admin:orders_order_send_canceled",
+        ):
+            self.assertContains(
+                response, reverse(name, args=[self.order.pk])
+            )
         self.assertContains(response, "btn btn-success")
         self.assertContains(response, "btn btn-warning")
         self.assertContains(response, "btn btn-info")
+        self.assertContains(response, "btn btn-secondary")
+        self.assertContains(response, "btn btn-primary")
+        self.assertContains(response, "btn btn-danger")
+
+    def test_status_field_not_editable_in_change_form(self):
+        response = self.client.get(
+            reverse("admin:orders_order_change", args=[self.order.pk])
+        )
+        self.assertContains(response, 'id="order-status"')
+        self.assertNotContains(response, 'name="status"')
 
 
 class OrderTotalTest(TestCase):

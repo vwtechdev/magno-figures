@@ -6,13 +6,25 @@
 {{ block.super }}
 {% if original and original.pk %}
 <li>
-    <button type="button" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm" data-order-action="{% url 'admin:orders_order_send_confirmation' original.pk %}">Confirmação (WhatsApp)</button>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm" data-order-action="{% url 'admin:orders_order_send_confirmation' original.pk %}" data-whatsapp>Confirmação (WhatsApp)</button>
 </li>
 <li>
-    <button type="button" class="btn {{ jazzmin_ui.button_classes.warning }} btn-sm" data-order-action="{% url 'admin:orders_order_send_production' original.pk %}">Produção (WhatsApp)</button>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.secondary }} btn-sm" data-order-action="{% url 'admin:orders_order_send_payment' original.pk %}">Pagamento</button>
 </li>
 <li>
-    <button type="button" class="btn {{ jazzmin_ui.button_classes.info }} btn-sm" data-order-action="{% url 'admin:orders_order_send_shipment' original.pk %}">Envio (WhatsApp)</button>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.primary }} btn-sm" data-order-action="{% url 'admin:orders_order_send_paid' original.pk %}">Pago</button>
+</li>
+<li>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.warning }} btn-sm" data-order-action="{% url 'admin:orders_order_send_production' original.pk %}" data-whatsapp>Produção (WhatsApp)</button>
+</li>
+<li>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.info }} btn-sm" data-order-action="{% url 'admin:orders_order_send_shipment' original.pk %}" data-whatsapp>Envio (WhatsApp)</button>
+</li>
+<li>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm" data-order-action="{% url 'admin:orders_order_send_delivered' original.pk %}">Entregue</button>
+</li>
+<li>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.danger }} btn-sm" data-order-action="{% url 'admin:orders_order_send_canceled' original.pk %}">Cancelado</button>
 </li>
 {% endif %}
 {% endblock %}
@@ -20,4 +32,27 @@
 {% block extrahead %}
 {{ block.super }}
 <script src="{% static 'js/admin/order-actions.js' %}" defer></script>
+<style>
+    .mf-status-badge {
+        display: inline-block;
+        padding: .25em .6em;
+        font-size: .85em;
+        font-weight: 600;
+        line-height: 1;
+        border-radius: 8px;
+        color: #fff;
+        background: #6c757d;
+    }
+    .mf-status-badge.st-confirm,
+    .mf-status-badge.st-production { background: #b8860b; }
+    .mf-status-badge.st-payment { background: #17a2b8; }
+    .mf-status-badge.st-paid { background: #0d6efd; }
+    .mf-status-badge.st-sent { background: #138496; }
+    .mf-status-badge.st-canceled { background: #dc3545; }
+    .mf-status-badge.st-delivered { background: #198754; }
+    .mf-status-badge.status-flash {
+        box-shadow: 0 0 0 3px rgba(201, 159, 43, .6);
+        transition: box-shadow .3s ease;
+    }
+</style>
 {% endblock %}
