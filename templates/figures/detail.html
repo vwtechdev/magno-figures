@@ -91,6 +91,7 @@
         </div>
         {% endif %}
 
+        {% if not figure.sold_out %}
         <div class="shipping" id="shipping">
             <h3 class="shipping__title">Calcular <span class="text-gold">frete</span></h3>
             <div class="shipping__form">
@@ -100,6 +101,7 @@
             <p class="shipping__hint">Informe seu CEP e clique em Calcular</p>
             <div class="shipping__results" id="shippingResults" aria-live="polite"></div>
         </div>
+        {% endif %}
 
         <div class="product__cta-row">
             {% if not figure.sold_out %}
