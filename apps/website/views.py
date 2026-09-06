@@ -21,7 +21,9 @@ def home_view(request):
     context = {
         "banners": Banner.objects.active(),
         "figures": visible_figures.filter(discount_percent=0),
-        "new_releases": visible_figures.order_by("-created_at")[:10],
+        "new_releases": visible_figures.filter(discount_percent=0).order_by(
+            "-created_at"
+        )[:10],
         "promotions": visible_figures.filter(
             discount_percent__gt=0, sold_out=False
         ).order_by("-discount_percent", "-created_at")[:10],
