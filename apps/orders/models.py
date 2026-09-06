@@ -61,11 +61,7 @@ class Order(BaseModel):
 
     objects = OrderManager()
 
-    TRACKING_PORTALS = {
-        "correios": "https://rastreamento.correios.com.br/",
-        "jadlog": "https://www.jadlog.com.br/jadlog/rastreie",
-        "loggi": "https://www.loggi.com/rastreador/",
-    }
+    TRACKING_PORTAL = "https://rastreamento.correios.com.br/"
 
     class Meta:
         verbose_name = "Pedido"
@@ -91,14 +87,7 @@ class Order(BaseModel):
     def tracking_url(self):
         if not self.tracking_code.strip():
             return None
-        service = (self.shipping_service or "").lower()
-        if "jadlog" in service:
-            return self.TRACKING_PORTALS["jadlog"]
-        if "loggi" in service:
-            return self.TRACKING_PORTALS["loggi"]
-        if any(key in service for key in ("pac", "sedex", "mini", "correios")):
-            return self.TRACKING_PORTALS["correios"]
-        return None
+        return self.TRACKING_PORTAL
 
     @property
     def total(self):

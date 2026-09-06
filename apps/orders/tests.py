@@ -484,28 +484,13 @@ class OrderTrackingTest(TestCase):
         time.sleep(0.3)
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_tracking_url_by_carrier(self):
+    def test_tracking_url_always_correios(self):
         order = self._make_order(tracking_code="ABC123")
-        order.shipping_service = "SEDEX"
-        self.assertEqual(
-            order.tracking_url, "https://rastreamento.correios.com.br/"
-        )
-        order.shipping_service = "Mini Envios"
-        self.assertEqual(
-            order.tracking_url, "https://rastreamento.correios.com.br/"
-        )
-        order.shipping_service = "Jadlog Package"
-        self.assertEqual(
-            order.tracking_url, "https://www.jadlog.com.br/jadlog/rastreie"
-        )
-        order.shipping_service = "Loggi"
-        self.assertEqual(
-            order.tracking_url, "https://www.loggi.com/rastreador/"
-        )
-        order.shipping_service = "A combinar"
-        self.assertIsNone(order.tracking_url)
-        order.shipping_service = ""
-        self.assertIsNone(order.tracking_url)
+        for service in ("SEDEX", "Mini Envios", "Jadlog", "Loggi", "A combinar", ""):
+            order.shipping_service = service
+            self.assertEqual(
+                order.tracking_url, "https://rastreamento.correios.com.br/"
+            )
         order.tracking_code = ""
         order.shipping_service = "PAC"
         self.assertIsNone(order.tracking_url)
