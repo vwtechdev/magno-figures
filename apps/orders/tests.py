@@ -102,6 +102,9 @@ class CheckoutFlowTest(TestCase):
         self.assertIn("*CPF:* 12345678909", message)
         self.assertIn("*Frete:* R$ 59.80 (PAC)", message)
         self.assertIn("*Total:* R$ 259.60", message)
+        self.assertIn("Tenho interesse em finalizar este pedido!", message)
+        self.assertNotIn("Gostaria de finalizar", message)
+        self.assertIn(f"/orders/{order.pk}/", message)
 
         detail = self.client.get(reverse("orders:detail", args=[order.pk]))
         self.assertContains(detail, "Frete")
