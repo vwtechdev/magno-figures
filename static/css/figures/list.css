@@ -83,8 +83,32 @@
 
 .filters__title {
     font-weight: 700;
-    margin-bottom: 12px;
     padding: 0;
+}
+
+.filters__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.filters__x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.filters__x:hover {
+    color: inherit;
+    border-color: currentColor;
 }
 
 .filters__check {
@@ -191,21 +215,6 @@
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.04);
-    color: inherit;
-}
-
-.filters__actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.filters__clear {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.filters__clear:hover {
     color: inherit;
 }
 

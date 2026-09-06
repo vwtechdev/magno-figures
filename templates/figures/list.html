@@ -20,7 +20,12 @@
             <form method="get" action="{% url 'figures:list' %}" id="filtersForm">
                 {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
                 <fieldset class="filters__group">
-                    <legend class="filters__title">Categorias</legend>
+                    <div class="filters__head">
+                        <span class="filters__title">Categorias</span>
+                        {% if selected_cats or min_price or max_price or query %}
+                        <a href="{% url 'figures:list' %}" class="filters__x" aria-label="Limpar filtros" title="Limpar filtros">&times;</a>
+                        {% endif %}
+                    </div>
                     {% if filter_categories %}
                     <ul class="filters__tree">
                         {% recursetree filter_categories %}
@@ -59,9 +64,6 @@
                         </label>
                     </div>
                 </fieldset>
-                <div class="filters__actions">
-                    <a href="{% url 'figures:list' %}" class="filters__clear">Limpar filtros</a>
-                </div>
             </form>
         </aside>
         <div class="catalog-results" id="catalog-results">
