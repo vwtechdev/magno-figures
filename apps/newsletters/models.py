@@ -9,8 +9,8 @@ class NewsletterSubscriber(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Assinante da newsletter"
-        verbose_name_plural = "Assinantes da newsletter"
+        verbose_name = "Assinante"
+        verbose_name_plural = "Assinantes"
         ordering = ["email"]
 
     def __str__(self):
@@ -29,8 +29,8 @@ class NewsletterCampaign(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Campanha da newsletter"
-        verbose_name_plural = "Campanhas da newsletter"
+        verbose_name = "Campanha"
+        verbose_name_plural = "Campanhas"
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -56,8 +56,8 @@ class StockAlert(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Alerta de reposição"
-        verbose_name_plural = "Alertas de reposição"
+        verbose_name = "Alerta"
+        verbose_name_plural = "Alertas"
         ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
