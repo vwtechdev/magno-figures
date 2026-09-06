@@ -223,12 +223,24 @@
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.04);
-    color: inherit;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
 }
 
 .filters__select select option {
-    color: #1a1a1a;
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.filters__select select option:checked {
+    color: #c99f2b;
+    font-weight: 600;
+}
+
+.filters__select select:focus {
+    outline: none;
+    border-color: rgba(201, 159, 43, 0.6);
 }
 
 .sr-only {
