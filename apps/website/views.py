@@ -3,6 +3,10 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
 
+from apps.categories.gating import (
+    filter_nsfw_categories,
+    filter_nsfw_figures,
+)
 from apps.categories.models import Category
 from apps.figures.models import Figure
 from apps.website.models import Banner
@@ -12,7 +16,10 @@ from core.utils import site_base_url
 def home_view(request):
     context = {
         "banners": Banner.objects.active(),
-        "figures": Figure.objects.active().prefetch_related("categories", "images"),
+        "figures": filter_nsfw_figures(
+            request,
+            Figure.objects.active().prefetch_related("categories", "images"),
+        ),
     }
     return render(request, "website/home.html", context)
 
@@ -45,7 +52,9 @@ def sitemap_view(request):
         entries.append(
             {"loc": base + path, "changefreq": "weekly", "priority": "0.8"}
         )
-    for figure in Figure.objects.active().order_by("-updated_at"):
+    for figure in filter_nsfw_figures(
+        request, Figure.objects.active().order_by("-updated_at")
+    ):
         entries.append(
             {
                 "loc": base + reverse("figures:detail", args=[figure.slug]),
@@ -54,7 +63,9 @@ def sitemap_view(request):
                 "priority": "0.8",
             }
         )
-    for category in Category.objects.active().order_by("-updated_at"):
+    for category in filter_nsfw_categories(
+        request, Category.objects.active().order_by("-updated_at")
+    ):
         entries.append(
             {
                 "loc": base + reverse("categories:detail", args=[category.slug]),

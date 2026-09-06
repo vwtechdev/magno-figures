@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from apps.carts.models import Cart, CartItem
+from apps.categories.gating import is_age_verified, redirect_to_age_gate
 from apps.figures.models import Figure
 
 SESSION_CART_KEY = "cart"
@@ -54,6 +56,17 @@ def add_to_cart_view(request, figure_id):
             "Este item está esgotado e não pode ser adicionado ao carrinho.",
         )
         return redirect(request.META.get("HTTP_REFERER") or "figures:list")
+    if figure.is_nsfw and not is_age_verified(request):
+        messages.error(
+            request,
+            "Este item é destinado a maiores de 18 anos. "
+            "Confirme sua idade para continuar.",
+        )
+        return redirect_to_age_gate(
+            request,
+            next_url=request.META.get("HTTP_REFERER")
+            or reverse("figures:list"),
+        )
     was_empty = cart_is_empty(request)
 
     if request.user.is_authenticated:
@@ -158,6 +171,17 @@ def update_cart_view(request, figure_id):
         if item is None:
             return redirect("carts:detail")
         new_quantity = _apply_quantity(item.quantity, action, qty, figure)
+        if (
+            figure.is_nsfw
+            and not is_age_verified(request)
+            and new_quantity > item.quantity
+        ):
+            messages.error(
+                request,
+                "Este item é destinado a maiores de 18 anos. "
+                "Confirme sua idade para continuar.",
+            )
+            return redirect_to_age_gate(request, next_url=reverse("carts:detail"))
         if new_quantity <= 0:
             item.delete()
         else:
@@ -169,6 +193,17 @@ def update_cart_view(request, figure_id):
         if key not in session_cart:
             return redirect("carts:detail")
         new_quantity = _apply_quantity(session_cart[key], action, qty, figure)
+        if (
+            figure.is_nsfw
+            and not is_age_verified(request)
+            and new_quantity > session_cart[key]
+        ):
+            messages.error(
+                request,
+                "Este item é destinado a maiores de 18 anos. "
+                "Confirme sua idade para continuar.",
+            )
+            return redirect_to_age_gate(request, next_url=reverse("carts:detail"))
         if new_quantity <= 0:
             del session_cart[key]
         else:

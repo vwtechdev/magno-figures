@@ -6,6 +6,11 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
+from apps.categories.gating import (
+    filter_nsfw_figures,
+    is_age_verified,
+    redirect_to_age_gate,
+)
 from apps.figures.models import Figure
 from apps.figures.services import calculate_shipping
 from apps.website.models import Website
@@ -22,6 +27,7 @@ def figure_list_view(request):
         figures = figures.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         )
+    figures = filter_nsfw_figures(request, figures)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE
     ).get_page(request.GET.get("page"))
@@ -40,13 +46,16 @@ def figure_detail_view(request, slug):
     figure = Figure.objects.active().prefetch_related(
         "categories", "images"
     ).get(slug=slug)
-    related = (
+    if figure.is_nsfw and not is_age_verified(request):
+        return redirect_to_age_gate(request)
+    related = filter_nsfw_figures(
+        request,
         Figure.objects.active()
         .filter(categories__in=figure.categories.all())
         .exclude(pk=figure.pk)
         .distinct()
-        .prefetch_related("images")[:4]
-    )
+        .prefetch_related("images"),
+    )[:4]
     context = {
         "figure": figure,
         "related": related,
@@ -63,6 +72,10 @@ def figure_shipping_view(request, slug):
         return JsonResponse({"error": "Informe um CEP válido."}, status=400)
 
     figure = get_object_or_404(Figure.objects.active(), slug=slug)
+    if figure.is_nsfw and not is_age_verified(request):
+        return JsonResponse(
+            {"error": "Conteúdo destinado a maiores de 18 anos."}, status=403
+        )
     origin_zip = Website.objects.get_config().origin_zip_code or ""
 
     options, error = calculate_shipping(figure, zipcode, origin_zip)

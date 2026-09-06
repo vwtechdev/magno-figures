@@ -95,6 +95,15 @@ class Figure(BaseModel):
         image = self.images.order_by("order").first()
         return image.image if image else None
 
+    @property
+    def is_nsfw(self):
+        from apps.categories.gating import get_nsfw_category_ids
+
+        nsfw_ids = get_nsfw_category_ids()
+        if not nsfw_ids:
+            return False
+        return self.categories.filter(pk__in=nsfw_ids).exists()
+
 
 class FigureImage(BaseModel):
     figure = models.ForeignKey(

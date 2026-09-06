@@ -7,10 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from apps.addresses.forms import AddressForm
 from apps.addresses.models import Address
 from apps.carts.views import clear_cart, get_cart_items, merge_session_cart
+from apps.categories.gating import is_age_verified, redirect_to_age_gate
 from apps.figures.services import cart_shipping_options
 from apps.figures.views import ZIP_CODE_RE
 from apps.orders.models import Order, OrderItem, OrderStatus
@@ -18,6 +20,12 @@ from apps.website.models import Website
 from core.mail import send_mail_async
 from core.utils import site_base_url
 from core.validators import is_valid_cpf
+
+
+def _cart_has_nsfw(request):
+    return any(
+        item["figure"].is_nsfw for item in get_cart_items(request)
+    )
 
 
 @login_required
@@ -100,6 +108,12 @@ def checkout_shipping_view(request):
     items = get_cart_items(request)
     if not items:
         return JsonResponse({"error": "Seu carrinho está vazio."}, status=400)
+    if not is_age_verified(request) and any(
+        item["figure"].is_nsfw for item in items
+    ):
+        return JsonResponse(
+            {"error": "Conteúdo destinado a maiores de 18 anos."}, status=403
+        )
     origin = Website.objects.get_config().origin_zip_code or ""
     options, error = cart_shipping_options(items, zipcode, origin)
     if error:
@@ -110,6 +124,13 @@ def checkout_shipping_view(request):
 @login_required
 def checkout_view(request):
     merge_session_cart(request)
+    if not is_age_verified(request) and _cart_has_nsfw(request):
+        messages.error(
+            request,
+            "Seu carrinho contém itens para maiores de 18 anos. "
+            "Confirme sua idade para continuar.",
+        )
+        return redirect_to_age_gate(request, next_url=reverse("orders:checkout"))
     addresses = Address.objects.filter(user=request.user, is_active=True)
     selected_id = request.session.get("checkout_address_id")
     address_form = AddressForm()

@@ -741,3 +741,15 @@ ul {
         scroll-behavior: auto !important;
     }
 }
+
+.badge--nsfw {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    vertical-align: middle;
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+}

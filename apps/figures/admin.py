@@ -26,20 +26,24 @@ class FigureImageInline(admin.TabularInline):
 @admin.register(Figure)
 class FigureAdmin(admin.ModelAdmin):
     form = FigureAdminForm
-    list_display = ("name", "price", "stock", "sold_out", "is_active", "created_at")
+    list_display = ("name", "price", "stock", "sold_out", "is_nsfw_display", "is_active", "created_at")
     list_filter = ("is_active", "categories", "created_at")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("categories",)
-    readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
+    readonly_fields = ("is_nsfw_display", "created_at", "updated_at", "created_by", "updated_by")
     inlines = [FigureImageInline]
     fieldsets = (
         (None, {"fields": ("name", "slug", "description", "image", "batch_upload", "price", "stock")}),
         ("Envio", {"fields": ("weight_kg", "height_cm", "width_cm", "length_cm")}),
         ("Categorias", {"fields": ("categories",)}),
-        ("Status", {"fields": ("is_active", "sold_out")}),
+        ("Status", {"fields": ("is_active", "sold_out", "is_nsfw_display")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
+
+    @admin.display(boolean=True, description="+18")
+    def is_nsfw_display(self, obj):
+        return obj.is_nsfw
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

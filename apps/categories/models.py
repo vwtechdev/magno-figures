@@ -24,6 +24,12 @@ class Category(MPTTModel, BaseModel):
         related_name="children",
         verbose_name="Categoria Pai",
     )
+    is_nsfw = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="+18",
+        help_text="Conteúdo para maiores de 18 anos: exige verificação de idade e não é indexado.",
+    )
 
     objects = CategoryManager()
 
@@ -41,3 +47,11 @@ class Category(MPTTModel, BaseModel):
     @property
     def figure_count(self):
         return self.figures.filter(is_active=True).count()
+
+    @property
+    def is_nsfw_effective(self):
+        if self.is_nsfw:
+            return True
+        return (
+            self.get_ancestors(include_self=False).filter(is_nsfw=True).exists()
+        )

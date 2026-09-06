@@ -8,7 +8,7 @@
     <title>{% block title %}{{ website_config.company_name }}{% endblock %}</title>
     {% if website_config.description %}<meta name="description" content="{{ website_config.description }}">{% endif %}
     {% if website_config.seo_keywords %}<meta name="keywords" content="{{ website_config.seo_keywords }}">{% endif %}
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
     <link rel="canonical" href="{{ site_url }}{{ request.path }}">
     <meta property="og:site_name" content="{{ website_config.company_name }}">
     <meta property="og:locale" content="pt_BR">

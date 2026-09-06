@@ -8,6 +8,8 @@
 {% block twitter_title %}{{ category.name }} — {{ website_config.company_name }}{% endblock %}
 {% block twitter_description %}{{ website_config.description }}{% endblock %}
 
+{% block robots %}{% if category.is_nsfw_effective %}noindex, nofollow{% else %}index, follow{% endif %}{% endblock %}
+
 {% block extra_head %}
 {% with ancestors=category.get_ancestors %}
 <script type="application/ld+json">
@@ -34,7 +36,7 @@
         <span class="cat-page__crumb cat-page__crumb--current">{{ category.name }}</span>
     </nav>
 
-    <h1 class="cat-page__title"><span class="text-gold">{{ category.name }}</span></h1>
+    <h1 class="cat-page__title"><span class="text-gold">{{ category.name }}</span>{% if category.is_nsfw_effective %} <span class="badge badge--nsfw">+18</span>{% endif %}</h1>
 
     {% if figures %}
     <div class="cat-page__grid">

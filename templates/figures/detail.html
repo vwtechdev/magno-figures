@@ -12,6 +12,8 @@
 {% block twitter_description %}{{ figure.description|truncatechars:155 }}{% endblock %}
 {% block twitter_image %}{{ site_url }}{{ figure.first_image.url }}{% endblock %}
 
+{% block robots %}{% if figure.is_nsfw %}noindex, nofollow{% else %}index, follow{% endif %}{% endblock %}
+
 {% block extra_head %}
 {% with cats=figure.categories.all %}
 {% with total=cats|length %}
@@ -49,7 +51,7 @@
 
 {% block content %}
 <section class="product container" data-figure-slug="{{ figure.slug }}">
-    <h1 class="product__title">{{ figure.name }}</h1>
+    <h1 class="product__title">{{ figure.name }}{% if figure.is_nsfw %} <span class="badge badge--nsfw">+18</span>{% endif %}</h1>
 
     <div class="product__gallery">
         {% if figure.images.all %}
