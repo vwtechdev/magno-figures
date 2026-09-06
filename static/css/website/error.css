@@ -1,0 +1,52 @@
+.error-page {
+    padding-top: 140px;
+    padding-bottom: 64px;
+    text-align: center;
+}
+
+.error-page__code {
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.error-page__title {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    margin-bottom: 8px;
+}
+
+.error-page__hint {
+    color: var(--text-muted);
+    margin-bottom: 28px;
+}
+
+.error-page__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-page__btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+}
+
+.error-page__btn:hover {
+    opacity: 0.9;
+}
+
+.error-page__btn--ghost {
+    background: transparent;
+    color: var(--gold-2);
+    border: 1px solid rgba(234, 201, 121, 0.5);
+}
+
+.error-page__btn--ghost:hover {
+    background: rgba(234, 201, 121, 0.08);
+    opacity: 1;
+}

@@ -250,3 +250,25 @@ class HomeSectionsTest(TestCase):
         self.assertEqual(promos, [self.promo])
         self.assertContains(response, "Promoções")
         self.assertContains(response, "15% OFF")
+
+
+class Custom404Test(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=["*"])
+    def test_custom_404_page(self):
+        response = self.client.get("/pagina-que-nao-existe/")
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "Página não encontrada", status_code=404)
+        self.assertContains(response, "noindex, nofollow", status_code=404)
+        self.assertContains(response, "Voltar à home", status_code=404)

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Página não encontrada — {{ website_config.company_name }}{% endblock %}
+
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="error-page container">
+    <p class="error-page__code"><span class="text-gold">404</span></p>
+    <h1 class="error-page__title">Página não encontrada</h1>
+    <p class="error-page__hint">O endereço acessado não existe ou foi removido.</p>
+    <div class="error-page__actions">
+        <a href="{% url 'website:home' %}" class="error-page__btn">Voltar à home</a>
+        <a href="{% url 'figures:list' %}" class="error-page__btn error-page__btn--ghost">Ver catálogo</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/website/error.css' %}">
+{% endblock %}
