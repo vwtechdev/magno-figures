@@ -2,7 +2,6 @@ from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import path
-from django.utils.html import format_html
 
 from apps.orders.models import Order, OrderItem, OrderStatus
 
@@ -28,24 +27,12 @@ class OrderAdmin(admin.ModelAdmin):
         "updated_by",
         "user",
         "address",
-        "whatsapp_link",
     )
     inlines = [OrderItemInline]
     fieldsets = (
-        (None, {"fields": ("user", "address", "whatsapp_link", "status", "tracking_code")}),
+        (None, {"fields": ("user", "address", "status", "tracking_code")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
-
-    def whatsapp_link(self, obj):
-        if obj and obj.pk:
-            return format_html(
-                '<a href="{}" target="_blank" rel="noopener">Enviar mensagem no WhatsApp</a>',
-                obj.get_confirmation_url(),
-            )
-        return "-"
-
-    whatsapp_link.short_description = "Mensagem de pedido"
-    whatsapp_link.allow_tags = True
 
     def get_urls(self):
         urls = super().get_urls()
