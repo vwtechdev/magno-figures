@@ -177,18 +177,32 @@ class Order(BaseModel):
         return "\n".join(lines)
 
     def generate_confirmation_message(self):
-        message = (
-            f"Olá, {self.user.name}!\n\n"
-            f"Recebemos seu pedido *#{self.pk}* na Magno Figures:\n\n"
-            f"*Itens:*\n"
-            f"{self._items_text()}\n"
-            f"*Endereço de entrega:*\n"
-            f"{self.address.full_address}\n\n"
-            f"*Total:* R$ {self.total:.2f}\n\n"
-            f"Confirma a realização desse pedido? Assim que você confirmar, "
-            f"envio os dados para o pagamento."
-        )
-        return message
+        subtotal = self.total
+        lines = [
+            f"Olá, {self.user.name}!",
+            "",
+            f"Recebemos seu pedido *#{self.pk}* na Magno Figures:",
+            "",
+            "*Itens:*",
+            self._items_text(),
+            "*Endereço de entrega:*",
+            self.address.full_address,
+            "",
+        ]
+        if self.shipping_service and self.shipping_price is not None:
+            lines += [
+                f"*Subtotal:* R$ {subtotal:.2f}",
+                f"*Frete:* R$ {self.shipping_price:.2f} ({self.shipping_service})",
+                f"*Total:* R$ {subtotal + self.shipping_price:.2f}",
+            ]
+        else:
+            lines.append(f"*Total:* R$ {subtotal:.2f}")
+        lines += [
+            "",
+            "Confirma a realização desse pedido? Assim que você confirmar, "
+            "envio os dados para o pagamento.",
+        ]
+        return "\n".join(lines)
 
     def generate_production_message(self):
         return (

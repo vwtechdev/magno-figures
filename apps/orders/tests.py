@@ -517,6 +517,34 @@ class OrderTrackingTest(TestCase):
         response = self.client.get(reverse("orders:detail", args=[order.pk]))
         self.assertNotContains(response, "Rastrear pedido")
 
+    def test_confirmation_message_includes_shipping_breakdown(self):
+        figure = Figure.objects.create(
+            name="Figure Confirmação",
+            slug="figure-confirmacao",
+            description="Teste.",
+            price=Decimal("100.00"),
+            stock=5,
+            image=make_image(),
+        )
+        order = self._make_order(
+            shipping_service="PAC", shipping_price=Decimal("29.90")
+        )
+        OrderItem.objects.create(
+            order=order, figure=figure, quantity=1, price=figure.price
+        )
+        message = order.generate_confirmation_message()
+        self.assertIn("*Subtotal:* R$ 100.00", message)
+        self.assertIn("*Frete:* R$ 29.90 (PAC)", message)
+        self.assertIn("*Total:* R$ 129.90", message)
+        self.assertIn("Confirma a realização desse pedido?", message)
+
+    def test_confirmation_message_without_shipping_shows_only_total(self):
+        order = self._make_order()
+        message = order.generate_confirmation_message()
+        self.assertNotIn("*Subtotal:*", message)
+        self.assertNotIn("*Frete:*", message)
+        self.assertIn("*Total:* R$ 0.00", message)
+
 
 class OrderAdminActionsTest(TestCase):
     def setUp(self):
