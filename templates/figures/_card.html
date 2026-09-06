@@ -4,7 +4,7 @@
         {% if figure.sold_out %}
         <span class="card__badge card__badge--soldout">Esgotado</span>
         {% elif figure.has_discount %}
-        <span class="card__badge card__badge--sold">{{ figure.discount_percent }}% OFF</span>
+        <span class="card__badge card__badge--off">{{ figure.discount_percent }}% OFF</span>
         {% elif not figure.in_stock %}
         <span class="card__badge card__badge--sold">Sob encomenda</span>
         {% endif %}
