@@ -99,6 +99,89 @@ class CatalogPaginationTest(TestCase):
         self.assertEqual(response.context["page_query"], "")
 
 
+class CatalogSortTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.figure_b = Figure.objects.create(
+            name="Batman",
+            slug="batman",
+            description="Cavaleiro das trevas.",
+            price=Decimal("199.90"),
+            stock=3,
+            image=make_image(),
+        )
+        time.sleep(0.01)
+        self.figure_a = Figure.objects.create(
+            name="Akira",
+            slug="akira",
+            description="Manga e filme.",
+            price=Decimal("50.00"),
+            stock=3,
+            image=make_image(),
+        )
+        time.sleep(0.01)
+        self.figure_c = Figure.objects.create(
+            name="Coringa",
+            slug="coringa",
+            description="Príncipe do crime.",
+            price=Decimal("120.00"),
+            discount_percent=50,
+            stock=3,
+            image=make_image(),
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="(11) 99999-9999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+
+    def test_sort_az(self):
+        response = self.client.get(reverse("figures:list"), {"sort": "az"})
+        names = [f.name for f in response.context["figures"]]
+        self.assertEqual(names, ["Akira", "Batman", "Coringa"])
+
+    def test_sort_za(self):
+        response = self.client.get(reverse("figures:list"), {"sort": "za"})
+        names = [f.name for f in response.context["figures"]]
+        self.assertEqual(names, ["Coringa", "Batman", "Akira"])
+
+    def test_sort_price_asc_uses_effective_price(self):
+        response = self.client.get(
+            reverse("figures:list"), {"sort": "price_asc"}
+        )
+        names = [f.name for f in response.context["figures"]]
+        self.assertEqual(
+            names, ["Akira", "Coringa", "Batman"]
+        )
+
+    def test_sort_price_desc(self):
+        response = self.client.get(
+            reverse("figures:list"), {"sort": "price_desc"}
+        )
+        names = [f.name for f in response.context["figures"]]
+        self.assertEqual(
+            names, ["Batman", "Coringa", "Akira"]
+        )
+
+    def test_unknown_sort_falls_back_to_default(self):
+        response = self.client.get(reverse("figures:list"), {"sort": "xyz"})
+        self.assertEqual(response.context["sort"], "")
+        self.assertEqual(
+            [f.name for f in response.context["figures"]],
+            ["Coringa", "Akira", "Batman"],
+        )
+
+    def test_sidebar_renders_sort_select(self):
+        response = self.client.get(reverse("figures:list"))
+        self.assertContains(response, 'select name="sort"')
+        self.assertContains(response, "A–Z")
+        self.assertContains(response, "Preço: menor para maior")
+
+
 class FigureDetailSeoTest(TestCase):
     def setUp(self):
         cache.clear()

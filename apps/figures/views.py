@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Case, F, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -73,6 +73,29 @@ def figure_list_view(request):
     promo_only = request.GET.get("promo") == "1"
     if promo_only:
         figures = figures.filter(discount_percent__gt=0, sold_out=False)
+    sort = request.GET.get("sort", "").strip()
+    if sort == "az":
+        figures = figures.order_by("name")
+    elif sort == "za":
+        figures = figures.order_by("-name")
+    elif sort == "price_asc":
+        figures = figures.order_by(
+            Case(
+                When(discount_percent__gt=0, then=F("price") * (100 - F("discount_percent")) / Value(100)),
+                default=F("price"),
+            ),
+            "pk",
+        )
+    elif sort == "price_desc":
+        figures = figures.order_by(
+            -Case(
+                When(discount_percent__gt=0, then=F("price") * (100 - F("discount_percent")) / Value(100)),
+                default=F("price"),
+            ),
+            "pk",
+        )
+    else:
+        sort = ""
     figures = filter_nsfw_figures(request, figures)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE
@@ -95,6 +118,7 @@ def figure_list_view(request):
         "max_price": (request.GET.get("max_price") or "").strip(),
         "needs_verification": needs_verification,
         "promo_only": promo_only,
+        "sort": sort,
     }
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse(

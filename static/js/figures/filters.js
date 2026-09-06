@@ -22,6 +22,10 @@
                 params.set(name, input.value.trim());
             }
         });
+        var sort = form.querySelector('select[name="sort"]');
+        if (sort && sort.value) {
+            params.set("sort", sort.value);
+        }
         var query = params.toString();
         var base = form.action.split("?")[0];
         return query ? base + "?" + query : base;
@@ -69,6 +73,13 @@
             load(buildUrl(), false);
         });
     });
+
+    var sortSelect = form.querySelector('select[name="sort"]');
+    if (sortSelect) {
+        sortSelect.addEventListener("change", function () {
+            load(buildUrl(), false);
+        });
+    }
 
     form.querySelectorAll(".filters__node-toggle").forEach(function (btn) {
         btn.addEventListener("click", function () {
