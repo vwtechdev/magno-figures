@@ -37,7 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const serviceInput = document.getElementById("shippingServiceInput");
     const submitBtn = document.getElementById("checkoutSubmit");
 
-    const STEP_ORDER = ["address", "shipping", "cpf", "summary"];
+    const STEP_ORDER = hasCpf
+        ? ["address", "shipping", "summary"]
+        : ["address", "shipping", "cpf", "summary"];
     const STEP_LABELS = {
         address: "Endereço",
         shipping: "Frete",
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateContinueState = () => {
         continueAddress.disabled = !addressReady();
         continueShipping.disabled = !selectedOption;
-        continueCpf.disabled = !cpfOk;
+        if (continueCpf) continueCpf.disabled = !cpfOk;
     };
 
     const renderOptions = (options) => {
@@ -221,14 +223,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     continueShipping.addEventListener("click", () => {
         if (!selectedOption) return;
+        if (hasCpf) {
+            refreshSummary();
+            showStep("summary");
+            return;
+        }
         showStep("cpf");
     });
 
-    continueCpf.addEventListener("click", () => {
-        if (!cpfOk) return;
-        refreshSummary();
-        showStep("summary");
-    });
+    if (continueCpf) {
+        continueCpf.addEventListener("click", () => {
+            if (!cpfOk) return;
+            refreshSummary();
+            showStep("summary");
+        });
+    }
 
     if (cpfInput) {
         cpfInput.addEventListener("input", validateCpf);

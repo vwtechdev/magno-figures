@@ -12,7 +12,7 @@
         <div class="checkout__error">{{ error }}</div>
         {% endif %}
 
-        <div class="checkout__stepper"><span id="stepLabel">Etapa 1 de 4 — Endereço</span></div>
+        <div class="checkout__stepper"><span id="stepLabel">Etapa 1 de {% if has_cpf %}3{% else %}4{% endif %} — Endereço</span></div>
 
         <form class="checkout__form" method="post" action="{% url 'orders:checkout' %}"
             data-has-cpf="{% if has_cpf %}1{% else %}0{% endif %}" data-subtotal="{{ subtotal }}">
@@ -66,24 +66,22 @@
                 </div>
             </section>
 
+            {% if not has_cpf %}
             <section class="checkout__step" data-step="cpf" hidden>
                 <h2 class="checkout__subtitle">3. CPF</h2>
-                {% if has_cpf %}
-                <p class="checkout__hint">CPF já cadastrado: <strong>{{ user.cpf }}</strong></p>
-                {% else %}
                 <label class="checkout__field">
                     <span class="checkout__label">CPF</span>
                     <input type="text" name="cpf" id="id_checkout_cpf" class="checkout__input" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off" data-cpf-mask>
                     <span class="checkout__status" id="cpfStatus"></span>
                 </label>
-                {% endif %}
                 <div class="checkout__step-actions">
                     <button type="button" class="checkout__continue" id="continueCpf" disabled>Continuar</button>
                 </div>
             </section>
+            {% endif %}
 
             <section class="checkout__step" data-step="summary" hidden>
-                <h2 class="checkout__subtitle">4. Resumo do pedido</h2>
+                <h2 class="checkout__subtitle">{% if has_cpf %}3{% else %}4{% endif %}. Resumo do pedido</h2>
                 <div class="checkout__summary-items" id="summaryItems">
                     {% for item in cart_items %}
                     <div class="checkout__summary-item">

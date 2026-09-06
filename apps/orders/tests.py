@@ -347,3 +347,55 @@ class CheckoutShippingFailureTest(TestCase):
         response = self._post("combine")
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Order.objects.filter(user=self.user).exists())
+
+
+class CheckoutCpfStepTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = User.objects.create_user(
+            email="cpfstep@example.com",
+            password="senha-forte-123",
+            name="Cliente CPF",
+            phone="(11) 99999-0000",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        self.figure = Figure.objects.create(
+            name="Figure CPF",
+            slug="figure-cpf",
+            description="Teste de etapa CPF.",
+            price=Decimal("50.00"),
+            stock=5,
+            image=make_image(),
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="(11) 99999-9999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.client.force_login(self.user)
+        self.user.cart.items.create(figure=self.figure, quantity=1)
+
+    def test_cpf_step_rendered_without_cpf(self):
+        response = self.client.get(reverse("orders:checkout"))
+        self.assertContains(response, 'data-step="cpf"')
+        self.assertContains(response, "Etapa 1 de 4")
+
+    def test_cpf_step_skipped_with_cpf(self):
+        self.user.cpf = "12345678909"
+        self.user.save(update_fields=["cpf"])
+        response = self.client.get(reverse("orders:checkout"))
+        self.assertNotContains(response, 'data-step="cpf"')
+        self.assertContains(response, "Etapa 1 de 3")
+        self.assertContains(response, "3. Resumo do pedido")
