@@ -18,7 +18,7 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = "admin/orders/order/change_form.html"
-    list_display = ("pk", "user", "status", "tracking_code", "total", "created_at")
+    list_display = ("pk", "user", "status", "tracking_code", "subtotal_display", "shipping_display", "grand_total_display", "created_at")
     list_filter = ("status", "created_at")
     search_fields = ("user__email", "user__name", "pk", "tracking_code")
     readonly_fields = (
