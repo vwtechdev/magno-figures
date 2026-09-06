@@ -1,0 +1,13 @@
+{% if figures %}
+<div class="catalog-page__grid" id="catalog-grid">
+    {% for figure in figures %}
+        {% include "figures/_card.html" with figure=figure %}
+    {% endfor %}
+</div>
+{% include "partials/pagination.html" %}
+{% else %}
+<div class="catalog-page__empty">
+    <p>Nenhum resultado encontrado.</p>
+    <a href="{% url 'figures:list' %}" class="catalog-page__clean">Limpar filtros</a>
+</div>
+{% endif %}

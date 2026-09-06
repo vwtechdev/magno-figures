@@ -12,23 +12,54 @@
     <p class="catalog-page__subtitle">Resultados para “{{ query }}”</p>
     {% endif %}
 
-    {% if figures %}
-    <div class="catalog-page__grid">
-        {% for figure in figures %}
-            {% include "figures/_card.html" with figure=figure %}
-        {% endfor %}
+    <button type="button" class="filters__toggle" id="filtersToggle" aria-expanded="false" aria-controls="catalogFilters">Filtros</button>
+
+    <div class="catalog-layout">
+        <aside class="filters" id="catalogFilters" aria-label="Filtros do catálogo">
+            <form method="get" action="{% url 'figures:list' %}" id="filtersForm">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                <fieldset class="filters__group">
+                    <legend class="filters__title">Categorias</legend>
+                    {% for category in filter_categories %}
+                    <label class="filters__check filters__check--level-{{ category.level }}">
+                        <input type="checkbox" name="cat" value="{{ category.slug }}"{% if category.slug in selected_cats %} checked{% endif %}>
+                        <span>{{ category.name }}</span>
+                    </label>
+                    {% empty %}
+                    <p class="filters__empty">Nenhuma categoria.</p>
+                    {% endfor %}
+                </fieldset>
+                <fieldset class="filters__group">
+                    <legend class="filters__title">Preço (R$)</legend>
+                    <div class="filters__price-row">
+                        <label class="filters__price">
+                            <span>Mín</span>
+                            <input type="text" name="min_price" value="{{ min_price }}" inputmode="decimal" placeholder="0,00" autocomplete="off">
+                        </label>
+                        <label class="filters__price">
+                            <span>Máx</span>
+                            <input type="text" name="max_price" value="{{ max_price }}" inputmode="decimal" placeholder="999,99" autocomplete="off">
+                        </label>
+                    </div>
+                </fieldset>
+                <div class="filters__actions">
+                    <button type="submit" class="filters__apply">Aplicar</button>
+                    <a href="{% url 'figures:list' %}" class="filters__clear">Limpar</a>
+                </div>
+            </form>
+        </aside>
+        <div class="catalog-results" id="catalog-results">
+            {% include "figures/_results.html" %}
+        </div>
     </div>
-    {% include "partials/pagination.html" %}
-    {% else %}
-    <div class="catalog-page__empty">
-        <p>Nenhum resultado encontrado.</p>
-        <a href="{% url 'figures:list' %}" class="catalog-page__clean">Limpar busca</a>
-    </div>
-    {% endif %}
 </section>
 {% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/figures/list.css' %}">
 <link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/figures/filters.js' %}" defer></script>
 {% endblock %}

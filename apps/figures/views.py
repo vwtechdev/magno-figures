@@ -1,21 +1,40 @@
 import re
+from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 
 from apps.categories.gating import (
+    filter_nsfw_categories,
     filter_nsfw_figures,
     is_age_verified,
     redirect_to_age_gate,
 )
+from apps.categories.models import Category
 from apps.figures.models import Figure
 from apps.figures.services import calculate_shipping
 from apps.website.models import Website
 
 ZIP_CODE_RE = re.compile(r"^\d{5}-?\d{3}$")
+
+
+def _parse_price(value):
+    if value is None:
+        return None
+    text = value.strip().replace(",", ".")
+    if not text:
+        return None
+    try:
+        price = Decimal(text)
+    except InvalidOperation:
+        return None
+    if price < 0:
+        return None
+    return price
 
 
 def figure_list_view(request):
@@ -27,6 +46,26 @@ def figure_list_view(request):
         figures = figures.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         )
+    selected_slugs = [slug for slug in request.GET.getlist("cat") if slug]
+    selected = Category.objects.active().filter(slug__in=selected_slugs)
+    selected_slugs = list(selected.values_list("slug", flat=True))
+    if selected_slugs:
+        category_ids = set()
+        for category in selected:
+            category_ids.update(
+                category.get_descendants(include_self=True).values_list(
+                    "pk", flat=True
+                )
+            )
+        figures = figures.filter(categories__in=category_ids).distinct()
+    min_price = _parse_price(request.GET.get("min_price"))
+    max_price = _parse_price(request.GET.get("max_price"))
+    if min_price is not None and max_price is not None and min_price > max_price:
+        min_price, max_price = max_price, min_price
+    if min_price is not None:
+        figures = figures.filter(price__gte=min_price)
+    if max_price is not None:
+        figures = figures.filter(price__lte=max_price)
     figures = filter_nsfw_figures(request, figures)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE
@@ -38,7 +77,22 @@ def figure_list_view(request):
         "page_obj": page_obj,
         "page_query": page_query.urlencode(),
         "query": query,
+        "filter_categories": filter_nsfw_categories(
+            request, Category.objects.active().order_by("tree_id", "lft")
+        ),
+        "selected_cats": selected_slugs,
+        "min_price": (request.GET.get("min_price") or "").strip(),
+        "max_price": (request.GET.get("max_price") or "").strip(),
     }
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse(
+            {
+                "html": render_to_string(
+                    "figures/_results.html", context, request=request
+                ),
+                "count": page_obj.paginator.count,
+            }
+        )
     return render(request, "figures/list.html", context)
 
 

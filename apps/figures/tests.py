@@ -316,3 +316,125 @@ class SuperFreteShippingTest(TestCase):
             calculate_shipping(self.figure, "01310100", "05311900")
         headers = post.call_args.kwargs["headers"]
         self.assertEqual(headers["User-Agent"], "Superfrete (teste@exemplo.com)")
+
+
+class CatalogFilterTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.anime = Category.objects.create(name="Anime", slug="anime")
+        self.naruto = Category.objects.create(
+            name="Naruto", slug="naruto", parent=self.anime
+        )
+        self.marvel = Category.objects.create(name="Marvel", slug="marvel")
+        self.adult = Category.objects.create(
+            name="+18", slug="mais-18", is_nsfw=True
+        )
+        self.naruto_fig = self._make_figure("Naruto Figure", "naruto-fig", "100.00")
+        self.naruto_fig.categories.add(self.naruto)
+        self.goku_fig = self._make_figure("Goku Figure", "goku-fig", "200.00")
+        self.goku_fig.categories.add(self.anime)
+        self.iron_fig = self._make_figure("Iron Man", "iron-man", "300.00")
+        self.iron_fig.categories.add(self.marvel)
+        self.dark_fig = self._make_figure("Dark Lady", "dark-lady", "400.00")
+        self.dark_fig.categories.add(self.adult)
+
+    def _make_figure(self, name, slug, price):
+        return Figure.objects.create(
+            name=name,
+            slug=slug,
+            description=f"Figure {name}.",
+            price=Decimal(price),
+            stock=3,
+            image=make_image(f"{slug}.png"),
+        )
+
+    def test_multi_select_returns_union(self):
+        response = self.client.get(reverse("figures:list"), {"cat": ["anime", "marvel"]})
+        self.assertContains(response, "Naruto Figure")
+        self.assertContains(response, "Goku Figure")
+        self.assertContains(response, "Iron Man")
+        self.assertNotContains(response, "Dark Lady")
+
+    def test_parent_includes_child_categories(self):
+        response = self.client.get(reverse("figures:list"), {"cat": "anime"})
+        self.assertContains(response, "Naruto Figure")
+        self.assertContains(response, "Goku Figure")
+        self.assertNotContains(response, "Iron Man")
+
+    def test_invalid_category_slug_ignored(self):
+        response = self.client.get(reverse("figures:list"), {"cat": "nope"})
+        self.assertContains(response, "Naruto Figure")
+        self.assertContains(response, "Iron Man")
+
+    def test_min_and_max_price(self):
+        response = self.client.get(reverse("figures:list"), {"min_price": "150"})
+        self.assertNotContains(response, "Naruto Figure")
+        self.assertContains(response, "Goku Figure")
+        self.assertContains(response, "Iron Man")
+        response = self.client.get(reverse("figures:list"), {"max_price": "150"})
+        self.assertContains(response, "Naruto Figure")
+        self.assertNotContains(response, "Goku Figure")
+
+    def test_price_accepts_comma_and_swaps_inverted_range(self):
+        response = self.client.get(
+            reverse("figures:list"),
+            {"min_price": "150,00", "max_price": "250,00"},
+        )
+        self.assertNotContains(response, "Naruto Figure")
+        self.assertContains(response, "Goku Figure")
+        self.assertNotContains(response, "Iron Man")
+        response = self.client.get(
+            reverse("figures:list"),
+            {"min_price": "300", "max_price": "100"},
+        )
+        self.assertContains(response, "Naruto Figure")
+        self.assertContains(response, "Goku Figure")
+        self.assertContains(response, "Iron Man")
+
+    def test_invalid_price_ignored(self):
+        response = self.client.get(reverse("figures:list"), {"min_price": "abc"})
+        self.assertContains(response, "Naruto Figure")
+        self.assertContains(response, "Iron Man")
+
+    def test_filters_combine_with_search(self):
+        response = self.client.get(
+            reverse("figures:list"), {"q": "Naruto", "cat": "marvel"}
+        )
+        self.assertContains(response, "Nenhum resultado encontrado.")
+
+    def test_pagination_preserves_filter_params(self):
+        response = self.client.get(
+            reverse("figures:list"), {"cat": "anime", "min_price": "50"}
+        )
+        page_query = response.context["page_query"]
+        self.assertIn("cat=anime", page_query)
+        self.assertIn("min_price=50", page_query)
+
+    def test_ajax_returns_json_with_html(self):
+        response = self.client.get(
+            reverse("figures:list"),
+            {"cat": "marvel"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["count"], 1)
+        self.assertIn("Iron Man", payload["html"])
+        self.assertNotIn("Naruto Figure", payload["html"])
+
+    def test_sidebar_hides_nsfw_category(self):
+        response = self.client.get(reverse("figures:list"))
+        slugs = [c.slug for c in response.context["filter_categories"]]
+        self.assertIn("anime", slugs)
+        self.assertNotIn("mais-18", slugs)
+        response = self.client.get(reverse("figures:list"), {"cat": "mais-18"})
+        self.assertContains(response, "Nenhum resultado encontrado.")
