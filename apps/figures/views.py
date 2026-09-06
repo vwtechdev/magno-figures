@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 
 from apps.categories.gating import (
-    filter_nsfw_categories,
     filter_nsfw_figures,
     is_age_verified,
     redirect_to_age_gate,
@@ -72,17 +71,21 @@ def figure_list_view(request):
     ).get_page(request.GET.get("page"))
     page_query = request.GET.copy()
     page_query.pop("page", None)
+    needs_verification = not is_age_verified(request) and any(
+        category.is_nsfw_effective for category in selected
+    )
     context = {
         "figures": page_obj.object_list,
         "page_obj": page_obj,
         "page_query": page_query.urlencode(),
         "query": query,
-        "filter_categories": filter_nsfw_categories(
-            request, Category.objects.active().order_by("tree_id", "lft")
+        "filter_categories": Category.objects.active().order_by(
+            "tree_id", "lft"
         ),
         "selected_cats": selected_slugs,
         "min_price": (request.GET.get("min_price") or "").strip(),
         "max_price": (request.GET.get("max_price") or "").strip(),
+        "needs_verification": needs_verification,
     }
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse(

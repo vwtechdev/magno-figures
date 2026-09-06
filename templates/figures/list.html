@@ -31,7 +31,7 @@
                             <div class="filters__node-row">
                                 <label class="filters__check">
                                     <input type="checkbox" name="cat" value="{{ node.slug }}"{% if node.slug in selected_cats %} checked{% endif %}>
-                                    <span>{{ node.name }}</span>
+                                    <span>{{ node.name }}{% if node.is_nsfw_effective %} <span class="badge badge--nsfw">+18</span>{% endif %}</span>
                                 </label>
                                 {% if not node.is_leaf_node %}
                                 <button type="button" class="filters__node-toggle" aria-expanded="false" aria-label="Expandir {{ node.name }}">

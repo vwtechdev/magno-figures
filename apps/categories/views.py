@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.categories.gating import (
     AGE_VERIFIED_SESSION_KEY,
-    filter_nsfw_categories,
     is_age_verified,
     redirect_to_age_gate,
     safe_next_url,
@@ -27,9 +26,7 @@ def age_gate_view(request):
 
 def category_list_view(request):
     context = {
-        "categories": filter_nsfw_categories(
-            request, Category.objects.active()
-        ),
+        "categories": Category.objects.active(),
     }
     return render(request, "categories/list.html", context)
 

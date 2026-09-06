@@ -431,10 +431,22 @@ class CatalogFilterTest(TestCase):
         self.assertIn("Iron Man", payload["html"])
         self.assertNotIn("Naruto Figure", payload["html"])
 
-    def test_sidebar_hides_nsfw_category(self):
+    def test_verified_selection_shows_nsfw_figures(self):
+        self.client.post(
+            reverse("categories:age_gate"), {"confirm": "yes", "next": "/"}
+        )
+        response = self.client.get(reverse("figures:list"), {"cat": "mais-18"})
+        self.assertContains(response, "Dark Lady")
+        self.assertNotContains(response, "Confirmar idade")
+
+    def test_sidebar_shows_nsfw_category_with_gate_invitation(self):
         response = self.client.get(reverse("figures:list"))
         slugs = [c.slug for c in response.context["filter_categories"]]
         self.assertIn("anime", slugs)
-        self.assertNotIn("mais-18", slugs)
+        self.assertIn("mais-18", slugs)
+        self.assertContains(response, "+18")
         response = self.client.get(reverse("figures:list"), {"cat": "mais-18"})
-        self.assertContains(response, "Nenhum resultado encontrado.")
+        self.assertContains(
+            response, "Esta categoria contém conteúdo para maiores de 18 anos."
+        )
+        self.assertContains(response, reverse("categories:age_gate"))

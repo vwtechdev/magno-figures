@@ -7,7 +7,12 @@
 {% include "partials/pagination.html" %}
 {% else %}
 <div class="catalog-page__empty">
+    {% if needs_verification %}
+    <p>Esta categoria contém conteúdo para maiores de 18 anos.</p>
+    <a href="{% url 'categories:age_gate' %}?next={{ request.get_full_path|urlencode }}" class="catalog-page__clean">Confirmar idade</a>
+    {% else %}
     <p>Nenhum resultado encontrado.</p>
     <a href="{% url 'figures:list' %}" class="catalog-page__clean">Limpar filtros</a>
+    {% endif %}
 </div>
 {% endif %}
