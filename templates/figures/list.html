@@ -22,9 +22,7 @@
                 <fieldset class="filters__group">
                     <div class="filters__head">
                         <span class="filters__title">Categorias</span>
-                        {% if selected_cats or min_price or max_price or query %}
                         <a href="{% url 'figures:list' %}" class="filters__x" aria-label="Limpar filtros" title="Limpar filtros">&times;</a>
-                        {% endif %}
                     </div>
                     {% if filter_categories %}
                     <ul class="filters__tree">
