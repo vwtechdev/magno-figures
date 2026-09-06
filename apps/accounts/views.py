@@ -1,4 +1,5 @@
 import re
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -116,15 +117,30 @@ def profile_data_view(request):
         name = request.POST.get("name", "").strip()
         phone = request.POST.get("phone", "").strip()
         cpf = re.sub(r"\D", "", request.POST.get("cpf", ""))
+        birth_date = None
+        birth_date_error = False
+        birth_date_raw = request.POST.get("birth_date", "").strip()
+        if birth_date_raw:
+            try:
+                birth_date = date.fromisoformat(birth_date_raw)
+                if birth_date > date.today():
+                    birth_date_error = True
+            except ValueError:
+                birth_date_error = True
         if not name:
             messages.error(request, "Informe seu nome.")
         elif cpf and not is_valid_cpf(cpf):
             messages.error(request, "CPF inválido.")
+        elif birth_date_error:
+            messages.error(request, "Data de nascimento inválida.")
         else:
             request.user.name = name
             request.user.phone = phone
             request.user.cpf = cpf
-            request.user.save(update_fields=["name", "phone", "cpf"])
+            request.user.birth_date = birth_date
+            request.user.save(
+                update_fields=["name", "phone", "cpf", "birth_date"]
+            )
             messages.success(request, "Dados atualizados com sucesso.")
     return redirect("accounts:profile")
 

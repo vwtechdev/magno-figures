@@ -44,6 +44,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     cpf = models.CharField(
         max_length=14, blank=True, default="", verbose_name="CPF"
     )
+    birth_date = models.DateField(
+        null=True, blank=True, verbose_name="Data de Nascimento"
+    )
     is_staff = models.BooleanField(
         default=False, verbose_name="Equipe"
     )

@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ("email",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Dados Pessoais", {"fields": ("name", "phone", "cpf")}),
+        ("Dados Pessoais", {"fields": ("name", "phone", "cpf", "birth_date")}),
         (
             "Permissões",
             {

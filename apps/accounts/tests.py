@@ -87,3 +87,55 @@ class ProfileDataTest(TestCase):
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.cpf, "")
+    def test_profile_data_saves_birth_date(self):
+        self.client.post(
+            reverse("accounts:profile_data"),
+            {
+                "name": "Nome Novo",
+                "phone": "",
+                "cpf": "",
+                "birth_date": "1990-05-15",
+            },
+        )
+
+        self.user.refresh_from_db()
+        self.assertEqual(str(self.user.birth_date), "1990-05-15")
+
+    def test_profile_data_rejects_future_birth_date(self):
+        self.client.post(
+            reverse("accounts:profile_data"),
+            {
+                "name": "Nome Novo",
+                "phone": "",
+                "cpf": "",
+                "birth_date": "2999-01-01",
+            },
+        )
+
+        self.user.refresh_from_db()
+        self.assertIsNone(self.user.birth_date)
+        self.assertEqual(self.user.name, "Nome Antigo")
+
+    def test_profile_data_rejects_invalid_birth_date(self):
+        self.client.post(
+            reverse("accounts:profile_data"),
+            {
+                "name": "Nome Novo",
+                "phone": "",
+                "cpf": "",
+                "birth_date": "31/02/2000",
+            },
+        )
+
+        self.user.refresh_from_db()
+        self.assertIsNone(self.user.birth_date)
+
+    def test_profile_data_allows_blank_birth_date(self):
+        self.client.post(
+            reverse("accounts:profile_data"),
+            {"name": "Nome Novo", "phone": "", "cpf": "", "birth_date": ""},
+        )
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Nome Novo")
+        self.assertIsNone(self.user.birth_date)

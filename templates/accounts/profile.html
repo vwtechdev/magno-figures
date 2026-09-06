@@ -52,6 +52,10 @@
                 <label class="profile__data-label" for="id_cpf">CPF</label>
                 <input type="text" id="id_cpf" name="cpf" value="{{ user.cpf }}" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" class="profile__input" data-cpf-mask>
             </div>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_birth_date">Data de Nascimento</label>
+                <input type="date" id="id_birth_date" name="birth_date" value="{{ user.birth_date|date:'Y-m-d' }}" class="profile__input">
+            </div>
             <button type="submit" class="profile__cpf-btn">Salvar</button>
         </form>
     </div>
