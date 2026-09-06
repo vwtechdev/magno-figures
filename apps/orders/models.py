@@ -186,6 +186,23 @@ class Order(BaseModel):
         )
         return message
 
+    def generate_production_message(self):
+        return (
+            f"Olá, {self.user.name}! "
+            f"Seu pedido *#{self.pk}* na Magno Figures entrou em "
+            f"*produção*. Avisaremos quando for enviado!"
+        )
+
+    def generate_shipment_message(self):
+        lines = [
+            f"Olá, {self.user.name}! "
+            f"Seu pedido *#{self.pk}* foi *enviado*!",
+            f"*Código de rastreio:* {self.tracking_code.strip()}",
+        ]
+        if self.tracking_url:
+            lines += ["", f"Acompanhe aqui: {self.tracking_url}"]
+        return "\n".join(lines)
+
     def _whatsapp_url(self, message):
         from apps.website.models import Website
 
@@ -197,6 +214,12 @@ class Order(BaseModel):
 
     def get_confirmation_url(self):
         return self._whatsapp_url(self.generate_confirmation_message())
+
+    def get_production_url(self):
+        return self._whatsapp_url(self.generate_production_message())
+
+    def get_shipment_url(self):
+        return self._whatsapp_url(self.generate_shipment_message())
 
 
 class OrderItem(BaseModel):

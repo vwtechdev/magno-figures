@@ -516,3 +516,116 @@ class OrderTrackingTest(TestCase):
         order = self._make_order(status=OrderStatus.PAID)
         response = self.client.get(reverse("orders:detail", args=[order.pk]))
         self.assertNotContains(response, "Rastrear pedido")
+
+
+class OrderAdminActionsTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        mail.outbox.clear()
+        self.admin = User.objects.create_superuser(
+            email="admin@example.com",
+            password="senha-forte-123",
+            name="Admin",
+        )
+        self.user = User.objects.create_user(
+            email="acao@example.com",
+            password="senha-forte-123",
+            name="Cliente Ação",
+            phone="(11) 99999-0000",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.order = Order.objects.create(
+            user=self.user,
+            address=self.address,
+            status=OrderStatus.NEW,
+        )
+        self.client.force_login(self.admin)
+
+    def _post(self, name):
+        return self.client.post(
+            reverse(name, args=[self.order.pk])
+        )
+
+    def test_confirmation_sets_status_and_opens_whatsapp(self):
+        response = self._post("admin:orders_order_send_confirmation")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.CONFIRM)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            response.url.startswith("https://api.whatsapp.com/send?phone=")
+        )
+        self.assertIn("Confirma%20a%20realiza", response.url)
+
+    def test_production_sets_status_and_opens_whatsapp(self):
+        response = self._post("admin:orders_order_send_production")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.PRODUCTION)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("produ", response.url)
+
+    def test_shipment_with_code_sets_status_and_opens_whatsapp(self):
+        self.order.tracking_code = "BR123456789BR"
+        self.order.save()
+        response = self._post("admin:orders_order_send_shipment")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.SENT)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("BR123456789BR", response.url)
+
+    def test_shipment_without_code_stays(self):
+        response = self._post("admin:orders_order_send_shipment")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.NEW)
+        self.assertRedirects(
+            response,
+            reverse("admin:orders_order_change", args=[self.order.pk]),
+        )
+
+    def test_get_does_not_change_status(self):
+        response = self.client.get(
+            reverse("admin:orders_order_send_confirmation", args=[self.order.pk])
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.NEW)
+        self.assertEqual(response.status_code, 302)
+
+    def test_requires_staff(self):
+        self.client.logout()
+        response = self.client.post(
+            reverse("admin:orders_order_send_confirmation", args=[self.order.pk])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login/", response.url)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, OrderStatus.NEW)
+
+    def test_message_contents(self):
+        self.assertIn("entrou em *produção*", self.order.generate_production_message())
+        shipment = Order.objects.create(
+            user=self.user,
+            address=self.address,
+            status=OrderStatus.SENT,
+            shipping_service="PAC",
+            tracking_code="BR123456789BR",
+        )
+        message = shipment.generate_shipment_message()
+        self.assertIn("foi *enviado*", message)
+        self.assertIn("BR123456789BR", message)
+        self.assertIn("https://rastreamento.correios.com.br/", message)

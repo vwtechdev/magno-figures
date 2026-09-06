@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+
+{% block after_field_sets %}
+{{ block.super }}
+{% if original and original.pk %}
+<fieldset class="module aligned">
+    <h2>Ações WhatsApp</h2>
+    <div class="form-row">
+        <form method="post" action="{% url 'admin:orders_order_send_confirmation' original.pk %}" target="_blank" style="display: inline-block; margin-right: 8px;">
+            {% csrf_token %}
+            <button type="submit" class="button">Confirmação (WhatsApp)</button>
+        </form>
+        <form method="post" action="{% url 'admin:orders_order_send_production' original.pk %}" target="_blank" style="display: inline-block; margin-right: 8px;">
+            {% csrf_token %}
+            <button type="submit" class="button">Produção (WhatsApp)</button>
+        </form>
+        <form method="post" action="{% url 'admin:orders_order_send_shipment' original.pk %}" target="_blank" style="display: inline-block;">
+            {% csrf_token %}
+            <button type="submit" class="button">Envio (WhatsApp)</button>
+        </form>
+        <p class="help">Atualiza o status do pedido e abre o WhatsApp em nova guia com a mensagem pronta.</p>
+    </div>
+</fieldset>
+{% endif %}
+{% endblock %}
