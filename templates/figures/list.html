@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load mptt_tags %}
 
 {% block title %}Catálogo — {{ website_config.company_name }}{% endblock %}
 
@@ -20,23 +21,30 @@
                 {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
                 <fieldset class="filters__group">
                     <legend class="filters__title">Categorias</legend>
-                    <details class="filters__dropdown" id="categoryDropdown">
-                        <summary class="filters__dropdown-toggle">
-                            <span>Selecionar categorias</span>
-                            <span class="filters__dropdown-count" id="categoryCount"{% if not selected_cats %} hidden{% endif %}>{{ selected_cats|length }}</span>
-                            <svg class="filters__dropdown-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-                        </summary>
-                        <div class="filters__dropdown-panel">
-                            {% for category in filter_categories %}
-                            <label class="filters__check filters__check--level-{{ category.level }}">
-                                <input type="checkbox" name="cat" value="{{ category.slug }}"{% if category.slug in selected_cats %} checked{% endif %}>
-                                <span>{{ category.name }}</span>
-                            </label>
-                            {% empty %}
-                            <p class="filters__empty">Nenhuma categoria.</p>
-                            {% endfor %}
-                        </div>
-                    </details>
+                    {% if filter_categories %}
+                    <ul class="filters__tree">
+                        {% recursetree filter_categories %}
+                        <li class="filters__node">
+                            <div class="filters__node-row">
+                                <label class="filters__check">
+                                    <input type="checkbox" name="cat" value="{{ node.slug }}"{% if node.slug in selected_cats %} checked{% endif %}>
+                                    <span>{{ node.name }}</span>
+                                </label>
+                                {% if not node.is_leaf_node %}
+                                <button type="button" class="filters__node-toggle" aria-expanded="false" aria-label="Expandir {{ node.name }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% if not node.is_leaf_node %}
+                            <ul class="filters__children">{{ children }}</ul>
+                            {% endif %}
+                        </li>
+                        {% endrecursetree %}
+                    </ul>
+                    {% else %}
+                    <p class="filters__empty">Nenhuma categoria.</p>
+                    {% endif %}
                 </fieldset>
                 <fieldset class="filters__group">
                     <legend class="filters__title">Preço (R$)</legend>

@@ -64,23 +64,35 @@
         load(buildUrl(), false);
     });
 
-    function updateCategoryCount() {
-        var count = document.getElementById("categoryCount");
-        if (!count) {
-            return;
-        }
-        var total = form.querySelectorAll('input[name="cat"]:checked').length;
-        count.textContent = total;
-        count.hidden = total === 0;
-    }
-
     form.querySelectorAll('input[name="cat"]').forEach(function (box) {
         box.addEventListener("change", function () {
-            updateCategoryCount();
             load(buildUrl(), false);
         });
     });
-    updateCategoryCount();
+
+    form.querySelectorAll(".filters__node-toggle").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var node = btn.closest(".filters__node");
+            var open = node.classList.toggle("is-open");
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+    });
+
+    form.querySelectorAll('input[name="cat"]:checked').forEach(function (box) {
+        var el = box;
+        while (el) {
+            var node = el.closest ? el.closest(".filters__node") : null;
+            if (!node) {
+                break;
+            }
+            node.classList.add("is-open");
+            var btn = node.querySelector(":scope > .filters__node-row > .filters__node-toggle");
+            if (btn) {
+                btn.setAttribute("aria-expanded", "true");
+            }
+            el = node.parentElement;
+        }
+    });
 
     var debounceTimer = null;
     ["min_price", "max_price"].forEach(function (name) {
