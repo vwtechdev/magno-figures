@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -91,9 +92,12 @@ class Order(BaseModel):
 
     @property
     def total(self):
-        return self.items.aggregate(
+        # SQLite devolve float em agregações com decimais; converte via str
+        # para não carregar o erro binário e quantiza em 2 casas.
+        value = self.items.aggregate(
             total=Sum(models.F("price") * models.F("quantity"))
-        )["total"] or 0.0
+        )["total"] or 0
+        return Decimal(str(value)).quantize(Decimal("0.01"))
 
     @property
     def total_with_shipping(self):

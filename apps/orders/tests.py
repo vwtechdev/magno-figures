@@ -653,3 +653,35 @@ class OrderAdminActionsTest(TestCase):
         self.assertContains(response, "btn btn-success")
         self.assertContains(response, "btn btn-warning")
         self.assertContains(response, "btn btn-info")
+
+
+class OrderTotalTest(TestCase):
+    def test_total_is_quantized_decimal(self):
+        user = User.objects.create_user(
+            email="total@example.com",
+            password="senha-forte-123",
+            name="Cliente Total",
+        )
+        address = Address.objects.create(
+            user=user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        figure = Figure.objects.create(
+            name="Figure Total",
+            slug="figure-total",
+            description="Teste de total.",
+            price=Decimal("799.90"),
+            stock=5,
+            image=make_image(),
+        )
+        order = Order.objects.create(user=user, address=address)
+        OrderItem.objects.create(
+            order=order, figure=figure, quantity=1, price=figure.price
+        )
+        self.assertEqual(order.total, Decimal("799.90"))
+        self.assertIsInstance(order.total, Decimal)
