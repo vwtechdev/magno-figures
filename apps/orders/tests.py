@@ -629,3 +629,13 @@ class OrderAdminActionsTest(TestCase):
         self.assertIn("foi *enviado*", message)
         self.assertIn("BR123456789BR", message)
         self.assertIn("https://rastreamento.correios.com.br/", message)
+
+    def test_change_form_renders_jazzmin_buttons(self):
+        response = self.client.get(
+            reverse("admin:orders_order_change", args=[self.order.pk])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Ações WhatsApp")
+        self.assertContains(response, "btn btn-success")
+        self.assertContains(response, "btn btn-warning")
+        self.assertContains(response, "btn btn-info")
