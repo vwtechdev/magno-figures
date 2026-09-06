@@ -78,7 +78,7 @@
             {% if figure.has_discount %}
             <del class="product__old-price">R$ {{ figure.old_price|floatformat:2 }}</del>
             R$ {{ figure.sale_price|floatformat:2 }}
-            <span class="badge badge--off">{{ figure.discount_percent }}% OFF</span>
+            <span class="product__stock product__stock--out">{{ figure.discount_percent }}% OFF</span>
             {% else %}
             R$ {{ figure.price|floatformat:2 }}
             {% endif %}

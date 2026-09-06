@@ -595,13 +595,6 @@ ul {
     color: #f87171;
 }
 
-.card__badge--off {
-    background: var(--gold-gradient);
-    border-color: transparent;
-    color: var(--bg);
-    font-weight: 700;
-}
-
 .card__old-price {
     color: var(--text-muted);
     font-weight: 400;
@@ -811,15 +804,4 @@ ul {
     background: rgba(248, 113, 113, 0.15);
     color: #f87171;
     border: 1px solid rgba(248, 113, 113, 0.4);
-}
-
-.badge--off {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    vertical-align: middle;
-    background: var(--gold-gradient);
-    color: var(--bg);
 }
