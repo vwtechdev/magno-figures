@@ -1,5 +1,6 @@
 from decimal import Decimal
 from io import BytesIO
+import re
 import time
 from unittest import mock
 
@@ -727,6 +728,13 @@ class OrderAdminActionsTest(TestCase):
         )
         self.assertContains(response, 'id="order-status"')
         self.assertNotContains(response, 'name="status"')
+
+    def test_dashboard_prioritizes_orders_card(self):
+        response = self.client.get("/admin/")
+        self.assertEqual(response.status_code, 200)
+        cards = re.findall(r'<h5 class="m-0">([^<]+)</h5>', response.content.decode())
+        self.assertIn("Pedidos", cards)
+        self.assertEqual(cards.index("Pedidos"), 0)
 
 
 class OrderTotalTest(TestCase):
