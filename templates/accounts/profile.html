@@ -46,7 +46,7 @@
             </div>
             <div class="profile__field">
                 <label class="profile__data-label" for="id_phone">Telefone</label>
-                <input type="text" id="id_phone" name="phone" value="{{ user.phone }}" class="profile__input" placeholder="(00) 00000-0000">
+                <input type="text" id="id_phone" name="phone" value="{{ user.phone }}" class="profile__input" placeholder="(00) 00000-0000" data-phone-mask>
             </div>
             <div class="profile__field">
                 <label class="profile__data-label" for="id_cpf">CPF</label>
@@ -93,4 +93,5 @@
 {% block extra_js %}
 <script src="{% static 'js/accounts/profile-tabs.js' %}" defer></script>
 <script src="{% static 'js/cpf-mask.js' %}" defer></script>
+<script src="{% static 'js/accounts/phone-mask.js' %}" defer></script>
 {% endblock %}

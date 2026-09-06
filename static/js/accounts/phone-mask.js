@@ -24,6 +24,9 @@ function applyPhoneMask(input) {
 
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("input[data-phone-mask]").forEach((input) => {
+        if (input.value) {
+            applyPhoneMask(input);
+        }
         input.addEventListener("input", () => applyPhoneMask(input));
     });
 });
