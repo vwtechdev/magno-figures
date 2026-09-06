@@ -69,6 +69,11 @@
     </div>
 
     <div class="product__info">
+        {% if messages %}
+        <div class="notify__messages">
+            {% for message in messages %}<p class="notify__message">{{ message }}</p>{% endfor %}
+        </div>
+        {% endif %}
         <div class="product__price">
             R$ {{ figure.price|floatformat:2 }}
         </div>
@@ -107,6 +112,15 @@
             {% if not figure.sold_out %}
             <a href="{% url 'carts:add' figure.id %}?buy=1" class="product__cta product__cta--buy">Comprar</a>
             <a href="{% url 'carts:add' figure.id %}" class="product__cta product__cta--ghost">Adicionar ao carrinho</a>
+            {% else %}
+            <form class="notify" method="post" action="{% url 'figures:notify' figure.slug %}">
+                {% csrf_token %}
+                <label class="notify__label" for="notifyEmail">Me avise quando disponível</label>
+                <div class="notify__row">
+                    <input class="notify__input" type="email" name="email" id="notifyEmail" placeholder="Seu email" required autocomplete="email">
+                    <button class="notify__btn" type="submit">Avise-me</button>
+                </div>
+            </form>
             {% endif %}
         </div>
     </div>

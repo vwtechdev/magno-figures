@@ -2,10 +2,14 @@ import re
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.core.validators import validate_email
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 
 from apps.categories.gating import (
@@ -14,7 +18,7 @@ from apps.categories.gating import (
     redirect_to_age_gate,
 )
 from apps.categories.models import Category
-from apps.figures.models import Figure
+from apps.figures.models import Figure, StockAlert
 from apps.figures.services import calculate_shipping
 from apps.website.models import Website
 
@@ -139,3 +143,57 @@ def figure_shipping_view(request, slug):
     if error:
         return JsonResponse({"error": error}, status=503)
     return JsonResponse({"options": options})
+
+
+def stock_alert_subscribe_view(request, slug):
+    figure = get_object_or_404(Figure.objects.active(), slug=slug)
+    if not figure.sold_out:
+        messages.info(request, "Este item já está disponível.")
+        return redirect("figures:detail", slug=figure.slug)
+    if request.method != "POST":
+        return redirect("figures:detail", slug=figure.slug)
+    email = (request.POST.get("email") or "").strip().lower()
+    try:
+        validate_email(email)
+    except ValidationError:
+        messages.error(request, "Informe um email válido.")
+        return redirect("figures:detail", slug=figure.slug)
+    try:
+        alert, created = StockAlert.objects.get_or_create(
+            figure=figure, email=email
+        )
+    except IntegrityError:
+        messages.info(request, "Este email já está na lista de avisos.")
+        return redirect("figures:detail", slug=figure.slug)
+    if not created and not alert.is_notified:
+        messages.info(request, "Este email já está na lista de avisos.")
+    else:
+        if not created and alert.is_notified:
+            alert.is_notified = False
+            alert.save(update_fields=["is_notified", "updated_by"])
+        messages.success(
+            request,
+            "Email cadastrado! Avisaremos quando estiver disponível.",
+        )
+    return redirect("figures:detail", slug=figure.slug)
+
+
+def stock_alert_unsubscribe_view(request, token):
+    from django.core import signing
+
+    from apps.figures.notifications import parse_stock_alert_token
+
+    try:
+        data = parse_stock_alert_token(token)
+    except signing.BadSignature:
+        return render(
+            request, "figures/unsubscribe.html", {"valid": False}, status=400
+        )
+    StockAlert.objects.filter(
+        figure_id=data.get("figure_id"), email=data.get("email")
+    ).delete()
+    return render(
+        request,
+        "figures/unsubscribe.html",
+        {"valid": True, "email": data.get("email")},
+    )

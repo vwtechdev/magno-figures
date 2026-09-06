@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cancelar aviso — {{ website_config.company_name }}{% endblock %}
+
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="auth container">
+    <div class="auth__box">
+        {% if valid %}
+        <h1 class="auth__title"><span class="text-gold">Aviso cancelado</span></h1>
+        <p class="auth__hint">O email {{ email }} não receberá mais avisos de reposição.</p>
+        {% else %}
+        <h1 class="auth__title"><span class="text-gold">Link inválido</span></h1>
+        <p class="auth__hint">Este link de cancelamento não é válido.</p>
+        {% endif %}
+        <p class="auth__switch"><a href="{% url 'figures:list' %}" class="auth__link">Voltar ao catálogo</a></p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/login.css' %}">
+{% endblock %}

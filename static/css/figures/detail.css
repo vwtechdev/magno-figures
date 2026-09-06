@@ -182,6 +182,66 @@
     box-shadow: none;
 }
 
+.notify {
+    width: 100%;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+}
+
+.notify__label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.notify__row {
+    display: flex;
+    gap: 10px;
+}
+
+.notify__input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.notify__input:focus {
+    outline: none;
+    border-color: var(--gold-2);
+    box-shadow: 0 0 0 3px rgba(234, 201, 121, 0.15);
+}
+
+.notify__btn {
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: var(--gold-gradient);
+    color: var(--bg);
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.notify__btn:hover {
+    opacity: 0.9;
+}
+
+.notify__messages {
+    margin-top: 10px;
+}
+
+.notify__message {
+    font-size: 0.9rem;
+    color: var(--gold-2);
+}
+
 @media (max-width: 480px) {
     .product__cta-row {
         flex-direction: column;

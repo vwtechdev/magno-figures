@@ -1,4 +1,4 @@
-from django.db.models.signals import post_delete, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from apps.figures.models import Figure, FigureImage
@@ -40,3 +40,25 @@ def replace_figure_image(sender, instance, **kwargs):
 @receiver(pre_save, sender=FigureImage)
 def replace_figure_image_file(sender, instance, **kwargs):
     _replace_file(sender, instance, "image")
+
+
+@receiver(pre_save, sender=Figure)
+def stash_figure_sold_out(sender, instance, **kwargs):
+    if not instance.pk:
+        instance._was_sold_out = None
+        return
+    instance._was_sold_out = (
+        sender.objects.filter(pk=instance.pk)
+        .values_list("sold_out", flat=True)
+        .first()
+    )
+
+
+@receiver(post_save, sender=Figure)
+def send_stock_alerts_on_restock(sender, instance, created, **kwargs):
+    if created:
+        return
+    if getattr(instance, "_was_sold_out", None) and not instance.sold_out:
+        from apps.figures.notifications import notify_stock_alerts
+
+        notify_stock_alerts(instance)

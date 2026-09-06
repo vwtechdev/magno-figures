@@ -4,17 +4,20 @@ import json
 import os
 import re
 import tempfile
+import time
 from unittest import mock
 
 import requests
 from PIL import Image
+from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.categories.models import Category
-from apps.figures.models import Figure, FigureImage
+from apps.figures.models import Figure, FigureImage, StockAlert
+from apps.figures.notifications import stock_alert_token
 from apps.figures.services import calculate_shipping
 from apps.website.models import Website
 from core.utils import site_base_url
@@ -450,3 +453,145 @@ class CatalogFilterTest(TestCase):
             response, "Esta categoria contém conteúdo para maiores de 18 anos."
         )
         self.assertContains(response, reverse("categories:age_gate"))
+
+class StockAlertTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        mail.outbox.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.figure = Figure.objects.create(
+            name="Iron Man",
+            slug="iron-man",
+            description="Action figure do Homem de Ferro.",
+            price=Decimal("199.90"),
+            stock=0,
+            sold_out=True,
+            image=make_image("iron.png"),
+        )
+
+    def _wait_for_email(self, timeout=2.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if mail.outbox:
+                return True
+            time.sleep(0.01)
+        return False
+
+    def test_sold_out_page_shows_notify_form(self):
+        response = self.client.get(
+            reverse("figures:detail", args=[self.figure.slug])
+        )
+        self.assertContains(response, "Me avise quando disponível")
+        self.assertContains(
+            response, reverse("figures:notify", args=[self.figure.slug])
+        )
+
+    def test_available_page_has_no_notify_form(self):
+        self.figure.sold_out = False
+        self.figure.save()
+        response = self.client.get(
+            reverse("figures:detail", args=[self.figure.slug])
+        )
+        self.assertNotContains(response, "Me avise quando disponível")
+
+    def test_subscribe_creates_alert(self):
+        response = self.client.post(
+            reverse("figures:notify", args=[self.figure.slug]),
+            {"email": "cliente@example.com"},
+            follow=True,
+        )
+        self.assertTrue(
+            StockAlert.objects.filter(
+                figure=self.figure, email="cliente@example.com"
+            ).exists()
+        )
+        self.assertContains(response, "Avisaremos quando estiver disponível.")
+
+    def test_subscribe_duplicate_keeps_single_alert(self):
+        url = reverse("figures:notify", args=[self.figure.slug])
+        self.client.post(url, {"email": "cliente@example.com"})
+        response = self.client.post(
+            url, {"email": "cliente@example.com"}, follow=True
+        )
+        self.assertEqual(
+            StockAlert.objects.filter(figure=self.figure).count(), 1
+        )
+        self.assertContains(response, "já está na lista de avisos.")
+
+    def test_subscribe_invalid_email_rejected(self):
+        response = self.client.post(
+            reverse("figures:notify", args=[self.figure.slug]),
+            {"email": "nao-email"},
+            follow=True,
+        )
+        self.assertEqual(
+            StockAlert.objects.filter(figure=self.figure).count(), 0
+        )
+        self.assertContains(response, "Informe um email válido.")
+
+    def test_subscribe_available_figure_rejected(self):
+        self.figure.sold_out = False
+        self.figure.save()
+        response = self.client.post(
+            reverse("figures:notify", args=[self.figure.slug]),
+            {"email": "cliente@example.com"},
+            follow=True,
+        )
+        self.assertEqual(
+            StockAlert.objects.filter(figure=self.figure).count(), 0
+        )
+        self.assertContains(response, "já está disponível.")
+
+    def test_restock_sends_email_and_marks_notified(self):
+        alert = StockAlert.objects.create(
+            figure=self.figure, email="cliente@example.com"
+        )
+        self.figure.sold_out = False
+        self.figure.save()
+        self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["cliente@example.com"])
+        self.assertIn("Iron Man", message.subject)
+        self.assertIn("/figures/iron-man/", message.body)
+        self.assertIn("/figures/stock-alerts/unsubscribe/", message.body)
+        alert.refresh_from_db()
+        self.assertTrue(alert.is_notified)
+
+    def test_other_edits_do_not_send(self):
+        StockAlert.objects.create(
+            figure=self.figure, email="cliente@example.com"
+        )
+        self.figure.price = Decimal("179.90")
+        self.figure.save()
+        time.sleep(0.3)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_unsubscribe_valid_token(self):
+        alert = StockAlert.objects.create(
+            figure=self.figure, email="cliente@example.com"
+        )
+        token = stock_alert_token(alert)
+        response = self.client.get(
+            reverse("figures:unsubscribe", args=[token])
+        )
+        self.assertContains(response, "Aviso cancelado")
+        self.assertFalse(
+            StockAlert.objects.filter(pk=alert.pk).exists()
+        )
+
+    def test_unsubscribe_invalid_token(self):
+        response = self.client.get(
+            reverse("figures:unsubscribe", args=["invalido"])
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(
+            response, "Link inválido", status_code=400
+        )
