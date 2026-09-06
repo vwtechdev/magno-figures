@@ -103,6 +103,32 @@
     margin-bottom: 12px;
 }
 
+.order-page__copy {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px;
+    margin-left: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    vertical-align: middle;
+}
+
+.order-page__copy:hover {
+    color: var(--gold-2);
+    border-color: var(--gold-2);
+}
+
+.order-page__copy svg {
+    display: block;
+}
+
+.order-page__copied {
+    margin-left: 8px;
+    font-size: 0.85rem;
+    color: var(--gold-2);
+}
+
 .order-page__tracking-btn {
     display: inline-block;
     padding: 10px 20px;

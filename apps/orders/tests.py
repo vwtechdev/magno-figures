@@ -519,6 +519,7 @@ class OrderTrackingTest(TestCase):
         response = self.client.get(reverse("orders:detail", args=[order.pk]))
         self.assertContains(response, "BR123456789BR")
         self.assertContains(response, "Rastrear pedido")
+        self.assertContains(response, 'id="copyTracking"')
         self.assertContains(
             response, "https://rastreamento.correios.com.br/"
         )
