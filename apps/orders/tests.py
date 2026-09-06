@@ -635,7 +635,22 @@ class OrderAdminActionsTest(TestCase):
             reverse("admin:orders_order_change", args=[self.order.pk])
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Ações WhatsApp")
+        self.assertContains(
+            response,
+            reverse(
+                "admin:orders_order_send_confirmation", args=[self.order.pk]
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "admin:orders_order_send_production", args=[self.order.pk]
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse("admin:orders_order_send_shipment", args=[self.order.pk]),
+        )
         self.assertContains(response, "btn btn-success")
         self.assertContains(response, "btn btn-warning")
         self.assertContains(response, "btn btn-info")

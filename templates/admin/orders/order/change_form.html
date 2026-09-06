@@ -2,26 +2,26 @@
 {% load i18n jazzmin %}
 {% get_jazzmin_ui_tweaks as jazzmin_ui %}
 
-{% block after_field_sets %}
+{% block object-tools-items %}
 {{ block.super }}
 {% if original and original.pk %}
-<fieldset class="module aligned">
-    <h2>Ações WhatsApp</h2>
-    <div class="form-row">
-        <form method="post" action="{% url 'admin:orders_order_send_confirmation' original.pk %}" target="_blank" style="display: inline-block; margin-right: 8px;">
-            {% csrf_token %}
-            <button type="submit" class="btn {{ jazzmin_ui.button_classes.success }}">Confirmação (WhatsApp)</button>
-        </form>
-        <form method="post" action="{% url 'admin:orders_order_send_production' original.pk %}" target="_blank" style="display: inline-block; margin-right: 8px;">
-            {% csrf_token %}
-            <button type="submit" class="btn {{ jazzmin_ui.button_classes.warning }}">Produção (WhatsApp)</button>
-        </form>
-        <form method="post" action="{% url 'admin:orders_order_send_shipment' original.pk %}" target="_blank" style="display: inline-block;">
-            {% csrf_token %}
-            <button type="submit" class="btn {{ jazzmin_ui.button_classes.info }}">Envio (WhatsApp)</button>
-        </form>
-        <p class="help">Atualiza o status do pedido e abre o WhatsApp em nova guia com a mensagem pronta.</p>
-    </div>
-</fieldset>
+<li>
+    <form method="post" action="{% url 'admin:orders_order_send_confirmation' original.pk %}" target="_blank" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm">Confirmação (WhatsApp)</button>
+    </form>
+</li>
+<li>
+    <form method="post" action="{% url 'admin:orders_order_send_production' original.pk %}" target="_blank" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn {{ jazzmin_ui.button_classes.warning }} btn-sm">Produção (WhatsApp)</button>
+    </form>
+</li>
+<li>
+    <form method="post" action="{% url 'admin:orders_order_send_shipment' original.pk %}" target="_blank" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn {{ jazzmin_ui.button_classes.info }} btn-sm">Envio (WhatsApp)</button>
+    </form>
+</li>
 {% endif %}
 {% endblock %}
