@@ -13,6 +13,9 @@ const CPFMask = (() => {
 
     function init(input) {
         if (!input) return;
+        if (input.value) {
+            input.value = format(input.value);
+        }
         input.addEventListener("input", () => {
             input.value = format(input.value);
         });
