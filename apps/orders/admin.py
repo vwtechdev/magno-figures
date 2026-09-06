@@ -28,12 +28,35 @@ class OrderAdmin(admin.ModelAdmin):
         "updated_by",
         "user",
         "address",
+        "subtotal_display",
+        "shipping_display",
+        "grand_total_display",
     )
     inlines = [OrderItemInline]
     fieldsets = (
         (None, {"fields": ("user", "address", "status", "tracking_code")}),
+        ("Totais", {"fields": ("subtotal_display", "shipping_display", "grand_total_display")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
+
+    @admin.display(description="Subtotal")
+    def subtotal_display(self, obj):
+        if obj and obj.pk:
+            return f"R$ {obj.total:.2f}".replace(".", ",")
+        return "-"
+
+    @admin.display(description="Frete")
+    def shipping_display(self, obj):
+        if obj and obj.pk and obj.shipping_price is not None:
+            service = f" ({obj.shipping_service})" if obj.shipping_service else ""
+            return f"R$ {obj.shipping_price:.2f}{service}".replace(".", ",")
+        return "A combinar"
+
+    @admin.display(description="Total")
+    def grand_total_display(self, obj):
+        if obj and obj.pk:
+            return f"R$ {obj.total_with_shipping:.2f}".replace(".", ",")
+        return "-"
 
     def get_urls(self):
         urls = super().get_urls()
