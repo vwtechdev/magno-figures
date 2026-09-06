@@ -567,18 +567,19 @@ class OrderAdminActionsTest(TestCase):
         response = self._post("admin:orders_order_send_confirmation")
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, OrderStatus.CONFIRM)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        url = response.json()["url"]
         self.assertTrue(
-            response.url.startswith("https://api.whatsapp.com/send?phone=")
+            url.startswith("https://api.whatsapp.com/send?phone=")
         )
-        self.assertIn("Confirma%20a%20realiza", response.url)
+        self.assertIn("Confirma%20a%20realiza", url)
 
     def test_production_sets_status_and_opens_whatsapp(self):
         response = self._post("admin:orders_order_send_production")
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, OrderStatus.PRODUCTION)
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("produ", response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("produ", response.json()["url"])
 
     def test_shipment_with_code_sets_status_and_opens_whatsapp(self):
         self.order.tracking_code = "BR123456789BR"
@@ -586,17 +587,15 @@ class OrderAdminActionsTest(TestCase):
         response = self._post("admin:orders_order_send_shipment")
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, OrderStatus.SENT)
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("BR123456789BR", response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("BR123456789BR", response.json()["url"])
 
     def test_shipment_without_code_stays(self):
         response = self._post("admin:orders_order_send_shipment")
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, OrderStatus.NEW)
-        self.assertRedirects(
-            response,
-            reverse("admin:orders_order_change", args=[self.order.pk]),
-        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("error", response.json())
 
     def test_get_does_not_change_status(self):
         response = self.client.get(
@@ -604,7 +603,7 @@ class OrderAdminActionsTest(TestCase):
         )
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, OrderStatus.NEW)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 405)
 
     def test_requires_staff(self):
         self.client.logout()

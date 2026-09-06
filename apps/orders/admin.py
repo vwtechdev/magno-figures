@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import path
 
 from apps.orders.models import Order, OrderItem, OrderStatus
@@ -55,35 +56,37 @@ class OrderAdmin(admin.ModelAdmin):
         ]
         return custom + urls
 
-    def _transition_and_redirect(self, request, pk, status, url_getter):
-        change_url = redirect("admin:orders_order_change", pk)
+    def _transition_result(self, request, pk, status, url_getter):
         if request.method != "POST":
-            return change_url
+            return JsonResponse({"error": "Método não permitido."}, status=405)
         order = get_object_or_404(Order, pk=pk)
         order.status = status
         try:
             order.clean()
         except ValidationError as exc:
-            for field_errors in exc.message_dict.values():
-                for error in field_errors:
-                    messages.error(request, error)
-            return change_url
+            errors = [
+                str(error)
+                for field_errors in exc.message_dict.values()
+                for error in field_errors
+            ]
+            messages.error(request, " ".join(errors))
+            return JsonResponse({"error": " ".join(errors)}, status=400)
         order.updated_by = request.user
         order.save(update_fields=["status", "updated_by"])
-        return redirect(url_getter(order))
+        return JsonResponse({"url": url_getter(order)})
 
     def send_confirmation_view(self, request, pk):
-        return self._transition_and_redirect(
+        return self._transition_result(
             request, pk, OrderStatus.CONFIRM, Order.get_confirmation_url
         )
 
     def send_production_view(self, request, pk):
-        return self._transition_and_redirect(
+        return self._transition_result(
             request, pk, OrderStatus.PRODUCTION, Order.get_production_url
         )
 
     def send_shipment_view(self, request, pk):
-        return self._transition_and_redirect(
+        return self._transition_result(
             request, pk, OrderStatus.SENT, Order.get_shipment_url
         )
 

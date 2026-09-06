@@ -1,27 +1,23 @@
 {% extends "admin/change_form.html" %}
-{% load i18n jazzmin %}
+{% load i18n jazzmin static %}
 {% get_jazzmin_ui_tweaks as jazzmin_ui %}
 
 {% block object-tools-items %}
 {{ block.super }}
 {% if original and original.pk %}
 <li>
-    <form method="post" action="{% url 'admin:orders_order_send_confirmation' original.pk %}" target="_blank" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm">Confirmação (WhatsApp)</button>
-    </form>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.success }} btn-sm" data-order-action="{% url 'admin:orders_order_send_confirmation' original.pk %}">Confirmação (WhatsApp)</button>
 </li>
 <li>
-    <form method="post" action="{% url 'admin:orders_order_send_production' original.pk %}" target="_blank" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn {{ jazzmin_ui.button_classes.warning }} btn-sm">Produção (WhatsApp)</button>
-    </form>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.warning }} btn-sm" data-order-action="{% url 'admin:orders_order_send_production' original.pk %}">Produção (WhatsApp)</button>
 </li>
 <li>
-    <form method="post" action="{% url 'admin:orders_order_send_shipment' original.pk %}" target="_blank" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn {{ jazzmin_ui.button_classes.info }} btn-sm">Envio (WhatsApp)</button>
-    </form>
+    <button type="button" class="btn {{ jazzmin_ui.button_classes.info }} btn-sm" data-order-action="{% url 'admin:orders_order_send_shipment' original.pk %}">Envio (WhatsApp)</button>
 </li>
 {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'js/admin/order-actions.js' %}" defer></script>
 {% endblock %}
