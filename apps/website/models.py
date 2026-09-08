@@ -83,11 +83,15 @@ class Website(BaseModel):
     )
     logo = models.ImageField(
         upload_to="website/",
+        blank=True,
+        null=True,
         validators=[validate_image_size],
         verbose_name="Logo",
     )
     favicon = models.ImageField(
         upload_to="website/",
+        blank=True,
+        null=True,
         validators=[validate_image_size],
         verbose_name="Favicon",
     )

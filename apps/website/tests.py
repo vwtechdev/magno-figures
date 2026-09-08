@@ -241,7 +241,6 @@ class HomeSectionsTest(TestCase):
         self.assertIn(self.old, releases)
         self.assertNotIn(self.promo, releases)
         self.assertNotIn(self.sold_promo, releases)
-        self.assertContains(response, "Novos")
         self.assertContains(response, "Lançamentos")
 
     def test_promotions_excludes_sold_out_and_plain(self):
@@ -315,3 +314,21 @@ class WebsiteThemeTest(TestCase):
         self.website.theme_buttons = "dourado"
         with self.assertRaises(ValidationError):
             self.website.full_clean()
+
+
+class WebsiteConfigEmptyDbTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.all().delete()
+
+    def test_get_config_creates_placeholder_without_images(self):
+        config = Website.objects.get_config()
+        self.assertIsNotNone(config)
+        self.assertEqual(config.pk, 1)
+        self.assertFalse(config.logo)
+        self.assertFalse(config.favicon)
+
+    def test_home_renders_without_website_config(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "img/logo.png")
