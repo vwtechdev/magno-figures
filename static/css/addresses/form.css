@@ -13,6 +13,14 @@
     cursor: pointer;
 }
 
-.addr__back {
-    margin-top: 16px;
+.addr__back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: color var(--transition);
+}
+
+.addr__back-link:hover {
+    color: var(--gold-2);
 }

@@ -5,6 +5,8 @@
 
 {% block content %}
 <section class="checkout container">
+    <a href="{% url 'accounts:profile' %}?tab=addresses" class="addr__back-link">← Voltar para meus endereços</a>
+
     <h1 class="checkout__title">
         <span class="text-gold">{% if address %}Editar{% else %}Novo{% endif %}</span> Endereço
     </h1>
@@ -53,10 +55,6 @@
 
         <button class="checkout__submit" type="submit">Salvar endereço</button>
     </form>
-
-    <p class="addr__back">
-        <a href="{% url 'accounts:profile' %}?tab=addresses" class="addr__link">← Voltar para meus endereços</a>
-    </p>
 </section>
 {% endblock %}
 
