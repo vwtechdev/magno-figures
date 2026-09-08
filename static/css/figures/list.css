@@ -100,7 +100,7 @@
     width: 26px;
     height: 26px;
     border-radius: 8px;
-    border: 1px solid rgba(var(--white-rgb), 0.2);
+    border: 1px solid var(--border);
     color: var(--text);
     font-size: 1.1rem;
     line-height: 1;
