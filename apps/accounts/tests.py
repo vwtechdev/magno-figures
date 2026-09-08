@@ -169,6 +169,98 @@ class RegisterVerificationTest(TestCase):
         self.assertEqual(len(mail.outbox), second_count)
 
 
+class ProfilePasswordTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="senha@example.com",
+            password="senha-forte-123",
+            name="Cliente Senha",
+        )
+        self.client.force_login(self.user)
+        self.url = reverse("accounts:profile_password")
+
+    def test_change_password_success(self):
+        response = self.client.post(
+            self.url,
+            {
+                "current_password": "senha-forte-123",
+                "new_password1": "nova-senha-456",
+                "new_password2": "nova-senha-456",
+            },
+        )
+        self.assertRedirects(
+            response, reverse("accounts:profile") + "?tab=password"
+        )
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("nova-senha-456"))
+        self.assertIn("_auth_user_id", self.client.session)
+        response = self.client.get(reverse("accounts:profile") + "?tab=password")
+        self.assertContains(response, "Senha alterada com sucesso.")
+
+    def test_wrong_current_password_rejected(self):
+        response = self.client.post(
+            self.url,
+            {
+                "current_password": "errada",
+                "new_password1": "nova-senha-456",
+                "new_password2": "nova-senha-456",
+            },
+        )
+        self.assertRedirects(
+            response, reverse("accounts:profile") + "?tab=password"
+        )
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("senha-forte-123"))
+
+    def test_mismatched_passwords_rejected(self):
+        self.client.post(
+            self.url,
+            {
+                "current_password": "senha-forte-123",
+                "new_password1": "nova-senha-456",
+                "new_password2": "outra-senha-789",
+            },
+        )
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("senha-forte-123"))
+
+    def test_weak_password_rejected(self):
+        self.client.post(
+            self.url,
+            {
+                "current_password": "senha-forte-123",
+                "new_password1": "123",
+                "new_password2": "123",
+            },
+        )
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("senha-forte-123"))
+
+    def test_get_redirects_to_password_tab(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, reverse("accounts:profile") + "?tab=password"
+        )
+
+    def test_anonymous_redirects_to_login(self):
+        self.client.logout()
+        response = self.client.post(
+            self.url,
+            {
+                "current_password": "senha-forte-123",
+                "new_password1": "nova-senha-456",
+                "new_password2": "nova-senha-456",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_password_tab_renders(self):
+        response = self.client.get(reverse("accounts:profile") + "?tab=password")
+        self.assertContains(response, "Trocar senha")
+        self.assertContains(response, 'name="current_password"')
+
+
 class ProfileDataTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(

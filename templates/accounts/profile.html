@@ -24,6 +24,7 @@
         <button class="profile__tab{% if active_tab == 'profile' %} is-active{% endif %}" data-tab="profile" role="tab" aria-selected="{% if active_tab == 'profile' %}true{% else %}false{% endif %}">Meu Perfil</button>
         <button class="profile__tab{% if active_tab == 'addresses' %} is-active{% endif %}" data-tab="addresses" role="tab" aria-selected="{% if active_tab == 'addresses' %}true{% else %}false{% endif %}">Endereços</button>
         <button class="profile__tab{% if active_tab == 'orders' %} is-active{% endif %}" data-tab="orders" role="tab" aria-selected="{% if active_tab == 'orders' %}true{% else %}false{% endif %}">Meus Pedidos</button>
+        <button class="profile__tab{% if active_tab == 'password' %} is-active{% endif %}" data-tab="password" role="tab" aria-selected="{% if active_tab == 'password' %}true{% else %}false{% endif %}">Senhas</button>
     </div>
 
     <div class="profile__panel{% if active_tab == 'profile' %} is-active{% endif %}" data-panel="profile" role="tabpanel"{% if active_tab != 'profile' %} hidden{% endif %}>
@@ -73,6 +74,32 @@
             <h2 class="profile__panel-title">Meus Pedidos</h2>
         </div>
         {% include "accounts/_orders_tab.html" %}
+    </div>
+
+    <div class="profile__panel{% if active_tab == 'password' %} is-active{% endif %}" data-panel="password" role="tabpanel"{% if active_tab != 'password' %} hidden{% endif %}>
+        {% if messages and active_tab == 'password' %}
+        <div class="profile__messages">
+            {% for message in messages %}<p class="profile__message">{{ message }}</p>{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:profile_password' %}" class="profile__data">
+            {% csrf_token %}
+            <h2 class="profile__panel-title">Trocar senha</h2>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_current_password">Senha atual</label>
+                <input type="password" id="id_current_password" name="current_password" class="profile__input" autocomplete="current-password">
+            </div>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_new_password1">Nova senha</label>
+                <input type="password" id="id_new_password1" name="new_password1" class="profile__input" autocomplete="new-password">
+            </div>
+            <div class="profile__field">
+                <label class="profile__data-label" for="id_new_password2">Repetir nova senha</label>
+                <input type="password" id="id_new_password2" name="new_password2" class="profile__input" autocomplete="new-password">
+            </div>
+            <button type="submit" class="profile__cpf-btn">Trocar senha</button>
+        </form>
     </div>
     {% else %}
     <div class="auth__box">

@@ -2,7 +2,7 @@ import re
 from datetime import date
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm as DjangoPasswordResetForm
@@ -186,7 +186,7 @@ def profile_view(request):
         else Address.objects.none()
     )
     tab = request.GET.get("tab", "profile")
-    if tab not in ("profile", "orders", "addresses"):
+    if tab not in ("profile", "orders", "addresses", "password"):
         tab = "profile"
     return render(
         request,
@@ -231,6 +231,32 @@ def profile_data_view(request):
             )
             messages.success(request, "Dados atualizados com sucesso.")
     return redirect("accounts:profile")
+
+
+@login_required
+def profile_password_view(request):
+    redirect_url = f"{reverse('accounts:profile')}?tab=password"
+    if request.method != "POST":
+        return redirect(redirect_url)
+    current_password = request.POST.get("current_password", "")
+    new_password1 = request.POST.get("new_password1", "")
+    new_password2 = request.POST.get("new_password2", "")
+    if not request.user.check_password(current_password):
+        messages.error(request, "Senha atual incorreta.")
+        return redirect(redirect_url)
+    if new_password1 != new_password2:
+        messages.error(request, "As novas senhas não coincidem.")
+        return redirect(redirect_url)
+    try:
+        validate_password(new_password1, request.user)
+    except ValidationError as exc:
+        messages.error(request, " ".join(exc.messages))
+        return redirect(redirect_url)
+    request.user.set_password(new_password1)
+    request.user.save(update_fields=["password"])
+    update_session_auth_hash(request, request.user)
+    messages.success(request, "Senha alterada com sucesso.")
+    return redirect(redirect_url)
 
 
 class AsyncPasswordResetForm(DjangoPasswordResetForm):
