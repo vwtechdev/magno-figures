@@ -38,6 +38,18 @@
         if (toggle) {
             toggle.setAttribute("aria-expanded", "false");
         }
+        if (backdrop) {
+            backdrop.classList.remove("is-visible");
+        }
+    }
+
+    var backdrop = null;
+    if (aside) {
+        backdrop = document.createElement("div");
+        backdrop.className = "filters__backdrop";
+        backdrop.setAttribute("aria-hidden", "true");
+        document.body.appendChild(backdrop);
+        backdrop.addEventListener("click", closeDrawer);
     }
 
     function load(url, scroll) {
@@ -134,6 +146,9 @@
         toggle.addEventListener("click", function () {
             var open = aside.classList.toggle("filters--open");
             toggle.setAttribute("aria-expanded", open ? "true" : "false");
+            if (backdrop) {
+                backdrop.classList.toggle("is-visible", open);
+            }
         });
         document.addEventListener("keydown", function (event) {
             if (event.key === "Escape") {
