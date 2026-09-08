@@ -101,6 +101,36 @@
     color: var(--danger-soft);
 }
 
+.addr__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--gold-2);
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.addr__icon-btn:hover {
+    color: var(--gold-3);
+    border-color: var(--gold-2);
+    background: rgba(var(--gold-2-rgb), 0.08);
+}
+
+.addr__icon-btn--danger {
+    color: var(--danger);
+}
+
+.addr__icon-btn--danger:hover {
+    color: var(--danger-soft);
+    border-color: var(--danger);
+    background: rgba(var(--danger-rgb), 0.08);
+}
+
 .addr__empty {
     color: var(--text-muted);
     margin-bottom: 20px;
