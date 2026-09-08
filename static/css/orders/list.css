@@ -27,7 +27,7 @@
 }
 
 .order:hover {
-    border-color: rgba(234, 201, 121, 0.5);
+    border-color: rgba(var(--gold-2-rgb), 0.5);
     transform: translateX(4px);
 }
 
@@ -48,7 +48,7 @@
 }
 
 .order__thumb--empty {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
 }
 
 .order__thumb-wrap {
@@ -114,43 +114,43 @@
 }
 
 .order__status--new {
-    background: rgba(234, 201, 121, 0.12);
+    background: rgba(var(--gold-2-rgb), 0.12);
     color: var(--gold-2);
 }
 
 .order__status--confirm {
-    background: rgba(96, 165, 250, 0.12);
-    color: #60a5fa;
+    background: rgba(var(--info-rgb), 0.12);
+    color: var(--info);
 }
 
 .order__status--payment {
-    background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
+    background: rgba(var(--warning-rgb), 0.12);
+    color: var(--warning);
 }
 
 .order__status--paid {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
+    background: rgba(var(--success-rgb), 0.12);
+    color: var(--success);
 }
 
 .order__status--production {
-    background: rgba(192, 132, 252, 0.12);
-    color: #c084fc;
+    background: rgba(var(--violet-rgb), 0.12);
+    color: var(--violet);
 }
 
 .order__status--sent {
-    background: rgba(56, 189, 248, 0.12);
-    color: #38bdf8;
+    background: rgba(var(--info-2-rgb), 0.12);
+    color: var(--info-2);
 }
 
 .order__status--canceled {
-    background: rgba(248, 113, 113, 0.12);
-    color: #f87171;
+    background: rgba(var(--danger-rgb), 0.12);
+    color: var(--danger);
 }
 
 .order__status--delivered {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
+    background: rgba(var(--success-rgb), 0.12);
+    color: var(--success);
 }
 
 .orders__empty-box {

@@ -41,43 +41,43 @@
 }
 
 .order-page__status--new {
-    background: rgba(234, 201, 121, 0.12);
+    background: rgba(var(--gold-2-rgb), 0.12);
     color: var(--gold-2);
 }
 
 .order-page__status--confirm {
-    background: rgba(96, 165, 250, 0.12);
-    color: #60a5fa;
+    background: rgba(var(--info-rgb), 0.12);
+    color: var(--info);
 }
 
 .order-page__status--payment {
-    background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
+    background: rgba(var(--warning-rgb), 0.12);
+    color: var(--warning);
 }
 
 .order-page__status--paid {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
+    background: rgba(var(--success-rgb), 0.12);
+    color: var(--success);
 }
 
 .order-page__status--production {
-    background: rgba(192, 132, 252, 0.12);
-    color: #c084fc;
+    background: rgba(var(--violet-rgb), 0.12);
+    color: var(--violet);
 }
 
 .order-page__status--sent {
-    background: rgba(56, 189, 248, 0.12);
-    color: #38bdf8;
+    background: rgba(var(--info-2-rgb), 0.12);
+    color: var(--info-2);
 }
 
 .order-page__status--canceled {
-    background: rgba(248, 113, 113, 0.12);
-    color: #f87171;
+    background: rgba(var(--danger-rgb), 0.12);
+    color: var(--danger);
 }
 
 .order-page__status--delivered {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
+    background: rgba(var(--success-rgb), 0.12);
+    color: var(--success);
 }
 
 .order-page__date {
@@ -165,7 +165,7 @@
 }
 
 .order-item__thumb--empty {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
 }
 
 .order-item__body {
@@ -205,7 +205,7 @@
     margin-top: 18px;
     padding: 16px 18px;
     border-radius: var(--radius);
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(var(--scrim-rgb), 0.25);
     border: 1px solid var(--border);
 }
 
@@ -226,7 +226,7 @@
 .order-page__total-row--total {
     margin-top: 4px;
     padding-top: 12px;
-    border-top: 1px dashed rgba(234, 201, 121, 0.25);
+    border-top: 1px dashed rgba(var(--gold-2-rgb), 0.25);
     color: var(--text);
     font-size: 1.15rem;
     font-weight: 700;
@@ -237,7 +237,7 @@
 }
 
 .order-page__address {
-    color: #E7E5E4;
+    color: var(--text);
     line-height: 1.6;
 }
 
@@ -248,9 +248,9 @@
 .order-page__message {
     padding: 10px 14px;
     border-radius: 10px;
-    border: 1px solid rgba(52, 211, 153, 0.4);
-    background: rgba(52, 211, 153, 0.08);
-    color: #34d399;
+    border: 1px solid rgba(var(--success-rgb), 0.4);
+    background: rgba(var(--success-rgb), 0.08);
+    color: var(--success);
     font-size: 0.9rem;
 }
 
@@ -262,14 +262,14 @@
 .order-page__cancel {
     padding: 12px 24px;
     border-radius: 10px;
-    border: 1px solid rgba(248, 113, 113, 0.4);
-    background: rgba(248, 113, 113, 0.08);
-    color: #f87171;
+    border: 1px solid rgba(var(--danger-rgb), 0.4);
+    background: rgba(var(--danger-rgb), 0.08);
+    color: var(--danger);
     font-weight: 700;
     font-size: 0.95rem;
     transition: background var(--transition), color var(--transition);
 }
 
 .order-page__cancel:hover {
-    background: rgba(248, 113, 113, 0.18);
+    background: rgba(var(--danger-rgb), 0.18);
 }

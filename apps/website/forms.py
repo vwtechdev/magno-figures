@@ -33,6 +33,16 @@ class WebsiteAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["batch_upload"].widget.attrs.update({"multiple": True})
+        for name, field in self.fields.items():
+            if name.startswith("theme_"):
+                field.widget.attrs.update(
+                    {
+                        "data-color-field": "true",
+                        "placeholder": "#RRGGBB",
+                        "maxlength": "7",
+                        "style": "max-width: 110px; text-transform: uppercase;",
+                    }
+                )
 
     def clean_batch_upload(self):
         uploads = self.files.getlist("batch_upload")

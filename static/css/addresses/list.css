@@ -24,7 +24,7 @@
 
 .addr__btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .addr__list {
@@ -42,11 +42,11 @@
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(var(--white-rgb), 0.03);
 }
 
 .addr__item--primary {
-    border-color: rgba(234, 201, 121, 0.5);
+    border-color: rgba(var(--gold-2-rgb), 0.5);
 }
 
 .addr__text {
@@ -63,7 +63,7 @@
     margin-top: 6px;
     padding: 3px 10px;
     border-radius: 8px;
-    background: rgba(234, 201, 121, 0.15);
+    background: rgba(var(--gold-2-rgb), 0.15);
     color: var(--gold-2);
     font-size: 0.75rem;
     font-weight: 700;
@@ -94,11 +94,11 @@
 }
 
 .addr__link--danger {
-    color: #f87171;
+    color: var(--danger);
 }
 
 .addr__link--danger:hover {
-    color: #fca5a5;
+    color: var(--danger-soft);
 }
 
 .addr__empty {

@@ -45,13 +45,13 @@
     font-size: clamp(2rem, 5vw, 3.2rem);
     line-height: 1.1;
     margin-bottom: 12px;
-    text-shadow: 0 1px 6px rgba(90, 62, 20, 0.55);
+    text-shadow: 0 1px 6px rgba(var(--bronze-rgb), 0.55);
 }
 
 .hero__subtitle {
     font-size: 1.1rem;
-    color: #E7E5E4;
-    text-shadow: 0 1px 4px rgba(90, 62, 20, 0.5);
+    color: var(--text);
+    text-shadow: 0 1px 4px rgba(var(--bronze-rgb), 0.5);
 }
 
 .hero__arrow {
@@ -64,8 +64,8 @@
     width: 46px;
     height: 46px;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(234, 201, 121, 0.4);
+    background: rgba(var(--scrim-rgb), 0.55);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.4);
     color: var(--gold-2);
     transition: background var(--transition), color var(--transition);
     z-index: 5;
@@ -98,7 +98,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(var(--white-rgb), 0.35);
     transition: background var(--transition), transform var(--transition);
 }
 
@@ -175,7 +175,7 @@
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(var(--white-rgb), 0.04);
     border: 1px solid var(--border);
     color: var(--gold-2);
     cursor: pointer;

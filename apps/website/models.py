@@ -1,8 +1,14 @@
 from django.core.cache import cache
+from django.core.validators import RegexValidator
 from django.db import models
 
 from core.models import BaseModel
 from core.validators import validate_image_size
+
+hex_color_validator = RegexValidator(
+    regex=r"^#[0-9a-fA-F]{6}$",
+    message="Use o formato hexadecimal, ex.: #EAC979.",
+)
 
 
 class BannerManager(models.Manager):
@@ -131,6 +137,110 @@ class Website(BaseModel):
     terms = models.TextField(
         blank=True, verbose_name="Termos de Uso"
     )
+    theme_background = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Fundo",
+        help_text="Em branco mantém o padrão (#0C0A09).",
+    )
+    theme_surface = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Superfícies (cards)",
+        help_text="Em branco mantém o padrão (#1C1917).",
+    )
+    theme_text = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Texto",
+        help_text="Em branco mantém o padrão (#F5F3F0).",
+    )
+    theme_muted = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Texto secundário",
+        help_text="Em branco mantém o padrão (#A8A29E).",
+    )
+    theme_border = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Bordas",
+        help_text="Em branco mantém o padrão (#44403C).",
+    )
+    theme_buttons = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Botões / dourado",
+        help_text="Em branco mantém o dourado padrão.",
+    )
+    theme_hover = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Hover dos botões",
+        help_text="Em branco mantém o padrão.",
+    )
+    theme_navbar = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Barra de navegação",
+        help_text="Em branco mantém o padrão translúcido.",
+    )
+    theme_whatsapp = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Botão WhatsApp",
+        help_text="Em branco mantém o verde padrão (#25D366).",
+    )
+    theme_success = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Sucesso (verde)",
+        help_text="Em branco mantém o padrão (#34d399).",
+    )
+    theme_info = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Informação (azul)",
+        help_text="Em branco mantém o padrão (#60a5fa).",
+    )
+    theme_warning = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Alerta (âmbar)",
+        help_text="Em branco mantém o padrão (#fbbf24).",
+    )
+    theme_danger = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[hex_color_validator],
+        verbose_name="Erro (vermelho)",
+        help_text="Em branco mantém o padrão (#f87171).",
+    )
 
     objects = WebsiteManager()
 
@@ -161,3 +271,74 @@ class Website(BaseModel):
     def whatsapp_api_link(self):
         number = self._clean_whatsapp_number()
         return f"https://api.whatsapp.com/send?phone={number}" if number else "#"
+
+    @staticmethod
+    def _hex_to_rgb(value):
+        value = value.lstrip("#")
+        return (
+            int(value[0:2], 16),
+            int(value[2:4], 16),
+            int(value[4:6], 16),
+        )
+
+    @staticmethod
+    def _lighten(value, amount=0.55):
+        red, green, blue = Website._hex_to_rgb(value)
+        mixed = tuple(
+            round(channel + (255 - channel) * amount)
+            for channel in (red, green, blue)
+        )
+        return "#%02x%02x%02x" % mixed
+
+    @property
+    def theme_css_vars(self):
+        """Mapeia os campos de tema para variáveis CSS. Vazio = padrão."""
+        css_vars = {}
+        if self.theme_background:
+            css_vars["--bg"] = self.theme_background
+        if self.theme_surface:
+            css_vars["--bg-soft"] = self.theme_surface
+            css_vars["--card"] = self.theme_surface
+        if self.theme_text:
+            css_vars["--text"] = self.theme_text
+        if self.theme_muted:
+            css_vars["--text-muted"] = self.theme_muted
+        if self.theme_border:
+            css_vars["--border"] = self.theme_border
+        if self.theme_buttons:
+            red, green, blue = self._hex_to_rgb(self.theme_buttons)
+            css_vars["--gold-1"] = self.theme_buttons
+            css_vars["--gold-2"] = self.theme_buttons
+            css_vars["--gold-3"] = self.theme_buttons
+            css_vars["--gold-gradient"] = self.theme_buttons
+            css_vars["--gold-2-rgb"] = f"{red}, {green}, {blue}"
+        if self.theme_hover:
+            css_vars["--btn-hover"] = self.theme_hover
+        if self.theme_navbar:
+            css_vars["--navbar"] = self.theme_navbar
+        if self.theme_whatsapp:
+            red, green, blue = self._hex_to_rgb(self.theme_whatsapp)
+            css_vars["--whatsapp"] = self.theme_whatsapp
+            css_vars["--whatsapp-rgb"] = f"{red}, {green}, {blue}"
+        for field_name, var_name in (
+            ("theme_success", "--success"),
+            ("theme_info", "--info"),
+            ("theme_warning", "--warning"),
+            ("theme_danger", "--danger"),
+        ):
+            value = getattr(self, field_name)
+            if not value:
+                continue
+            red, green, blue = self._hex_to_rgb(value)
+            css_vars[var_name] = value
+            css_vars[f"{var_name}-rgb"] = f"{red}, {green}, {blue}"
+        if self.theme_info:
+            css_vars["--info-2"] = self.theme_info
+            red, green, blue = self._hex_to_rgb(self.theme_info)
+            css_vars["--info-2-rgb"] = f"{red}, {green}, {blue}"
+        if self.theme_danger:
+            soft = self._lighten(self.theme_danger)
+            red, green, blue = self._hex_to_rgb(soft)
+            css_vars["--danger-soft"] = soft
+            css_vars["--danger-soft-rgb"] = f"{red}, {green}, {blue}"
+        return css_vars

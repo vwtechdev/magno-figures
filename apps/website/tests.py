@@ -272,3 +272,46 @@ class Custom404Test(TestCase):
         self.assertContains(response, "Página não encontrada", status_code=404)
         self.assertContains(response, "noindex, nofollow", status_code=404)
         self.assertContains(response, "Voltar à home", status_code=404)
+
+
+class WebsiteThemeTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.website = Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+
+    def test_theme_block_absent_when_blank(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertNotContains(response, 'id="website-theme"')
+
+    def test_theme_block_renders_overrides(self):
+        self.website.theme_background = "#112233"
+        self.website.theme_buttons = "#EAC979"
+        self.website.theme_whatsapp = "#25D366"
+        self.website.theme_danger = "#f87171"
+        self.website.save()
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(response, 'id="website-theme"')
+        self.assertContains(response, "--bg: #112233;")
+        self.assertContains(response, "--gold-2: #EAC979;")
+        self.assertContains(response, "--gold-gradient: #EAC979;")
+        self.assertContains(response, "--gold-2-rgb: 234, 201, 121;")
+        self.assertContains(response, "--whatsapp-rgb: 37, 211, 102;")
+        self.assertContains(response, "--danger-soft:")
+
+    def test_theme_vars_empty_when_blank(self):
+        self.assertEqual(Website.objects.get_config().theme_css_vars, {})
+
+    def test_invalid_hex_rejected(self):
+        from django.core.exceptions import ValidationError
+
+        self.website.theme_buttons = "dourado"
+        with self.assertRaises(ValidationError):
+            self.website.full_clean()

@@ -10,7 +10,7 @@
 }
 
 .page__body {
-    color: #E7E5E4;
+    color: var(--text);
     font-size: 1rem;
     line-height: 1.7;
 }

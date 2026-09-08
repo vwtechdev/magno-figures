@@ -107,18 +107,18 @@
 }
 
 .product__stock--in {
-    background: rgba(37, 211, 102, 0.15);
+    background: rgba(var(--whatsapp-rgb), 0.15);
     color: var(--whatsapp);
 }
 
 .product__stock--out {
-    background: rgba(234, 201, 121, 0.12);
+    background: rgba(var(--gold-2-rgb), 0.12);
     color: var(--gold-2);
 }
 
 .product__stock--sold {
-    background: rgba(252, 165, 165, 0.12);
-    color: #fca5a5;
+    background: rgba(var(--danger-soft-rgb), 0.12);
+    color: var(--danger-soft);
 }
 
 .product__old-price {
@@ -129,7 +129,7 @@
 }
 
 .product__description {
-    color: #E7E5E4;
+    color: var(--text);
     line-height: 1.7;
     margin-bottom: 24px;
 }
@@ -144,7 +144,7 @@
 .product__category {
     padding: 6px 14px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
     border: 1px solid var(--border);
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -169,7 +169,7 @@
 
 .product__cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .product__cta-row {
@@ -181,11 +181,11 @@
 .product__cta--ghost {
     background: transparent;
     color: var(--gold-2);
-    border: 1px solid rgba(234, 201, 121, 0.5);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.5);
 }
 
 .product__cta--ghost:hover {
-    background: rgba(234, 201, 121, 0.08);
+    background: rgba(var(--gold-2-rgb), 0.08);
     box-shadow: none;
 }
 
@@ -193,7 +193,7 @@
     width: 100%;
     padding: 20px;
     border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(var(--white-rgb), 0.03);
     border: 1px solid var(--border);
 }
 
@@ -222,7 +222,7 @@
 .notify__input:focus {
     outline: none;
     border-color: var(--gold-2);
-    box-shadow: 0 0 0 3px rgba(234, 201, 121, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--gold-2-rgb), 0.15);
 }
 
 .notify__btn {
@@ -264,7 +264,7 @@
     margin-bottom: 28px;
     padding: 20px;
     border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(var(--white-rgb), 0.03);
     border: 1px solid var(--border);
 }
 
@@ -293,7 +293,7 @@
 .shipping__input:focus {
     outline: none;
     border-color: var(--gold-2);
-    box-shadow: 0 0 0 3px rgba(234, 201, 121, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--gold-2-rgb), 0.15);
 }
 
 .shipping__btn {
@@ -310,7 +310,7 @@
 
 .shipping__btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 6px 18px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .shipping__btn:disabled {
@@ -338,7 +338,7 @@
     gap: 12px;
     padding: 12px 14px;
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(var(--scrim-rgb), 0.2);
     border: 1px solid var(--border);
 }
 
@@ -374,8 +374,8 @@
 }
 
 .shipping__msg--error {
-    color: #f87171;
-    border-color: rgba(248, 113, 113, 0.4);
+    color: var(--danger);
+    border-color: rgba(var(--danger-rgb), 0.4);
 }
 
 @media (max-width: 480px) {
@@ -459,7 +459,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(var(--scrim-rgb), 0.92);
     backdrop-filter: blur(4px);
 }
 
@@ -495,8 +495,8 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(234, 201, 121, 0.3);
+    background: rgba(var(--white-rgb), 0.06);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.3);
     color: var(--gold-2);
     cursor: pointer;
     z-index: 5;
@@ -519,8 +519,8 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(234, 201, 121, 0.3);
+    background: rgba(var(--white-rgb), 0.06);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.3);
     color: var(--gold-2);
     cursor: pointer;
     z-index: 5;
@@ -548,7 +548,7 @@
     transform: translateX(-50%);
     padding: 6px 16px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--white-rgb), 0.08);
     border: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 0.9rem;

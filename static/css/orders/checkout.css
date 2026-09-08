@@ -66,11 +66,11 @@
 }
 
 .checkout__status.is-error {
-    color: #F87171;
+    color: var(--danger);
 }
 
 .checkout__input {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text);
@@ -86,7 +86,7 @@
 
 .checkout__input--muted,
 .checkout__input[readonly] {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(var(--white-rgb), 0.03);
     color: var(--text-muted);
     cursor: not-allowed;
 }
@@ -105,15 +105,15 @@
 
 .checkout__submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .checkout__selected {
     margin-bottom: 20px;
     padding: 16px 18px;
-    border: 1px solid rgba(234, 201, 121, 0.5);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.5);
     border-radius: var(--radius);
-    background: rgba(234, 201, 121, 0.06);
+    background: rgba(var(--gold-2-rgb), 0.06);
 }
 
 .checkout__selected-label {
@@ -140,10 +140,10 @@
 .checkout__error {
     margin-bottom: 20px;
     padding: 12px 14px;
-    border: 1px solid rgba(248, 113, 113, 0.4);
+    border: 1px solid rgba(var(--danger-rgb), 0.4);
     border-radius: 10px;
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.08);
+    color: var(--danger);
+    background: rgba(var(--danger-rgb), 0.08);
     font-size: 0.9rem;
 }
 
@@ -161,18 +161,18 @@
     padding: 14px 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(var(--white-rgb), 0.03);
     cursor: pointer;
     transition: border-color var(--transition), background var(--transition);
 }
 
 .checkout__address:hover {
-    border-color: rgba(234, 201, 121, 0.5);
+    border-color: rgba(var(--gold-2-rgb), 0.5);
 }
 
 .checkout__address--selected {
     border-color: var(--gold-2);
-    background: rgba(234, 201, 121, 0.08);
+    background: rgba(var(--gold-2-rgb), 0.08);
 }
 
 .checkout__radio {
@@ -202,7 +202,7 @@
     margin-top: 4px;
     padding: 2px 9px;
     border-radius: 8px;
-    background: rgba(234, 201, 121, 0.15);
+    background: rgba(var(--gold-2-rgb), 0.15);
     color: var(--gold-2);
     font-size: 0.72rem;
     font-weight: 700;
@@ -229,7 +229,7 @@
 }
 .checkout__step {
     padding: 6px 0 18px;
-    border-bottom: 1px solid rgba(234, 201, 121, 0.12);
+    border-bottom: 1px solid rgba(var(--gold-2-rgb), 0.12);
 }
 
 .checkout__step[hidden] {
@@ -248,7 +248,7 @@
     gap: 12px;
     padding: 12px 14px;
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(var(--scrim-rgb), 0.2);
     border: 1px solid var(--border);
     cursor: pointer;
     transition: border-color var(--transition);
@@ -256,7 +256,7 @@
 
 .checkout__ship:has(input:checked) {
     border-color: var(--gold-2);
-    background: rgba(234, 201, 121, 0.08);
+    background: rgba(var(--gold-2-rgb), 0.08);
 }
 
 .checkout__ship input {
@@ -314,7 +314,7 @@
 }
 
 .checkout__summary-image--empty {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
 }
 
 .checkout__summary-info {
@@ -357,7 +357,7 @@
     color: var(--text);
     font-weight: 700;
     font-size: 1.05rem;
-    border-top: 1px solid rgba(234, 201, 121, 0.15);
+    border-top: 1px solid rgba(var(--gold-2-rgb), 0.15);
     padding-top: 10px;
 }
 
@@ -396,7 +396,7 @@
 
 .checkout__continue:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .checkout__continue:disabled {

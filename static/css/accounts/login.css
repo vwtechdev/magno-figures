@@ -44,7 +44,7 @@
 }
 
 .auth__input {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--white-rgb), 0.05);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text);
@@ -122,7 +122,7 @@
 
 .auth__submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(234, 201, 121, 0.35);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .auth__submit--block {
@@ -168,11 +168,11 @@
 
 .auth__error {
     padding: 10px 14px;
-    border: 1px solid rgba(248, 113, 113, 0.4);
+    border: 1px solid rgba(var(--danger-rgb), 0.4);
     border-radius: 10px;
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.9rem;
-    background: rgba(248, 113, 113, 0.08);
+    background: rgba(var(--danger-rgb), 0.08);
 }
 
 .auth__link:hover {

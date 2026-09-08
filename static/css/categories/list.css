@@ -24,7 +24,7 @@
 }
 
 .cat:hover {
-    border-color: rgba(234, 201, 121, 0.5);
+    border-color: rgba(var(--gold-2-rgb), 0.5);
     transform: translateY(-3px);
     box-shadow: var(--shadow);
 }

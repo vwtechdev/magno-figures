@@ -26,6 +26,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% if website_config.theme_css_vars %}
+    <style id="website-theme">:root{% for name, value in website_config.theme_css_vars.items %}{{ name }}: {{ value }};{% endfor %}</style>
+    {% endif %}
     {% block extra_css %}{% endblock %}
     {% if website_config.google_analytics %}{{ website_config.google_analytics|safe }}{% endif %}
     <script type="application/ld+json">

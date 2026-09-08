@@ -34,9 +34,32 @@ class WebsiteAdmin(admin.ModelAdmin):
         ("Contato", {"fields": ("whatsapp", "email", "instagram", "facebook", "twitter")}),
         ("SEO", {"fields": ("seo_keywords", "google_analytics")}),
         ("Envio", {"fields": ("origin_zip_code",)}),
+        (
+            "Tema / Cores",
+            {
+                "fields": (
+                    "theme_background",
+                    "theme_surface",
+                    "theme_text",
+                    "theme_muted",
+                    "theme_border",
+                    "theme_buttons",
+                    "theme_hover",
+                    "theme_navbar",
+                    "theme_whatsapp",
+                    "theme_success",
+                    "theme_info",
+                    "theme_warning",
+                    "theme_danger",
+                )
+            },
+        ),
         ("Sobre", {"fields": ("about", "privacy_policy", "terms")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
+
+    class Media:
+        js = ("js/admin/color-picker.js",)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

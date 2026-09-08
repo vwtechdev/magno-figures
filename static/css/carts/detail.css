@@ -62,7 +62,7 @@
     justify-content: center;
     border-radius: 8px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(var(--white-rgb), 0.04);
     color: var(--text);
     font-size: 1.2rem;
     font-weight: 700;
@@ -74,7 +74,7 @@
 .cart-item__qty-btn:hover:not(:disabled) {
     border-color: var(--gold-2);
     color: var(--gold-2);
-    background: rgba(234, 201, 121, 0.08);
+    background: rgba(var(--gold-2-rgb), 0.08);
 }
 
 .cart-item__qty-btn:disabled {
@@ -93,15 +93,15 @@
 
 .cart-item__preorder {
     padding: 6px 12px;
-    border: 1px dashed rgba(248, 113, 113, 0.4);
+    border: 1px dashed rgba(var(--danger-rgb), 0.4);
     border-radius: 8px;
-    color: #f87171;
+    color: var(--danger);
     font-size: 0.85rem;
     white-space: nowrap;
 }
 
 .cart-item__preorder--sold {
-    background: rgba(248, 113, 113, 0.1);
+    background: rgba(var(--danger-rgb), 0.1);
     font-weight: 700;
 }
 
@@ -121,16 +121,16 @@
     justify-content: center;
     border-radius: 8px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(var(--white-rgb), 0.04);
     color: var(--text-muted);
     cursor: pointer;
     transition: color var(--transition), border-color var(--transition), background var(--transition);
 }
 
 .cart-item__remove-btn:hover {
-    color: #f87171;
-    border-color: rgba(248, 113, 113, 0.5);
-    background: rgba(248, 113, 113, 0.08);
+    color: var(--danger);
+    border-color: rgba(var(--danger-rgb), 0.5);
+    background: rgba(var(--danger-rgb), 0.08);
 }
 
 .cart-page__footer {

@@ -43,10 +43,10 @@
 .error-page__btn--ghost {
     background: transparent;
     color: var(--gold-2);
-    border: 1px solid rgba(234, 201, 121, 0.5);
+    border: 1px solid rgba(var(--gold-2-rgb), 0.5);
 }
 
 .error-page__btn--ghost:hover {
-    background: rgba(234, 201, 121, 0.08);
+    background: rgba(var(--gold-2-rgb), 0.08);
     opacity: 1;
 }
