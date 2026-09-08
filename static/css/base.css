@@ -776,6 +776,14 @@ ul {
         visibility: visible;
     }
 
+    body.nav-open .navbar {
+        z-index: 1300;
+    }
+
+    body.nav-open .fab-group {
+        display: none;
+    }
+
     .navbar__links {
         flex-direction: column;
         align-items: stretch;

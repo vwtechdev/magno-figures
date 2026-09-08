@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 isOpen ? "Fechar menu" : "Abrir menu"
             );
             backdrop.classList.toggle("is-visible", isOpen);
+            document.body.classList.toggle("nav-open", isOpen);
         };
 
         toggle.addEventListener("click", () => {
