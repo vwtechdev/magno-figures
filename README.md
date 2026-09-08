@@ -17,19 +17,9 @@ Sistema web para a Magno-Figures: catálogo de action figures em uma vitrine onl
 - SEO: Open Graph/Twitter Cards, canonical, JSON-LD (WebSite/Product/Breadcrumb), `sitemap.xml` e `robots.txt`
 - Emails em background (thread daemon) para notificação de pedido e reset de senha
 
-## Desenvolvimento
+## Configuração
 
-```bash
-# requirements-dev.txt é local-only (gitignored)
-pip install -r requirements-dev.txt
-
-python manage.py migrate --settings=core.settings_dev
-python manage.py runserver --settings=core.settings_dev
-```
-
-Testes: `python manage.py test --settings=core.settings_dev apps`
-
-Configuração via `.env` (não versionado, gerenciado pelo usuário) — veja `.env-example`.
+As variáveis de ambiente são gerenciadas pelo usuário via `.env` (não versionado) — veja `.env-example` para a referência.
 
 ## Deploy
 
