@@ -45,17 +45,13 @@
     font-size: clamp(2rem, 5vw, 3.2rem);
     line-height: 1.1;
     margin-bottom: 12px;
-    text-shadow:
-        0 2px 4px rgba(90, 62, 20, 0.9),
-        0 4px 24px rgba(90, 62, 20, 0.6);
+    text-shadow: 0 1px 6px rgba(90, 62, 20, 0.55);
 }
 
 .hero__subtitle {
     font-size: 1.1rem;
     color: #E7E5E4;
-    text-shadow:
-        0 1px 3px rgba(90, 62, 20, 0.9),
-        0 2px 14px rgba(90, 62, 20, 0.7);
+    text-shadow: 0 1px 4px rgba(90, 62, 20, 0.5);
 }
 
 .hero__arrow {
