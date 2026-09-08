@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8083:80"
+    environment:
+      - SERVER_NAME=${DOMAIN:-localhost}
     volumes:
       - ./staticfiles:/app/staticfiles:ro
       - $HOME/data/${COMPOSE_PROJECT_NAME}/media:/app/media:ro
