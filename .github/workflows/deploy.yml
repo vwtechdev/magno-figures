@@ -1,0 +1,41 @@
+name: Deploy VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na VPS
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+
+          script: |
+            set -e
+
+            cd ~/projects/${{ github.event.repository.name }}
+
+            echo "Atualizando repositório..."
+            git pull origin main
+
+            echo "Subindo nova versão..."
+            docker compose up -d --build --remove-orphans
+
+            echo "Aplicando migrations..."
+            docker compose exec web python manage.py migrate --noinput
+
+            echo "Coletando arquivos estáticos..."
+            docker compose exec web python manage.py collectstatic --noinput
+
+            echo "Limpando imagens antigas..."
+            docker image prune -f
+
+            echo "Deploy finalizado!"
