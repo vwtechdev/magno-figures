@@ -780,6 +780,11 @@ ul {
         z-index: 1300;
     }
 
+    body.nav-open .navbar__toggle {
+        position: relative;
+        z-index: 1301;
+    }
+
     body.nav-open .fab-group {
         display: none;
     }
