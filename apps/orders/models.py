@@ -163,16 +163,9 @@ class Order(BaseModel):
             ]
         else:
             lines.append(f"*Total:* R$ {subtotal:.2f}")
-        from django.urls import reverse
-
-        from core.utils import site_base_url
-
-        order_url = site_base_url() + reverse("orders:detail", args=[self.pk])
         lines += [
             "",
             "Tenho interesse em finalizar este pedido!",
-            "",
-            f"Acompanhe seu pedido aqui: {order_url}",
         ]
         return "\n".join(lines)
 
