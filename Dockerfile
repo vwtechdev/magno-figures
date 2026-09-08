@@ -20,6 +20,5 @@ COPY . .
 RUN mkdir -p /app/logs /app/media /app/staticfiles
 
 RUN useradd -m appuser && chown -R appuser:appuser /app
-USER appuser
 
 EXPOSE 8000
