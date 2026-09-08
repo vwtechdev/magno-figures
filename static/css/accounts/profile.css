@@ -184,6 +184,7 @@
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
+    margin-top: 16px;
 }
 
 .profile__danger-btn {
