@@ -46,16 +46,16 @@
     line-height: 1.1;
     margin-bottom: 12px;
     text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.9),
-        0 4px 24px rgba(0, 0, 0, 0.6);
+        0 2px 4px rgba(90, 62, 20, 0.9),
+        0 4px 24px rgba(90, 62, 20, 0.6);
 }
 
 .hero__subtitle {
     font-size: 1.1rem;
     color: #E7E5E4;
     text-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.9),
-        0 2px 14px rgba(0, 0, 0, 0.7);
+        0 1px 3px rgba(90, 62, 20, 0.9),
+        0 2px 14px rgba(90, 62, 20, 0.7);
 }
 
 .hero__arrow {
