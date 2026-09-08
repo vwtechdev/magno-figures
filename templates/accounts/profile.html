@@ -57,7 +57,9 @@
                 <label class="profile__data-label" for="id_birth_date">Data de Nascimento</label>
                 <input type="date" id="id_birth_date" name="birth_date" value="{{ user.birth_date|date:'Y-m-d' }}" class="profile__input">
             </div>
-            <button type="submit" class="profile__cpf-btn">Salvar</button>
+            <div class="profile__actions">
+                <button type="submit" class="profile__cpf-btn">Salvar</button>
+            </div>
         </form>
     </div>
 
