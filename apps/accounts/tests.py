@@ -3,8 +3,11 @@ import time
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from apps.accounts.models import User
+from apps.accounts.verification import verification_token_generator
 
 
 class PasswordResetEmailTest(TestCase):
@@ -46,6 +49,124 @@ class PasswordResetEmailTest(TestCase):
 
         time.sleep(0.1)
         self.assertEqual(len(mail.outbox), 0)
+
+
+class RegisterVerificationTest(TestCase):
+    def _wait_for_email(self, timeout=2.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if mail.outbox:
+                return True
+            time.sleep(0.01)
+        return False
+
+    def _register(self, email="novo@example.com"):
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(
+                reverse("accounts:register"),
+                {
+                    "name": "Cliente Novo",
+                    "email": email,
+                    "phone": "",
+                    "password1": "senha-forte-123",
+                    "password2": "senha-forte-123",
+                },
+            )
+
+    def test_register_creates_inactive_user_and_queues_email(self):
+        mail.outbox.clear()
+        response = self._register()
+        self.assertRedirects(response, reverse("accounts:verification_sent"))
+        user = User.objects.get(email="novo@example.com")
+        self.assertFalse(user.is_active)
+        self.assertIsNone(user.email_verified_at)
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["novo@example.com"])
+        self.assertIn("/verify-email/", message.body)
+
+    def test_register_rejects_invalid_email(self):
+        response = self._register(email="nao-email")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.filter(email="nao-email").exists())
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_login_before_verification_redirects_to_resend(self):
+        self._register()
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"email": "novo@example.com", "password": "senha-forte-123"},
+        )
+        self.assertRedirects(response, reverse("accounts:resend_verification"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_verify_email_activates_and_logs_in(self):
+        self._register()
+        user = User.objects.get(email="novo@example.com")
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = verification_token_generator.make_token(user)
+        response = self.client.get(
+            reverse("accounts:verify_email", args=[uid, token])
+        )
+        self.assertRedirects(response, reverse("website:home"))
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+        self.assertIsNotNone(user.email_verified_at)
+        self.assertEqual(str(self.client.session["_auth_user_id"]), str(user.pk))
+
+    def test_verify_email_invalid_token(self):
+        self._register()
+        user = User.objects.get(email="novo@example.com")
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        response = self.client.get(
+            reverse("accounts:verify_email", args=[uid, "invalido"])
+        )
+        self.assertEqual(response.status_code, 400)
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+
+    def test_verify_email_twice_redirects_to_login(self):
+        self._register()
+        user = User.objects.get(email="novo@example.com")
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = verification_token_generator.make_token(user)
+        url = reverse("accounts:verify_email", args=[uid, token])
+        self.client.get(url)
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("accounts:login"))
+
+    def test_resend_is_neutral_and_throttled(self):
+        mail.outbox.clear()
+        self._register()
+        self.assertTrue(self._wait_for_email())
+        first_count = len(mail.outbox)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(
+                reverse("accounts:resend_verification"),
+                {"email": "novo@example.com"},
+            )
+        self.assertRedirects(response, reverse("accounts:verification_sent"))
+        deadline = time.time() + 2.0
+        while time.time() < deadline and len(mail.outbox) <= first_count:
+            time.sleep(0.01)
+        second_count = len(mail.outbox)
+        self.assertGreater(second_count, first_count)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(
+                reverse("accounts:resend_verification"),
+                {"email": "novo@example.com"},
+            )
+        self.assertRedirects(response, reverse("accounts:verification_sent"))
+        time.sleep(0.5)
+        self.assertEqual(len(mail.outbox), second_count)
+        response = self.client.post(
+            reverse("accounts:resend_verification"),
+            {"email": "ninguem@example.com"},
+        )
+        self.assertRedirects(response, reverse("accounts:verification_sent"))
+        time.sleep(0.2)
+        self.assertEqual(len(mail.outbox), second_count)
 
 
 class ProfileDataTest(TestCase):

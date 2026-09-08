@@ -1,12 +1,13 @@
 from decimal import Decimal
 from io import BytesIO
 import time
+from unittest import mock
 
 from PIL import Image
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.figures.models import Figure
@@ -126,21 +127,6 @@ class StockAlertTest(TestCase):
         )
         self.assertContains(response, "já está disponível.")
 
-    def test_restock_sends_email_and_marks_notified(self):
-        alert = StockAlert.objects.create(
-            figure=self.figure, email="cliente@example.com"
-        )
-        self.figure.sold_out = False
-        self.figure.save()
-        self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
-        message = mail.outbox[0]
-        self.assertEqual(message.to, ["cliente@example.com"])
-        self.assertIn("Iron Man", message.subject)
-        self.assertIn("/figures/iron-man/", message.body)
-        self.assertIn("/newsletter/stock-alerts/unsubscribe/", message.body)
-        alert.refresh_from_db()
-        self.assertTrue(alert.is_notified)
-
     def test_other_edits_do_not_send(self):
         StockAlert.objects.create(
             figure=self.figure, email="cliente@example.com"
@@ -183,6 +169,69 @@ class StockAlertTest(TestCase):
         self.assertRedirects(
             response,
             reverse("newsletters:stock_alert_unsubscribe", args=[token]),
+        )
+
+
+class StockAlertDeliveryTest(TransactionTestCase):
+    def setUp(self):
+        cache.clear()
+        mail.outbox.clear()
+        make_website()
+        self.figure = Figure.objects.create(
+            name="Iron Man",
+            slug="iron-man",
+            description="Action figure do Homem de Ferro.",
+            price=Decimal("199.90"),
+            stock=0,
+            sold_out=True,
+            image=make_image("iron.png"),
+        )
+        self.alert = StockAlert.objects.create(
+            figure=self.figure, email="cliente@example.com"
+        )
+
+    def _wait_for(self, condition, timeout=3.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if condition():
+                return True
+            time.sleep(0.05)
+        return False
+
+    def test_restock_sends_email_and_marks_notified(self):
+        self.figure.sold_out = False
+        self.figure.save()
+        self.assertTrue(
+            self._wait_for(lambda: len(mail.outbox) >= 1),
+            "e-mail não foi enviado a tempo",
+        )
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["cliente@example.com"])
+        self.assertIn("Iron Man", message.subject)
+        self.assertIn("/figures/iron-man/", message.body)
+        self.assertIn("/newsletter/stock-alerts/unsubscribe/", message.body)
+        self.assertTrue(
+            self._wait_for(
+                lambda: StockAlert.objects.filter(
+                    pk=self.alert.pk, is_notified=True
+                ).exists()
+            ),
+            "alerta não foi marcado como avisado após o envio",
+        )
+
+    @override_settings(EMAIL_MAX_RETRIES=1, EMAIL_RETRY_DELAY=0)
+    def test_failed_delivery_keeps_pending(self):
+        self.figure.sold_out = False
+        with mock.patch(
+            "core.mail.EmailMessage.send",
+            side_effect=Exception("SMTP fora do ar"),
+        ):
+            self.figure.save()
+            time.sleep(1.0)
+        self.assertFalse(
+            StockAlert.objects.filter(
+                pk=self.alert.pk, is_notified=True
+            ).exists()
         )
 
 
@@ -285,7 +334,7 @@ class NewsletterSubscribeTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-class NewsletterCampaignTest(TestCase):
+class NewsletterCampaignTest(TransactionTestCase):
     def setUp(self):
         cache.clear()
         mail.outbox.clear()
@@ -308,6 +357,15 @@ class NewsletterCampaignTest(TestCase):
             time.sleep(0.01)
         return False
 
+    def _wait_for_sent(self, timeout=3.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            self.campaign.refresh_from_db()
+            if self.campaign.is_sent:
+                return True
+            time.sleep(0.05)
+        return False
+
     def test_send_campaign_notifies_actives_only(self):
         total = send_campaign(self.campaign)
         self.assertEqual(total, 2)
@@ -318,12 +376,14 @@ class NewsletterCampaignTest(TestCase):
             self.assertEqual(message.subject, "Novidades da semana")
             self.assertIn("Chegaram figures novas!", message.body)
             self.assertIn("/newsletter/unsubscribe/", message.body)
-        self.campaign.refresh_from_db()
-        self.assertTrue(self.campaign.is_sent)
+        self.assertTrue(
+            self._wait_for_sent(), "campanha não foi marcada como enviada"
+        )
 
     def test_send_campaign_skips_already_sent(self):
         send_campaign(self.campaign)
         self.assertTrue(self._wait_for_email(2))
+        self.assertTrue(self._wait_for_sent())
         sent = len(mail.outbox)
         total = send_campaign(self.campaign)
         self.assertEqual(total, 0)

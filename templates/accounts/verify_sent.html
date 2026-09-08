@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirme seu email — {{ website_config.company_name }}{% endblock %}
+
+{% block content %}
+<section class="auth container">
+    <div class="auth__box">
+        <h1 class="auth__title"><span class="text-gold">Confirme</span> seu email</h1>
+        <p class="auth__hint">Enviamos um link de confirmação para o seu email. O link expira em 48 horas.</p>
+
+        {% if messages %}
+        <div class="auth__error">
+            {% for message in messages %}{{ message }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <p class="auth__switch">Não recebeu? <a href="{% url 'accounts:resend_verification' %}" class="auth__link">Reenviar link</a></p>
+        <p class="auth__switch"><a href="{% url 'accounts:login' %}" class="auth__link">Voltar para o login</a></p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/login.css' %}">
+{% endblock %}

@@ -47,6 +47,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     birth_date = models.DateField(
         null=True, blank=True, verbose_name="Data de Nascimento"
     )
+    email_verified_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Email verificado em"
+    )
     is_staff = models.BooleanField(
         default=False, verbose_name="Equipe"
     )

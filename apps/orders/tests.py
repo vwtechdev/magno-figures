@@ -470,13 +470,31 @@ class OrderTrackingTest(TestCase):
         order = self._make_order(
             shipping_service="PAC", tracking_code="BR123456789BR"
         )
-        order.status = OrderStatus.SENT
-        order.save()
+        with self.captureOnCommitCallbacks(execute=True):
+            order.status = OrderStatus.SENT
+            order.save()
         self.assertTrue(self._wait_for_email(), "e-mail não foi enviado a tempo")
         message = mail.outbox[0]
         self.assertEqual(message.to, ["rastreio@example.com"])
         self.assertIn("BR123456789BR", message.body)
         self.assertIn("https://rastreamento.correios.com.br/", message.body)
+
+    def test_rollback_sends_nothing(self):
+        from django.db import transaction
+
+        order = self._make_order(
+            shipping_service="PAC", tracking_code="BR123456789BR"
+        )
+        mail.outbox.clear()
+        try:
+            with transaction.atomic():
+                order.status = OrderStatus.SENT
+                order.save()
+                raise RuntimeError("rollback intencional")
+        except RuntimeError:
+            pass
+        time.sleep(0.3)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_edit_without_status_change_sends_nothing(self):
         order = self._make_order(

@@ -19,7 +19,7 @@ class UserAdminForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     form = UserAdminForm
-    list_display = ("email", "name", "phone", "is_staff", "is_active")
+    list_display = ("email", "name", "phone", "is_staff", "is_active", "email_verified_at")
     list_filter = ("is_staff", "is_active")
     search_fields = ("email", "name")
     ordering = ("email",)
@@ -38,9 +38,9 @@ class UserAdmin(BaseUserAdmin):
                 )
             },
         ),
-        ("Datas", {"fields": ("created_at", "updated_at")}),
+        ("Datas", {"fields": ("email_verified_at", "created_at", "updated_at")}),
     )
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("email_verified_at", "created_at", "updated_at")
     add_fieldsets = (
         (
             None,

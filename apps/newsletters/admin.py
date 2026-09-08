@@ -50,7 +50,7 @@ class NewsletterCampaignAdmin(admin.ModelAdmin):
         total = 0
         for campaign in queryset.filter(sent_at__isnull=True):
             total += send_campaign(campaign)
-        self.message_user(request, f"{total} email(s) enviado(s).")
+        self.message_user(request, f"{total} email(s) com envio iniciado.")
 
 
 @admin.register(StockAlert)
@@ -76,4 +76,4 @@ class StockAlertAdmin(admin.ModelAdmin):
         total = 0
         for figure in Figure.objects.filter(pk__in=figure_ids):
             total += notify_stock_alerts(figure)
-        self.message_user(request, f"{total} aviso(s) enviado(s).")
+        self.message_user(request, f"{total} aviso(s) com envio iniciado.")

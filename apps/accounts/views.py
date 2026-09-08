@@ -8,12 +8,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm as DjangoPasswordResetForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.encoding import force_str
+from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 
 from apps.accounts.models import User
+from apps.accounts.verification import (
+    resend_throttled,
+    send_verification_email,
+    verification_token_generator,
+)
 from apps.addresses.models import Address
 from apps.orders.models import Order
 from core.mail import send_mail_async
@@ -35,6 +44,22 @@ def login_view(request):
             ):
                 next_url = "website:home"
             return redirect(next_url)
+        pending = (
+            User.objects.filter(email__iexact=email).only("pk").first()
+            if email
+            else None
+        )
+        if (
+            pending is not None
+            and not pending.is_active
+            and pending.email_verified_at is None
+        ):
+            messages.error(
+                request,
+                "Sua conta ainda não foi confirmada. Verifique seu e-mail "
+                "ou solicite um novo link.",
+            )
+            return redirect("accounts:resend_verification")
         messages.error(request, "Email ou senha inválidos.")
     return render(request, "accounts/login.html")
 
@@ -60,6 +85,11 @@ def register_view(request):
             errors.append("Informe seu nome.")
         if not email:
             errors.append("Informe seu email.")
+        else:
+            try:
+                validate_email(email)
+            except ValidationError:
+                errors.append("Informe um email válido.")
         if User.objects.filter(email__iexact=email).exists():
             errors.append("Já existe uma conta com este email.")
         if password1 != password2:
@@ -74,14 +104,72 @@ def register_view(request):
             messages.error(request, " ".join(errors))
             return render(request, "accounts/register.html", {"values": request.POST})
 
-        user = User.objects.create_user(
-            email=email, password=password1, name=name, phone=phone
+        with transaction.atomic():
+            user = User.objects.create_user(
+                email=email,
+                password=password1,
+                name=name,
+                phone=phone,
+                is_active=False,
+            )
+        send_verification_email(user)
+        messages.success(
+            request,
+            "Cadastro realizado! Enviamos um link de confirmação para o seu email.",
         )
-        login(request, user)
-        messages.success(request, "Cadastro realizado com sucesso. Bem-vindo!")
-        return redirect("website:home")
+        return redirect("accounts:verification_sent")
 
     return render(request, "accounts/register.html")
+
+
+def verification_sent_view(request):
+    return render(request, "accounts/verify_sent.html")
+
+
+def resend_verification_view(request):
+    if request.method == "POST":
+        email = (request.POST.get("email") or "").strip().lower()
+        user = (
+            User.objects.filter(email__iexact=email).first() if email else None
+        )
+        if (
+            user is not None
+            and not user.is_active
+            and user.email_verified_at is None
+            and not resend_throttled(user)
+        ):
+            send_verification_email(user)
+        messages.success(
+            request,
+            "Se a conta existir e ainda não foi confirmada, "
+            "enviamos um novo link para o seu email.",
+        )
+        return redirect("accounts:verification_sent")
+    return render(request, "accounts/verify_resend.html")
+
+
+def verify_email_view(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+        user = None
+    if user is not None and user.is_active and user.email_verified_at is not None:
+        messages.info(request, "Sua conta já foi confirmada. Faça login.")
+        return redirect("accounts:login")
+    if (
+        user is None
+        or not verification_token_generator.check_token(user, token)
+    ):
+        return render(request, "accounts/verify_invalid.html", status=400)
+    user.is_active = True
+    user.email_verified_at = timezone.now()
+    user.save(update_fields=["is_active", "email_verified_at"])
+    login(
+        request, user, backend="django.contrib.auth.backends.ModelBackend"
+    )
+    messages.success(request, "Email confirmado com sucesso. Bem-vindo!")
+    return redirect("website:home")
 
 
 def profile_view(request):

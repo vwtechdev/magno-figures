@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
@@ -28,20 +29,29 @@ def notify_tracking_code_on_shipment(sender, instance, created, **kwargs):
         return
     if not instance.tracking_code.strip() or not instance.user.email:
         return
+    name = instance.user.name
+    email = instance.user.email
+    order_pk = instance.pk
+    tracking_code = instance.tracking_code.strip()
+    tracking_url = instance.tracking_url
     lines = [
-        f"Olá, {instance.user.name}!",
+        f"Olá, {name}!",
         "",
-        f"Seu pedido #{instance.pk} foi enviado!",
+        f"Seu pedido #{order_pk} foi enviado!",
         "",
-        f"Código de rastreio: {instance.tracking_code.strip()}",
+        f"Código de rastreio: {tracking_code}",
     ]
-    if instance.tracking_url:
+    if tracking_url:
         lines += [
             "",
-            f"Acompanhe aqui: {instance.tracking_url}",
+            f"Acompanhe aqui: {tracking_url}",
         ]
-    send_mail_async(
-        f"Seu pedido #{instance.pk} foi enviado!",
-        "\n".join(lines),
-        [instance.user.email],
-    )
+
+    def _dispatch():
+        send_mail_async(
+            f"Seu pedido #{order_pk} foi enviado!",
+            "\n".join(lines),
+            [email],
+        )
+
+    transaction.on_commit(_dispatch)

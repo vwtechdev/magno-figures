@@ -65,27 +65,37 @@ def _notify_admin_new_order(order):
     recipient = Website.objects.get_config().email
     if not recipient:
         return
+    order_pk = order.pk
+    user_name = order.user.name
+    user_email = order.user.email
+    user_phone = order.user.phone
     items_text = "".join(
         f"- {item.quantity}x {item.figure.name} — R$ {item.price:.2f}\n"
         for item in order.items.select_related("figure").all()
     )
-    subject = f"Novo pedido #{order.pk} no site"
+    address_text = order.address.full_address
+    total = order.total
+    subject = f"Novo pedido #{order_pk} no site"
     body = (
         f"Novo pedido recebido.\n\n"
-        f"Pedido: #{order.pk}\n"
-        f"Cliente: {order.user.name} ({order.user.email})\n"
-        f"Telefone: {order.user.phone}\n\n"
+        f"Pedido: #{order_pk}\n"
+        f"Cliente: {user_name} ({user_email})\n"
+        f"Telefone: {user_phone}\n\n"
         f"Itens:\n{items_text}\n"
-        f"Endereço:\n{order.address.full_address}\n\n"
-        f"Total: R$ {order.total:.2f}\n\n"
-        f"Gerencie em: {site_base_url()}/admin/orders/order/{order.pk}/change/"
+        f"Endereço:\n{address_text}\n\n"
+        f"Total: R$ {total:.2f}\n\n"
+        f"Gerencie em: {site_base_url()}/admin/orders/order/{order_pk}/change/"
     )
-    send_mail_async(
-        subject,
-        body,
-        [recipient],
-        from_email=settings.DEFAULT_FROM_EMAIL,
-    )
+
+    def _dispatch():
+        send_mail_async(
+            subject,
+            body,
+            [recipient],
+            from_email=settings.DEFAULT_FROM_EMAIL,
+        )
+
+    transaction.on_commit(_dispatch)
 
 
 def _checkout_context(request, addresses, address_form, selected_id, selected_address=None):

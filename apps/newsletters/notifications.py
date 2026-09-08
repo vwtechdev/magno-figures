@@ -1,7 +1,8 @@
 from django.core import signing
+from django.db import transaction
 from django.urls import reverse
 
-from core.mail import send_mail_async
+from core.mail import dispatch_email_batch
 from core.utils import site_base_url
 
 STOCK_ALERT_SALT = "stock-alert-unsubscribe"
@@ -44,6 +45,8 @@ def notify_stock_alerts(figure):
         return 0
     base = site_base_url()
     product_url = base + reverse("figures:detail", args=[figure.slug])
+    payloads = []
+    alert_ids = []
     for alert in pending:
         unsubscribe_url = base + reverse(
             "newsletters:stock_alert_unsubscribe",
@@ -58,16 +61,31 @@ def notify_stock_alerts(figure):
             "Não quer mais receber estes avisos? "
             f"Cancele aqui: {unsubscribe_url}"
         )
-        send_mail_async(subject, message, [alert.email])
-        alert.is_notified = True
-        alert.save(update_fields=["is_notified", "updated_by"])
+        payloads.append(
+            {"subject": subject, "message": message, "recipients": [alert.email]}
+        )
+        alert_ids.append(alert.pk)
+
+    def _mark_notified(results):
+        succeeded = [
+            alert_id for alert_id, ok in zip(alert_ids, results) if ok
+        ]
+        if succeeded:
+            StockAlert.objects.filter(
+                pk__in=succeeded, is_notified=False
+            ).update(is_notified=True)
+
+    def _dispatch():
+        dispatch_email_batch(payloads, on_success=_mark_notified)
+
+    transaction.on_commit(_dispatch)
     return len(pending)
 
 
 def send_campaign(campaign):
     from django.utils import timezone
 
-    from apps.newsletters.models import NewsletterSubscriber
+    from apps.newsletters.models import NewsletterCampaign, NewsletterSubscriber
 
     if campaign.is_sent:
         return 0
@@ -75,6 +93,7 @@ def send_campaign(campaign):
         NewsletterSubscriber.objects.filter(is_active=True)
     )
     base = site_base_url()
+    payloads = []
     for subscriber in subscribers:
         unsubscribe_url = base + reverse(
             "newsletters:unsubscribe",
@@ -86,7 +105,25 @@ def send_campaign(campaign):
             "Não quer mais receber nossas novidades? "
             f"Cancele aqui: {unsubscribe_url}"
         )
-        send_mail_async(campaign.subject, message, [subscriber.email])
-    campaign.sent_at = timezone.now()
-    campaign.save(update_fields=["sent_at", "updated_by"])
+        payloads.append(
+            {
+                "subject": campaign.subject,
+                "message": message,
+                "recipients": [subscriber.email],
+            }
+        )
+    campaign_pk = campaign.pk
+
+    def _mark_sent(results):
+        # Envio total ou nada: se algum falhar, a campanha continua
+        # como não enviada para permitir nova tentativa pelo admin.
+        if results and all(results):
+            NewsletterCampaign.objects.filter(
+                pk=campaign_pk, sent_at__isnull=True
+            ).update(sent_at=timezone.now())
+
+    def _dispatch():
+        dispatch_email_batch(payloads, on_success=_mark_sent)
+
+    transaction.on_commit(_dispatch)
     return len(subscribers)
