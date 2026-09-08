@@ -34,7 +34,7 @@ Configuração via `.env` (não versionado, gerenciado pelo usuário) — veja `
 ## Deploy
 
 ```bash
-sh scripts/deploy.sh
+sh deploy.sh
 # docker compose up -d --build, migrate, collectstatic
 ```
 
