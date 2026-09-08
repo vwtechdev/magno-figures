@@ -8,6 +8,8 @@ from django.utils.http import urlsafe_base64_encode
 
 from apps.accounts.models import User
 from apps.accounts.verification import verification_token_generator
+from apps.addresses.models import Address
+from apps.orders.models import Order, OrderStatus
 
 
 class PasswordResetEmailTest(TestCase):
@@ -259,6 +261,84 @@ class ProfilePasswordTest(TestCase):
         response = self.client.get(reverse("accounts:profile") + "?tab=password")
         self.assertContains(response, "Trocar senha")
         self.assertContains(response, 'name="current_password"')
+
+
+class ProfileDeleteTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="excluir@example.com",
+            password="senha-forte-123",
+            name="Cliente Excluir",
+            phone="(11) 99999-9999",
+        )
+        self.address = Address.objects.create(
+            user=self.user,
+            zip_code="01310-100",
+            street="Av. Paulista",
+            number="1000",
+            neighborhood="Bela Vista",
+            city="São Paulo",
+            state="SP",
+        )
+        self.client.force_login(self.user)
+        self.url = reverse("accounts:profile_delete")
+        self.tab_url = reverse("accounts:profile") + "?tab=password"
+
+    def test_delete_without_orders_anonymizes_and_logs_out(self):
+        response = self.client.post(self.url, {"password": "senha-forte-123"})
+        self.assertRedirects(response, reverse("website:home"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+        self.assertFalse(self.user.has_usable_password())
+        self.assertEqual(self.user.name, "Conta excluída")
+        self.assertEqual(self.user.phone, "")
+        self.assertTrue(self.user.email.startswith("excluido_"))
+
+    def test_wrong_password_rejected(self):
+        response = self.client.post(self.url, {"password": "errada"})
+        self.assertRedirects(response, self.tab_url)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+        self.assertEqual(self.user.email, "excluir@example.com")
+
+    def test_open_order_blocks_deletion(self):
+        order = Order.objects.create(
+            user=self.user, address=self.address, status=OrderStatus.NEW
+        )
+        response = self.client.post(self.url, {"password": "senha-forte-123"})
+        self.assertRedirects(response, self.tab_url)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+        self.assertTrue(Order.objects.filter(pk=order.pk).exists())
+
+    def test_delivered_order_allows_deletion_and_preserves_order(self):
+        order = Order.objects.create(
+            user=self.user, address=self.address, status=OrderStatus.DELIVERED
+        )
+        response = self.client.post(self.url, {"password": "senha-forte-123"})
+        self.assertRedirects(response, reverse("website:home"))
+        self.assertTrue(Order.objects.filter(pk=order.pk).exists())
+        order.refresh_from_db()
+        self.assertEqual(order.address.full_address, self.address.full_address)
+
+    def test_get_redirects_to_password_tab(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, self.tab_url)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+
+    def test_anonymous_redirects_to_login(self):
+        self.client.logout()
+        response = self.client.post(self.url, {"password": "senha-forte-123"})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_password_tab_renders_delete_button_and_modal(self):
+        response = self.client.get(reverse("accounts:profile") + "?tab=password")
+        self.assertContains(response, "Excluir Conta")
+        self.assertContains(response, 'id="deleteAccountModal"')
+        self.assertContains(response, reverse("accounts:profile_delete"))
 
 
 class ProfileDataTest(TestCase):

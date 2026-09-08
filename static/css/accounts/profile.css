@@ -179,6 +179,74 @@
     cursor: pointer;
 }
 
+.profile__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.profile__danger-btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--danger);
+    background: transparent;
+    color: var(--danger);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile__danger-btn:hover {
+    background: rgba(var(--danger-rgb), 0.12);
+}
+
+.profile__cancel-btn {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.profile__modal[hidden] {
+    display: none;
+}
+
+.profile__modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.profile__modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--scrim-rgb), 0.7);
+}
+
+.profile__modal-box {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.profile__modal-title {
+    color: var(--danger);
+    margin-bottom: 10px;
+}
+
+.profile__modal-text {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+
 .profile__messages {
     display: grid;
     gap: 8px;

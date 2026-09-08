@@ -14,6 +14,7 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
     path("profile/dados/", views.profile_data_view, name="profile_data"),
     path("profile/senha/", views.profile_password_view, name="profile_password"),
+    path("profile/excluir/", views.profile_delete_view, name="profile_delete"),
     path("password-reset/", views.PasswordResetView.as_view(), name="password_reset"),
     path("password-reset/done/", views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),

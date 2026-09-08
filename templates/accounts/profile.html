@@ -98,8 +98,30 @@
                 <label class="profile__data-label" for="id_new_password2">Repetir nova senha</label>
                 <input type="password" id="id_new_password2" name="new_password2" class="profile__input" autocomplete="new-password">
             </div>
-            <button type="submit" class="profile__cpf-btn">Trocar senha</button>
+            <div class="profile__actions">
+                <button type="submit" class="profile__cpf-btn">Trocar senha</button>
+                <button type="button" class="profile__danger-btn" id="deleteAccountBtn">Excluir Conta</button>
+            </div>
         </form>
+
+        <div class="profile__modal" id="deleteAccountModal" hidden>
+            <div class="profile__modal-backdrop" data-close-modal></div>
+            <div class="profile__modal-box" role="dialog" aria-modal="true" aria-labelledby="deleteAccountTitle">
+                <h3 class="profile__modal-title" id="deleteAccountTitle">Excluir conta?</h3>
+                <p class="profile__modal-text">Sua conta será excluída permanentemente e você perderá o acesso aos seus pedidos. Se tiver pedidos em andamento, a exclusão será bloqueada. Digite sua senha para confirmar.</p>
+                <form method="post" action="{% url 'accounts:profile_delete' %}">
+                    {% csrf_token %}
+                    <div class="profile__field">
+                        <label class="profile__data-label" for="id_delete_password">Senha</label>
+                        <input type="password" id="id_delete_password" name="password" class="profile__input" autocomplete="current-password">
+                    </div>
+                    <div class="profile__actions">
+                        <button type="button" class="profile__cpf-btn profile__cancel-btn" data-close-modal>Cancelar</button>
+                        <button type="submit" class="profile__danger-btn">Confirmar exclusão</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
     {% else %}
     <div class="auth__box">
@@ -119,6 +141,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/accounts/profile-tabs.js' %}" defer></script>
+<script src="{% static 'js/accounts/profile-delete.js' %}" defer></script>
 <script src="{% static 'js/cpf-mask.js' %}" defer></script>
 <script src="{% static 'js/accounts/phone-mask.js' %}" defer></script>
 {% endblock %}

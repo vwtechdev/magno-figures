@@ -24,7 +24,7 @@ from apps.accounts.verification import (
     verification_token_generator,
 )
 from apps.addresses.models import Address
-from apps.orders.models import Order
+from apps.orders.models import Order, OrderStatus
 from core.mail import send_mail_async
 from core.validators import is_valid_cpf
 
@@ -257,6 +257,44 @@ def profile_password_view(request):
     update_session_auth_hash(request, request.user)
     messages.success(request, "Senha alterada com sucesso.")
     return redirect(redirect_url)
+
+
+@login_required
+def profile_delete_view(request):
+    redirect_url = f"{reverse('accounts:profile')}?tab=password"
+    if request.method != "POST":
+        return redirect(redirect_url)
+    if not request.user.check_password(request.POST.get("password", "")):
+        messages.error(request, "Senha incorreta.")
+        return redirect(redirect_url)
+    open_statuses = [
+        OrderStatus.NEW,
+        OrderStatus.CONFIRM,
+        OrderStatus.PAYMENT,
+        OrderStatus.PAID,
+        OrderStatus.PRODUCTION,
+        OrderStatus.SENT,
+    ]
+    if Order.objects.filter(user=request.user, status__in=open_statuses).exists():
+        messages.error(
+            request,
+            "Você tem pedidos em andamento. A conta só pode ser excluída "
+            "após a entrega ou cancelamento de todos os pedidos.",
+        )
+        return redirect(redirect_url)
+    user = request.user
+    user.name = "Conta excluída"
+    user.phone = ""
+    user.cpf = ""
+    user.birth_date = None
+    user.email = f"excluido_{user.pk}@magno-figures.invalid"
+    user.email_verified_at = None
+    user.is_active = False
+    user.set_unusable_password()
+    user.save()
+    logout(request)
+    messages.success(request, "Sua conta foi excluída com sucesso.")
+    return redirect("website:home")
 
 
 class AsyncPasswordResetForm(DjangoPasswordResetForm):
