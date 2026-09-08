@@ -26,6 +26,11 @@ services:
       - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-headers.headers.customrequestheaders.Host=${DOMAIN}"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=${COMPOSE_PROJECT_NAME}-headers"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.priority=100"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.entrypoints=web"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.middlewares=${COMPOSE_PROJECT_NAME}-redirect"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.permanent=true"
       - "traefik.docker.network=proxy"
     restart: always
     deploy:
@@ -69,7 +74,7 @@ services:
           memory: 128M
           cpus: '0.3'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "-H", "Host: ${DOMAIN}", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
