@@ -213,7 +213,7 @@
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid rgba(var(--white-rgb), 0.15);
+    border: 1px solid var(--border);
     background: rgba(var(--white-rgb), 0.04);
     color: inherit;
 }
@@ -222,7 +222,7 @@
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid rgba(var(--white-rgb), 0.15);
+    border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
     cursor: pointer;
