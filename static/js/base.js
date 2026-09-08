@@ -4,17 +4,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const backToTop = document.getElementById("backToTop");
 
     if (toggle && nav) {
-        toggle.addEventListener("click", () => {
-            const isOpen = nav.classList.toggle("is-open");
+        const backdrop = document.createElement("div");
+        backdrop.className = "navbar__backdrop";
+        backdrop.setAttribute("aria-hidden", "true");
+        document.body.appendChild(backdrop);
+
+        const setOpen = (isOpen) => {
+            nav.classList.toggle("is-open", isOpen);
             toggle.classList.toggle("is-open", isOpen);
             toggle.setAttribute("aria-expanded", String(isOpen));
+            toggle.setAttribute(
+                "aria-label",
+                isOpen ? "Fechar menu" : "Abrir menu"
+            );
+            backdrop.classList.toggle("is-visible", isOpen);
+        };
+
+        toggle.addEventListener("click", () => {
+            setOpen(!nav.classList.contains("is-open"));
+        });
+
+        backdrop.addEventListener("click", () => setOpen(false));
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") setOpen(false);
         });
 
         nav.querySelectorAll("a").forEach((link) => {
             link.addEventListener("click", () => {
-                nav.classList.remove("is-open");
-                toggle.classList.remove("is-open");
-                toggle.setAttribute("aria-expanded", "false");
+                setOpen(false);
                 nav.querySelectorAll(".navbar__item--dropdown.is-open").forEach((item) => {
                     item.classList.remove("is-open");
                 });

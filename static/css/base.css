@@ -740,21 +740,40 @@ ul {
 
     .navbar__nav {
         position: absolute;
-        top: 68px;
-        left: 0;
+        top: 0;
         right: 0;
-        background: rgba(var(--scrim-rgb), 0.92);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(var(--gold-2-rgb), 0.15);
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 300ms ease;
+        width: min(320px, 85vw);
+        height: 100vh;
+        background: var(--bg);
+        border-left: 1px solid rgba(var(--gold-2-rgb), 0.15);
+        border-radius: 14px 0 0 14px;
+        padding: 76px 12px 12px;
+        overflow-y: auto;
+        transform: translateX(105%);
+        transition: transform 0.25s ease;
+        z-index: 1200;
     }
 
     .navbar__nav.is-open {
-        max-height: 80vh;
-        overflow-y: auto;
+        transform: translateX(0);
+    }
+
+    .navbar__backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1190;
+        background: rgba(var(--scrim-rgb), 0.6);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .navbar__backdrop.is-visible {
+        opacity: 1;
+        visibility: visible;
     }
 
     .navbar__links {
