@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Alerta de reposição',
                 'verbose_name_plural': 'Alertas de reposição',
                 'ordering': ['-created_at'],
-                'constraints': [models.UniqueConstraint(fields=('figure', 'email'), name='unique_stock_alert_per_figure_email')],
+                'constraints': [models.UniqueConstraint(fields=('figure', 'email'), name='figures_unique_stock_alert_per_figure_email')],
             },
         ),
     ]

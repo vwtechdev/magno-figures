@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveConstraint(
             model_name='stockalert',
-            name='unique_stock_alert_per_figure_email',
+            name='figures_unique_stock_alert_per_figure_email',
         ),
         migrations.DeleteModel(
             name='StockAlert',
