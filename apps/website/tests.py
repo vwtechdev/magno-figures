@@ -332,3 +332,40 @@ class WebsiteConfigEmptyDbTest(TestCase):
         response = self.client.get(reverse("website:home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "img/logo.png")
+
+
+class HomeNoBannerTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.all().delete()
+
+    def test_catalog_section_gets_top_padding_without_banners(self):
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        response = self.client.get(reverse("website:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "catalog--no-hero")
+
+    def test_no_top_padding_class_when_banners_exist(self):
+        website = Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        Banner.objects.create(
+            website=website, title="Banner", image=make_image("banner.png")
+        )
+        response = self.client.get(reverse("website:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "catalog--no-hero")

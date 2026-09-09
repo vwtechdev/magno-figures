@@ -123,6 +123,10 @@
     padding-bottom: 24px;
 }
 
+.catalog--no-hero {
+    padding-top: 120px;
+}
+
 .section-head {
     display: flex;
     align-items: baseline;

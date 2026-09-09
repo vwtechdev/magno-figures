@@ -53,7 +53,7 @@
 </section>
 {% endif %}
 
-<section class="catalog container">
+<section class="catalog container{% if not banners %} catalog--no-hero{% endif %}">
     <div class="section-head">
         <h2 class="section-title"><span class="text-gold">Catálogo</span></h2>
         {% if figures|length > 1 %}
