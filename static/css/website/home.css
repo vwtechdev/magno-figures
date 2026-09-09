@@ -220,7 +220,8 @@
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
     .hero {
-        margin-top: 84px;
+        width: auto;
+        margin: 84px 12px 48px;
         border-radius: 12px;
     }
 
