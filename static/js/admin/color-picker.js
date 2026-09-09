@@ -1,4 +1,4 @@
-(function () {
+document.addEventListener("DOMContentLoaded", function () {
     function isHex(value) {
         return /^#[0-9a-fA-F]{6}$/.test(value || "");
     }
@@ -19,4 +19,4 @@
         });
         text.after(picker);
     });
-})();
+});
