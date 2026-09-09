@@ -35,6 +35,7 @@ class Banner(BaseModel):
         upload_to="website/banners/",
         validators=[validate_image_size],
         verbose_name="Imagem",
+        help_text="Dimensão recomendada: 1248×250 pixels.",
     )
     link = models.URLField(
         blank=True, verbose_name="Link"

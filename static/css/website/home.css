@@ -1,11 +1,12 @@
 /* ============ HERO / CAROUSEL ============ */
 .hero {
     position: relative;
-    height: 80vh;
-    min-height: 420px;
-    max-height: 700px;
+    width: 100%;
+    max-width: 1248px;
+    margin: 100px auto 48px;
+    aspect-ratio: 1248 / 250;
     overflow: hidden;
-    margin-bottom: 48px;
+    border-radius: 16px;
 }
 
 .hero__track {
@@ -34,24 +35,29 @@
 
 .hero__caption {
     position: absolute;
-    left: 8%;
-    bottom: 18%;
-    max-width: 480px;
+    left: 5%;
+    bottom: 12%;
+    max-width: 60%;
     text-align: left;
     animation: heroFadeUp 600ms ease;
 }
 
 .hero__title {
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
     line-height: 1.1;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     text-shadow: 0 1px 6px rgba(var(--bronze-rgb), 0.55);
 }
 
 .hero__subtitle {
-    font-size: 1.1rem;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
     color: var(--text);
     text-shadow: 0 1px 4px rgba(var(--bronze-rgb), 0.5);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .hero__arrow {
@@ -61,9 +67,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     background: rgba(var(--scrim-rgb), 0.55);
     border: 1px solid rgba(var(--gold-2-rgb), 0.4);
     color: var(--gold-2);
@@ -77,16 +83,16 @@
 }
 
 .hero__arrow--left {
-    left: 20px;
+    left: 12px;
 }
 
 .hero__arrow--right {
-    right: 20px;
+    right: 12px;
 }
 
 .hero__dots {
     position: absolute;
-    bottom: 24px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -214,14 +220,29 @@
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
     .hero {
-        height: 60vh;
-        min-height: 320px;
+        margin-top: 84px;
+        border-radius: 12px;
     }
 
     .hero__caption {
-        left: 20px;
-        right: 20px;
-        bottom: 70px;
+        left: 12px;
+        right: 12px;
+        bottom: 10px;
+        max-width: none;
+    }
+
+    .hero__title {
+        font-size: clamp(1rem, 5vw, 1.3rem);
+        margin-bottom: 2px;
+    }
+
+    .hero__subtitle {
+        display: none;
+    }
+
+    .hero__arrow {
+        width: 30px;
+        height: 30px;
     }
 
     .catalog .card {
