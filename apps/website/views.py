@@ -47,6 +47,15 @@ def robots_txt_view(request):
     content = (
         "User-agent: *\n"
         "Allow: /\n"
+        "Disallow: /accounts/\n"
+        "Disallow: /orders/\n"
+        "Disallow: /carts/\n"
+        "Disallow: /addresses/\n"
+        "Disallow: /newsletter/\n"
+        "Disallow: /categories/age-verification/\n"
+        "Disallow: /figures/stock-alerts/unsubscribe/\n"
+        "Disallow: /figures/*/notify-when-available/\n"
+        "Disallow: /figures/*/shipping/\n"
         f"Sitemap: {site_base_url()}/sitemap.xml\n"
     )
     return HttpResponse(content, content_type="text/plain")

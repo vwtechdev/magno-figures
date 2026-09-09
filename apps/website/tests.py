@@ -105,9 +105,36 @@ class WebsiteSeoTest(TestCase):
         response = self.client.get("/robots.txt")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/plain")
+        content = response.content.decode()
         self.assertIn(
-            f"Sitemap: {site_base_url()}/sitemap.xml", response.content.decode()
+            f"Sitemap: {site_base_url()}/sitemap.xml", content
         )
+        for disallow in (
+            "/accounts/",
+            "/orders/",
+            "/carts/",
+            "/addresses/",
+            "/newsletter/",
+            "/categories/age-verification/",
+            "/figures/stock-alerts/unsubscribe/",
+            "/figures/*/notify-when-available/",
+            "/figures/*/shipping/",
+        ):
+            self.assertIn(f"Disallow: {disallow}", content)
+
+    def test_auth_pages_are_noindex(self):
+        for path in (
+            reverse("accounts:login"),
+            reverse("accounts:register"),
+            reverse("accounts:password_reset"),
+            reverse("categories:age_gate"),
+        ):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(
+                response,
+                '<meta name="robots" content="noindex, nofollow">',
+            )
 
     def test_navbar_logo_and_favicon_use_website_config(self):
         response = self.client.get(reverse("website:home"))
