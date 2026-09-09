@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if address %}Editar{% else %}Novo{% endif %} Endereço — {{ website_config.company_name }}{% endblock %}
+{% block title %}{{ website_config.company_name }} - {% if address %}Editar{% else %}Novo{% endif %} Endereço{% endblock %}
 
 {% block content %}
 <section class="checkout container">

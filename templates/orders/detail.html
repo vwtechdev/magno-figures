@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Pedido #{{ order.pk }} — {{ website_config.company_name }}{% endblock %}
+{% block title %}{{ website_config.company_name }} - Pedido #{{ order.pk }}{% endblock %}
 
 {% block content %}
 <section class="order-page container">
