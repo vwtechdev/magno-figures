@@ -180,3 +180,5 @@ AGENTS.md
 /docs
 settings_dev.py
 requirements-dev.txt
+core/apps.py
+core/management/
