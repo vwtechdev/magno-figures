@@ -325,6 +325,7 @@ class WebsiteThemeTest(TestCase):
         self.website.save()
         response = self.client.get(reverse("website:home"))
         self.assertContains(response, 'id="website-theme"')
+        self.assertContains(response, ":root {")
         self.assertContains(response, "--bg: #112233;")
         self.assertContains(response, "--gold-2: #EAC979;")
         self.assertContains(response, "--gold-gradient: #EAC979;")
