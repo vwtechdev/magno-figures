@@ -81,6 +81,12 @@ class Website(BaseModel):
     company_name = models.CharField(
         max_length=255, verbose_name="Título do Site"
     )
+    subtitle = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Subtítulo (marca)",
+        help_text="Tagline exibida no título da aba da página inicial. Ex.: O melhor site de action figures.",
+    )
     logo = models.ImageField(
         upload_to="website/",
         blank=True,

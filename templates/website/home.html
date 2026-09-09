@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ website_config.company_name }} — Catálogo de Action Figures{% endblock %}
+{% block title %}{{ website_config.company_name }}{% if website_config.subtitle %} - {{ website_config.subtitle }}{% else %} — Catálogo de Action Figures{% endif %}{% endblock %}
 
 {% block content %}
 

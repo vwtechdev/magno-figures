@@ -369,3 +369,35 @@ class HomeNoBannerTest(TestCase):
         response = self.client.get(reverse("website:home"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "catalog--no-hero")
+
+
+class WebsiteSubtitleTitleTest(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def _make_website(self, subtitle=""):
+        return Website.objects.create(
+            company_name="Magno Figures",
+            subtitle=subtitle,
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+
+    def test_home_title_uses_subtitle_when_set(self):
+        self._make_website(subtitle="O melhor site de action figures")
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(response, "<title>Magno Figures - O melhor site de action figures</title>")
+
+    def test_home_title_falls_back_without_subtitle(self):
+        self._make_website()
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(response, "<title>Magno Figures — Catálogo de Action Figures</title>")
+
+    def test_get_config_creates_without_subtitle(self):
+        Website.objects.all().delete()
+        config = Website.objects.get_config()
+        self.assertEqual(config.subtitle, "")

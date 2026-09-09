@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ website_config.company_name }}{% endblock %}</title>
+    <title>{% block title %}{{ website_config.company_name }}{% if website_config.subtitle %} - {{ website_config.subtitle }}{% endif %}{% endblock %}</title>
     {% if website_config.description %}<meta name="description" content="{{ website_config.description }}">{% endif %}
     {% if website_config.seo_keywords %}<meta name="keywords" content="{{ website_config.seo_keywords }}">{% endif %}
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
