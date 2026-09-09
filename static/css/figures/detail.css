@@ -132,6 +132,8 @@
     color: var(--text);
     line-height: 1.7;
     margin-bottom: 24px;
+    white-space: pre-line;
+    overflow-wrap: break-word;
 }
 
 .product__categories {

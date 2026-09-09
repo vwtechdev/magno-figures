@@ -246,6 +246,14 @@ class FigureDetailSeoTest(TestCase):
         self.assertContains(response, "Esgotado")
         self.assertNotContains(response, 'class="product__cta product__cta--buy"')
 
+    def test_detail_description_preserves_line_breaks(self):
+        self.figure.description = "linha1\nlinha2\n\nlinha3\n\n\nlinha4"
+        self.figure.save()
+        response = self.client.get(
+            reverse("figures:detail", args=[self.figure.slug])
+        )
+        self.assertContains(response, "linha1\nlinha2\n\nlinha3\n\n\nlinha4")
+
 
 class FigureFileStorageTest(TestCase):
     @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
