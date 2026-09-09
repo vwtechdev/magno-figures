@@ -594,9 +594,17 @@ ul {
 }
 
 .card__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 6px;
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--gold-2);
+}
+
+.card__price-value {
+    white-space: nowrap;
 }
 
 .card__badge {
@@ -629,7 +637,7 @@ ul {
     color: var(--text-muted);
     font-weight: 400;
     font-size: 0.85rem;
-    margin-right: 6px;
+    white-space: nowrap;
 }
 
 /* ============ FAB ============ */

@@ -12,9 +12,9 @@
     <div class="card__overlay">
         <h3 class="card__title">{{ figure.name }}</h3>
         {% if figure.has_discount %}
-        <p class="card__price"><del class="card__old-price">R$ {{ figure.old_price|floatformat:2 }}</del> R$ {{ figure.sale_price|floatformat:2 }}</p>
+        <p class="card__price"><del class="card__old-price">R$ {{ figure.old_price|floatformat:2 }}</del><span class="card__price-value">R$ {{ figure.sale_price|floatformat:2 }}</span></p>
         {% else %}
-        <p class="card__price">R$ {{ figure.price|floatformat:2 }}</p>
+        <p class="card__price"><span class="card__price-value">R$ {{ figure.price|floatformat:2 }}</span></p>
         {% endif %}
     </div>
 </a>
