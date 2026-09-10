@@ -131,11 +131,27 @@ class NsfwAgeGateTest(TestCase):
         self.assertNotContains(response, "Dark Lady")
         self.assertNotContains(response, "Shadow")
 
-    def test_nsfw_category_visible_as_gated_entry(self):
+    def test_nsfw_category_hidden_until_verified(self):
         response = self.client.get(reverse("categories:list"))
         self.assertContains(response, "Marvel")
+        self.assertNotContains(response, "mais-18")
+        self.assertNotContains(response, "+18")
+        response = self.client.get(reverse("figures:list"))
+        sidebar = list(response.context["filter_categories"])
+        self.assertIn(self.safe_cat, sidebar)
+        self.assertNotIn(self.nsfw_cat, sidebar)
+        self.assertNotIn(self.child_cat, sidebar)
+
+    def test_nsfw_category_listed_once_verified(self):
+        self._verify_age(reverse("categories:list"))
+        response = self.client.get(reverse("categories:list"))
         self.assertContains(response, "mais-18")
         self.assertContains(response, "+18")
+        response = self.client.get(reverse("figures:list"))
+        sidebar = list(response.context["filter_categories"])
+        self.assertIn(self.safe_cat, sidebar)
+        self.assertIn(self.nsfw_cat, sidebar)
+        self.assertIn(self.child_cat, sidebar)
 
     def test_nsfw_category_hidden_from_navbar(self):
         response = self.client.get(reverse("website:home"))
