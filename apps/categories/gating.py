@@ -35,6 +35,24 @@ def filter_nsfw_figures(request, queryset):
     return queryset.exclude(categories__in=nsfw_ids).distinct()
 
 
+def show_nsfw_figures(request, selected_categories):
+    """NSFW figures surface only when verified AND an NSFW category is selected."""
+    if not is_age_verified(request):
+        return False
+    return any(
+        category.is_nsfw_effective for category in selected_categories
+    )
+
+
+def filter_nsfw_figures_selected(request, queryset, selected_categories):
+    if show_nsfw_figures(request, selected_categories):
+        return queryset
+    nsfw_ids = get_nsfw_category_ids()
+    if not nsfw_ids:
+        return queryset
+    return queryset.exclude(categories__in=nsfw_ids).distinct()
+
+
 def filter_nsfw_categories(request, queryset):
     if is_age_verified(request):
         return queryset

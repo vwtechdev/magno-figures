@@ -6,6 +6,7 @@ from django.urls import reverse
 from apps.categories.gating import (
     filter_nsfw_categories,
     filter_nsfw_figures,
+    filter_nsfw_figures_selected,
 )
 from apps.categories.models import Category
 from apps.figures.models import Figure
@@ -14,9 +15,10 @@ from core.utils import site_base_url
 
 
 def home_view(request):
-    visible_figures = filter_nsfw_figures(
+    visible_figures = filter_nsfw_figures_selected(
         request,
         Figure.objects.active().prefetch_related("categories", "images"),
+        [],
     )
     context = {
         "banners": Banner.objects.active(),

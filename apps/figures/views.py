@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 
 from apps.categories.gating import (
     filter_nsfw_figures,
+    filter_nsfw_figures_selected,
     is_age_verified,
     redirect_to_age_gate,
 )
@@ -96,7 +97,7 @@ def figure_list_view(request):
         )
     else:
         sort = ""
-    figures = filter_nsfw_figures(request, figures)
+    figures = filter_nsfw_figures_selected(request, figures, selected)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE
     ).get_page(request.GET.get("page"))

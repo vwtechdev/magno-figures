@@ -196,7 +196,18 @@ class NsfwAgeGateTest(TestCase):
         )
         self.assertContains(response, "+18")
         response = self.client.get(reverse("figures:list"))
+        self.assertNotContains(response, "Dark Lady")
+        response = self.client.get(
+            reverse("figures:list"), {"cat": "mais-18"}
+        )
         self.assertContains(response, "Dark Lady")
+
+    def test_verified_without_nsfw_filter_hides_nsfw_on_home(self):
+        self._verify_age("/")
+        response = self.client.get(reverse("website:home"))
+        self.assertNotContains(response, "Dark Lady")
+        self.assertNotContains(response, "Shadow")
+        self.assertContains(response, "Iron Man")
 
     def test_safe_pages_keep_index_follow(self):
         path = reverse("figures:detail", args=[self.safe_figure.slug])
