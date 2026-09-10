@@ -261,6 +261,13 @@ class HomeSectionsTest(TestCase):
             image=make_image("sold.png"),
         )
 
+    def test_catalog_shows_oldest_ten(self):
+        response = self.client.get(reverse("website:home"))
+        catalog = list(response.context["figures"])
+        self.assertEqual(catalog, [self.old, self.new])
+        self.assertNotIn(self.promo, catalog)
+        self.assertNotIn(self.sold_promo, catalog)
+
     def test_new_releases_ordered_by_recent(self):
         response = self.client.get(reverse("website:home"))
         releases = list(response.context["new_releases"])

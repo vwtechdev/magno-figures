@@ -22,7 +22,9 @@ def home_view(request):
     )
     context = {
         "banners": Banner.objects.active(),
-        "figures": visible_figures.filter(discount_percent=0),
+        "figures": visible_figures.filter(discount_percent=0).order_by(
+            "created_at"
+        )[:10],
         "new_releases": visible_figures.filter(discount_percent=0).order_by(
             "-created_at"
         )[:10],
