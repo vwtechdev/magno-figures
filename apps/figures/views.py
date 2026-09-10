@@ -13,7 +13,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 
 from apps.categories.gating import (
-    filter_nsfw_categories,
     filter_nsfw_figures,
     is_age_verified,
     redirect_to_age_gate,
@@ -111,8 +110,8 @@ def figure_list_view(request):
         "page_obj": page_obj,
         "page_query": page_query.urlencode(),
         "query": query,
-        "filter_categories": filter_nsfw_categories(
-            request, Category.objects.active().order_by("tree_id", "lft")
+        "filter_categories": Category.objects.active().order_by(
+            "tree_id", "lft"
         ),
         "selected_cats": selected_slugs,
         "min_price": (request.GET.get("min_price") or "").strip(),

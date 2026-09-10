@@ -136,11 +136,13 @@ class NsfwAgeGateTest(TestCase):
         self.assertContains(response, "Marvel")
         self.assertNotContains(response, "mais-18")
         self.assertNotContains(response, "+18")
+
+    def test_nsfw_filter_always_in_catalog_sidebar(self):
         response = self.client.get(reverse("figures:list"))
         sidebar = list(response.context["filter_categories"])
         self.assertIn(self.safe_cat, sidebar)
-        self.assertNotIn(self.nsfw_cat, sidebar)
-        self.assertNotIn(self.child_cat, sidebar)
+        self.assertIn(self.nsfw_cat, sidebar)
+        self.assertIn(self.child_cat, sidebar)
 
     def test_nsfw_category_listed_once_verified(self):
         self._verify_age(reverse("categories:list"))
