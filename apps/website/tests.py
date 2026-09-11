@@ -62,11 +62,27 @@ class WebsiteSeoTest(TestCase):
         )
 
     def test_google_analytics_script_rendered_unescaped(self):
+        self.client.cookies["mf_cookie_consent"] = "granted"
         response = self.client.get(reverse("website:home"))
         self.assertContains(
             response,
             '<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>',
         )
+
+    def test_google_analytics_absent_without_consent(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertNotContains(response, "googletagmanager.com")
+        self.assertContains(response, 'data-ga="1"')
+
+    def test_google_analytics_absent_when_denied(self):
+        self.client.cookies["mf_cookie_consent"] = "denied"
+        response = self.client.get(reverse("website:home"))
+        self.assertNotContains(response, "googletagmanager.com")
+
+    def test_cookie_bar_has_reject_button(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(response, 'id="cookieReject"')
+        self.assertContains(response, "Recusar")
 
     def test_twitter_social_link_rendered(self):
         response = self.client.get(reverse("website:home"))

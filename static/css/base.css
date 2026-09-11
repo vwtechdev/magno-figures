@@ -704,6 +704,29 @@ ul {
     box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
+.cookie-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.cookie-bar__reject {
+    background: none;
+    border: none;
+    padding: 10px 4px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.cookie-bar__reject:hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
 @media (max-width: 600px) {
     .cookie-bar {
         flex-direction: column;
@@ -714,6 +737,12 @@ ul {
 
     .cookie-bar__accept {
         width: 100%;
+    }
+
+    .cookie-bar__actions {
+        width: 100%;
+        flex-direction: column-reverse;
+        gap: 4px;
     }
 }
 
