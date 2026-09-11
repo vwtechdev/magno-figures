@@ -569,3 +569,18 @@ class RecaptchaFormsTest(TestCase):
         self.assertContains(response, "Verificação de segurança falhou")
         time.sleep(0.1)
         self.assertEqual(len(mail.outbox), 0)
+
+
+class RecaptchaNoticeTest(TestCase):
+    def test_notice_rendered_on_auth_pages(self):
+        for url_name in (
+            "accounts:login",
+            "accounts:register",
+            "accounts:password_reset",
+        ):
+            response = self.client.get(reverse(url_name))
+            self.assertContains(response, "protegido pelo reCAPTCHA")
+            self.assertContains(
+                response, "https://policies.google.com/privacy"
+            )
+            self.assertContains(response, "https://policies.google.com/terms")

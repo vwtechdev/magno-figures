@@ -138,6 +138,14 @@
     font-size: 0.9rem;
 }
 
+.auth__recaptcha {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
 .auth__row {
     display: flex;
     align-items: center;
