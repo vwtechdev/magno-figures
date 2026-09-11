@@ -16,8 +16,9 @@
         </div>
         {% endif %}
 
-        <form class="auth__form" method="post" action="{% url 'accounts:register' %}">
+        <form class="auth__form" method="post" action="{% url 'accounts:register' %}" data-recaptcha-action="register" data-recaptcha-key="{{ recaptcha_site_key }}">
             {% csrf_token %}
+            <input type="hidden" name="g-recaptcha-response" value="">
             <label class="auth__field">
                 <span class="auth__label">Nome</span>
                 <input class="auth__input" type="text" name="name" value="{{ values.name }}" required autocomplete="name">
@@ -65,4 +66,8 @@
 {% block extra_js %}
 <script src="{% static 'js/accounts/password-toggle.js' %}" defer></script>
 <script src="{% static 'js/accounts/phone-mask.js' %}" defer></script>
+{% if recaptcha_site_key %}
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+<script src="{% static 'js/accounts/recaptcha.js' %}" defer></script>
+{% endif %}
 {% endblock %}

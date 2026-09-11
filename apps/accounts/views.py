@@ -18,6 +18,7 @@ from django.utils.encoding import force_str
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 
 from apps.accounts.models import User
+from apps.accounts.recaptcha import verify_recaptcha_token
 from apps.accounts.verification import (
     resend_throttled,
     send_verification_email,
@@ -31,6 +32,13 @@ from core.validators import is_valid_cpf
 
 def login_view(request):
     if request.method == "POST":
+        if not verify_recaptcha_token(
+            request.POST.get("g-recaptcha-response", ""), "login"
+        ):
+            messages.error(
+                request, "Verificação de segurança falhou. Tente novamente."
+            )
+            return render(request, "accounts/login.html")
         email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
         user = authenticate(request, username=email, password=password)
@@ -81,6 +89,10 @@ def register_view(request):
         password2 = request.POST.get("password2", "")
 
         errors = []
+        if not verify_recaptcha_token(
+            request.POST.get("g-recaptcha-response", ""), "register"
+        ):
+            errors.append("Verificação de segurança falhou. Tente novamente.")
         if not name:
             errors.append("Informe seu nome.")
         if not email:
@@ -319,6 +331,18 @@ class PasswordResetView(auth_views.PasswordResetView):
     subject_template_name = "accounts/password_reset_subject.txt"
     success_url = reverse_lazy("accounts:password_reset_done")
     form_class = AsyncPasswordResetForm
+
+    def form_valid(self, form):
+        if not verify_recaptcha_token(
+            self.request.POST.get("g-recaptcha-response", ""),
+            "password_reset",
+        ):
+            messages.error(
+                self.request,
+                "Verificação de segurança falhou. Tente novamente.",
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView):

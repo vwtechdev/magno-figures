@@ -1,0 +1,52 @@
+import logging
+
+import requests
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
+
+
+def is_recaptcha_configured():
+    return bool(settings.RECAPTCHA_SITE_KEY and settings.RECAPTCHA_SECRET_KEY)
+
+
+def verify_recaptcha_token(token, action):
+    """Validate a reCAPTCHA v3 token against Google's siteverify API.
+
+    Returns True only when the response is successful, the action matches
+    and the score meets the configured threshold. Fail-closed: any network
+    or parsing error returns False. When no keys are configured (local
+    dev/test), verification is skipped and True is returned.
+    """
+    if not is_recaptcha_configured():
+        return True
+    if not token:
+        return False
+    try:
+        response = requests.post(
+            VERIFY_URL,
+            data={
+                "secret": settings.RECAPTCHA_SECRET_KEY,
+                "response": token,
+            },
+            timeout=settings.RECAPTCHA_TIMEOUT,
+        )
+        result = response.json()
+    except Exception:
+        logger.warning("recaptcha verification request failed")
+        return False
+    if not result.get("success"):
+        return False
+    if result.get("action") != action:
+        logger.warning("recaptcha action mismatch: %r", result.get("action"))
+        return False
+    try:
+        score = float(result.get("score", 0))
+    except (TypeError, ValueError):
+        return False
+    if score < settings.RECAPTCHA_MIN_SCORE:
+        logger.warning("recaptcha score below threshold: %s", score)
+        return False
+    return True

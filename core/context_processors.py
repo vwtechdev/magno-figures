@@ -14,5 +14,6 @@ def global_context(request):
     return {
         "website_config": Website.objects.get_config(),
         "cart_count": cart_count,
+        "recaptcha_site_key": settings.RECAPTCHA_SITE_KEY,
         "site_url": site_base_url(),
     }
