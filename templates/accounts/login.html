@@ -16,9 +16,8 @@
         </div>
         {% endif %}
 
-        <form class="auth__form" method="post" action="{% url 'accounts:login' %}" data-recaptcha-action="login" data-recaptcha-key="{{ recaptcha_site_key }}">
+        <form class="auth__form" method="post" action="{% url 'accounts:login' %}">
             {% csrf_token %}
-            <input type="hidden" name="g-recaptcha-response" value="">
             <input type="hidden" name="next" value="{{ request.GET.next }}">
             <label class="auth__field">
                 <span class="auth__label">Email</span>
@@ -47,7 +46,7 @@
         </form>
 
         <p class="auth__switch">Não tem conta? <a href="{% url 'accounts:register' %}" class="auth__link">Cadastre-se</a></p>
-        <p class="auth__recaptcha">Este site é protegido pelo reCAPTCHA e aplicam-se a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="auth__link">Política de Privacidade</a> e os <a href="https://policies.google.com/terms" target="_blank" rel="noopener" class="auth__link">Termos de Serviço</a> do Google.</p>
+        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
     </div>
 </section>
 {% endblock %}
@@ -58,8 +57,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/accounts/password-toggle.js' %}" defer></script>
-{% if recaptcha_site_key %}
-<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
-<script src="{% static 'js/accounts/recaptcha.js' %}" defer></script>
-{% endif %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock %}

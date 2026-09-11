@@ -33,7 +33,7 @@ from core.validators import is_valid_cpf
 def login_view(request):
     if request.method == "POST":
         if not verify_recaptcha_token(
-            request.POST.get("g-recaptcha-response", ""), "login"
+            request.POST.get("g-recaptcha-response", "")
         ):
             messages.error(
                 request, "Verificação de segurança falhou. Tente novamente."
@@ -90,7 +90,7 @@ def register_view(request):
 
         errors = []
         if not verify_recaptcha_token(
-            request.POST.get("g-recaptcha-response", ""), "register"
+            request.POST.get("g-recaptcha-response", "")
         ):
             errors.append("Verificação de segurança falhou. Tente novamente.")
         if not name:
@@ -334,8 +334,7 @@ class PasswordResetView(auth_views.PasswordResetView):
 
     def form_valid(self, form):
         if not verify_recaptcha_token(
-            self.request.POST.get("g-recaptcha-response", ""),
-            "password_reset",
+            self.request.POST.get("g-recaptcha-response", "")
         ):
             messages.error(
                 self.request,

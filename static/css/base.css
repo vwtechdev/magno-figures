@@ -752,10 +752,6 @@ ul {
 }
 
 /* ============ FAB ============ */
-.grecaptcha-badge {
-    visibility: hidden !important;
-}
-
 .fab-group {
     position: fixed;
     right: 24px;

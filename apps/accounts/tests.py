@@ -445,10 +445,8 @@ class FakeRecaptchaResponse:
         return self._payload
 
 
-def recaptcha_success(action="login", score=0.9):
-    return FakeRecaptchaResponse(
-        {"success": True, "action": action, "score": score}
-    )
+def recaptcha_success():
+    return FakeRecaptchaResponse({"success": True})
 
 
 @override_settings(RECAPTCHA_SITE_KEY="test-site", RECAPTCHA_SECRET_KEY="test-secret")
@@ -458,42 +456,28 @@ class RecaptchaHelperTest(TestCase):
             "apps.accounts.recaptcha.requests.post",
             return_value=recaptcha_success(),
         ):
-            self.assertTrue(verify_recaptcha_token("token", "login"))
+            self.assertTrue(verify_recaptcha_token("token"))
 
     def test_unsuccessful_response_returns_false(self):
         with patch(
             "apps.accounts.recaptcha.requests.post",
             return_value=FakeRecaptchaResponse({"success": False}),
         ):
-            self.assertFalse(verify_recaptcha_token("token", "login"))
-
-    def test_action_mismatch_returns_false(self):
-        with patch(
-            "apps.accounts.recaptcha.requests.post",
-            return_value=recaptcha_success(action="register"),
-        ):
-            self.assertFalse(verify_recaptcha_token("token", "login"))
-
-    def test_low_score_returns_false(self):
-        with patch(
-            "apps.accounts.recaptcha.requests.post",
-            return_value=recaptcha_success(score=0.1),
-        ):
-            self.assertFalse(verify_recaptcha_token("token", "login"))
+            self.assertFalse(verify_recaptcha_token("token"))
 
     def test_network_error_returns_false(self):
         with patch(
             "apps.accounts.recaptcha.requests.post",
             side_effect=Exception("timeout"),
         ):
-            self.assertFalse(verify_recaptcha_token("token", "login"))
+            self.assertFalse(verify_recaptcha_token("token"))
 
     def test_empty_token_returns_false(self):
-        self.assertFalse(verify_recaptcha_token("", "login"))
+        self.assertFalse(verify_recaptcha_token(""))
 
     @override_settings(RECAPTCHA_SITE_KEY="", RECAPTCHA_SECRET_KEY="")
     def test_unconfigured_keys_skip_verification(self):
-        self.assertTrue(verify_recaptcha_token("", "login"))
+        self.assertTrue(verify_recaptcha_token(""))
 
 
 @override_settings(RECAPTCHA_SITE_KEY="test-site", RECAPTCHA_SECRET_KEY="test-secret")
@@ -524,7 +508,7 @@ class RecaptchaFormsTest(TestCase):
     def test_login_allowed_with_valid_token(self):
         with patch(
             "apps.accounts.recaptcha.requests.post",
-            return_value=recaptcha_success(action="login"),
+            return_value=recaptcha_success(),
         ):
             response = self.client.post(
                 reverse("accounts:login"),
@@ -572,15 +556,14 @@ class RecaptchaFormsTest(TestCase):
 
 
 class RecaptchaNoticeTest(TestCase):
-    def test_notice_rendered_on_auth_pages(self):
+    def test_widget_rendered_on_auth_pages(self):
         for url_name in (
             "accounts:login",
             "accounts:register",
             "accounts:password_reset",
         ):
             response = self.client.get(reverse(url_name))
-            self.assertContains(response, "protegido pelo reCAPTCHA")
+            self.assertContains(response, 'class="g-recaptcha"')
             self.assertContains(
-                response, "https://policies.google.com/privacy"
+                response, "https://www.google.com/recaptcha/api.js"
             )
-            self.assertContains(response, "https://policies.google.com/terms")

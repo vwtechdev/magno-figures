@@ -12,13 +12,12 @@ def is_recaptcha_configured():
     return bool(settings.RECAPTCHA_SITE_KEY and settings.RECAPTCHA_SECRET_KEY)
 
 
-def verify_recaptcha_token(token, action):
-    """Validate a reCAPTCHA v3 token against Google's siteverify API.
+def verify_recaptcha_token(token):
+    """Validate a reCAPTCHA v2 token against Google's siteverify API.
 
-    Returns True only when the response is successful, the action matches
-    and the score meets the configured threshold. Fail-closed: any network
-    or parsing error returns False. When no keys are configured (local
-    dev/test), verification is skipped and True is returned.
+    Returns True only when the response is successful. Fail-closed: any
+    network or parsing error returns False. When no keys are configured
+    (local dev/test), verification is skipped and True is returned.
     """
     if not is_recaptcha_configured():
         return True
@@ -37,16 +36,4 @@ def verify_recaptcha_token(token, action):
     except Exception:
         logger.warning("recaptcha verification request failed")
         return False
-    if not result.get("success"):
-        return False
-    if result.get("action") != action:
-        logger.warning("recaptcha action mismatch: %r", result.get("action"))
-        return False
-    try:
-        score = float(result.get("score", 0))
-    except (TypeError, ValueError):
-        return False
-    if score < settings.RECAPTCHA_MIN_SCORE:
-        logger.warning("recaptcha score below threshold: %s", score)
-        return False
-    return True
+    return bool(result.get("success"))
