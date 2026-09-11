@@ -1,5 +1,4 @@
 {% load static %}
-{% load mptt_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -91,21 +90,6 @@
                     <li class="navbar__item">
                         <a href="{% url 'figures:list' %}" class="navbar__link">Catálogo</a>
                     </li>
-                    {% recursetree nav_categories %}
-                    <li class="navbar__item navbar__item--dropdown">
-                        <a href="{% url 'categories:detail' node.slug %}" class="navbar__link">{{ node.name }}{% if node.is_nsfw_effective %} <span class="badge badge--nsfw">+18</span>{% endif %}</a>
-                        {% if not node.is_leaf_node %}
-                        <button type="button" class="navbar__sub-toggle" aria-expanded="false" aria-label="Subcategorias de {{ node.name }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-                            </svg>
-                        </button>
-                        <ul class="navbar__dropdown">
-                            {{ children }}
-                        </ul>
-                        {% endif %}
-                    </li>
-                    {% endrecursetree %}
                 </ul>
             </nav>
 
