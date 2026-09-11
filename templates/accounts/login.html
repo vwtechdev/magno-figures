@@ -42,11 +42,11 @@
                 <a href="{% url 'accounts:password_reset' %}" class="auth__link auth__link--small">Esqueci minha senha?</a>
             </div>
 
+            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
             <button class="auth__submit" type="submit">Entrar</button>
         </form>
 
         <p class="auth__switch">Não tem conta? <a href="{% url 'accounts:register' %}" class="auth__link">Cadastre-se</a></p>
-        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
     </div>
 </section>
 {% endblock %}

@@ -50,11 +50,11 @@
                     </button>
                 </span>
             </label>
+            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
             <button class="auth__submit" type="submit">Cadastrar</button>
         </form>
 
         <p class="auth__switch">Já tem conta? <a href="{% url 'accounts:login' %}" class="auth__link">Entrar</a></p>
-        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
     </div>
 </section>
 {% endblock %}

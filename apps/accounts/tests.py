@@ -567,3 +567,8 @@ class RecaptchaNoticeTest(TestCase):
             self.assertContains(
                 response, "https://www.google.com/recaptcha/api.js"
             )
+            html = response.content.decode()
+            self.assertLess(
+                html.index('class="g-recaptcha"'),
+                html.index("auth__submit"),
+            )
