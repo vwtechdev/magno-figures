@@ -697,11 +697,12 @@ ul {
     font-weight: 700;
     font-size: 0.85rem;
     border: 1px solid transparent;
-    transition: border-color var(--transition);
+    transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .cookie-bar__accept:hover {
     border-color: var(--bg);
+    box-shadow: 0 8px 24px rgba(var(--gold-2-rgb), 0.35);
 }
 
 .cookie-bar__actions {
