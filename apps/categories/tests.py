@@ -155,6 +155,20 @@ class NsfwAgeGateTest(TestCase):
         self.assertIn(self.nsfw_cat, sidebar)
         self.assertIn(self.child_cat, sidebar)
 
+    def test_empty_category_hidden_from_catalog_sidebar(self):
+        Category.objects.create(name="Vazia", slug="vazia")
+        parent = Category.objects.create(name="Pai Vazio", slug="pai-vazio")
+        child = Category.objects.create(
+            name="Filha Cheia", slug="filha-cheia", parent=parent
+        )
+        self.safe_figure.categories.add(child)
+        response = self.client.get(reverse("figures:list"))
+        slugs = [c.slug for c in response.context["filter_categories"]]
+        self.assertNotIn("vazia", slugs)
+        self.assertNotContains(response, "Vazia")
+        self.assertIn("pai-vazio", slugs)
+        self.assertIn("filha-cheia", slugs)
+
     def test_nsfw_category_hidden_from_navbar(self):
         response = self.client.get(reverse("website:home"))
         self.assertContains(response, "Catálogo")

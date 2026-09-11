@@ -27,13 +27,13 @@
         <button class="profile__tab{% if active_tab == 'password' %} is-active{% endif %}" data-tab="password" role="tab" aria-selected="{% if active_tab == 'password' %}true{% else %}false{% endif %}">Senhas</button>
     </div>
 
-    <div class="profile__panel{% if active_tab == 'profile' %} is-active{% endif %}" data-panel="profile" role="tabpanel"{% if active_tab != 'profile' %} hidden{% endif %}>
-        {% if messages %}
-        <div class="profile__messages">
-            {% for message in messages %}<p class="profile__message">{{ message }}</p>{% endfor %}
-        </div>
-        {% endif %}
+    {% if messages %}
+    <div class="profile__messages">
+        {% for message in messages %}<p class="profile__message">{{ message }}</p>{% endfor %}
+    </div>
+    {% endif %}
 
+    <div class="profile__panel{% if active_tab == 'profile' %} is-active{% endif %}" data-panel="profile" role="tabpanel"{% if active_tab != 'profile' %} hidden{% endif %}>
         <form method="post" action="{% url 'accounts:profile_data' %}" class="profile__data">
             {% csrf_token %}
             <h2 class="profile__panel-title">Dados pessoais</h2>
@@ -79,12 +79,6 @@
     </div>
 
     <div class="profile__panel{% if active_tab == 'password' %} is-active{% endif %}" data-panel="password" role="tabpanel"{% if active_tab != 'password' %} hidden{% endif %}>
-        {% if messages and active_tab == 'password' %}
-        <div class="profile__messages">
-            {% for message in messages %}<p class="profile__message">{{ message }}</p>{% endfor %}
-        </div>
-        {% endif %}
-
         <form method="post" action="{% url 'accounts:profile_password' %}" class="profile__data">
             {% csrf_token %}
             <h2 class="profile__panel-title">Trocar senha</h2>

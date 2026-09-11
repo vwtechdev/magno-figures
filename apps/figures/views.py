@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
 from django.db import IntegrityError
-from django.db.models import Case, F, Q, Value, When
+from django.db.models import Case, Count, F, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -106,14 +106,30 @@ def figure_list_view(request):
     needs_verification = not is_age_verified(request) and any(
         category.is_nsfw_effective for category in selected
     )
+    non_empty = (
+        Category.objects.active()
+        .annotate(
+            active_figure_count=Count(
+                "figures", filter=Q(figures__is_active=True)
+            )
+        )
+        .filter(active_figure_count__gt=0)
+    )
+    visible_ids = set(non_empty.values_list("pk", flat=True))
+    for category in non_empty:
+        visible_ids.update(
+            category.get_ancestors(include_self=False).values_list(
+                "pk", flat=True
+            )
+        )
     context = {
         "figures": page_obj.object_list,
         "page_obj": page_obj,
         "page_query": page_query.urlencode(),
         "query": query,
-        "filter_categories": Category.objects.active().order_by(
-            "tree_id", "lft"
-        ),
+        "filter_categories": Category.objects.filter(
+            pk__in=visible_ids
+        ).order_by("tree_id", "lft"),
         "selected_cats": selected_slugs,
         "min_price": (request.GET.get("min_price") or "").strip(),
         "max_price": (request.GET.get("max_price") or "").strip(),

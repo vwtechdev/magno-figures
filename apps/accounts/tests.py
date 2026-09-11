@@ -189,6 +189,7 @@ class ProfilePasswordTest(TestCase):
                 "new_password1": "nova-senha-456",
                 "new_password2": "nova-senha-456",
             },
+            follow=True,
         )
         self.assertRedirects(
             response, reverse("accounts:profile") + "?tab=password"
@@ -196,7 +197,6 @@ class ProfilePasswordTest(TestCase):
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("nova-senha-456"))
         self.assertIn("_auth_user_id", self.client.session)
-        response = self.client.get(reverse("accounts:profile") + "?tab=password")
         self.assertContains(response, "Senha alterada com sucesso.")
 
     def test_wrong_current_password_rejected(self):
