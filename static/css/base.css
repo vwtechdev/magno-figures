@@ -739,14 +739,15 @@ ul {
         bottom: 12px;
     }
 
-    .cookie-bar__accept {
-        width: 100%;
-    }
-
     .cookie-bar__actions {
         width: 100%;
-        flex-direction: column-reverse;
-        gap: 4px;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .cookie-bar__reject,
+    .cookie-bar__accept {
+        flex: 1;
     }
 }
 
