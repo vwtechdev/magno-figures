@@ -436,3 +436,16 @@ class WebsiteSubtitleTitleTest(TestCase):
         Website.objects.all().delete()
         config = Website.objects.get_config()
         self.assertEqual(config.subtitle, "")
+
+
+class CookieBarTest(TestCase):
+    def test_cookie_bar_markup_present(self):
+        response = self.client.get(reverse("website:home"))
+        self.assertContains(response, 'id="cookieBar"')
+        self.assertContains(response, 'id="cookieAccept"')
+        self.assertContains(response, "Aceitar cookies")
+        self.assertContains(
+            response, "uso de cookies para agilizar a sua experiência de compra"
+        )
+        self.assertContains(response, reverse("website:privacy"))
+        self.assertContains(response, "js/website/cookies.js")

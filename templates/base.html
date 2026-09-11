@@ -235,8 +235,14 @@
         </a>
     </div>
 
+    <div class="cookie-bar" id="cookieBar" hidden>
+        <p class="cookie-bar__text">Ao navegar por este site, você aceita o uso de cookies para agilizar a sua experiência de compra. <a href="{% url 'website:privacy' %}" class="cookie-bar__link">Saiba mais</a></p>
+        <button class="cookie-bar__accept" id="cookieAccept" type="button">Aceitar cookies</button>
+    </div>
+
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/website/newsletter.js' %}" defer></script>
+    <script src="{% static 'js/website/cookies.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
