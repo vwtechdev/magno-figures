@@ -696,6 +696,12 @@ ul {
     color: var(--bg);
     font-weight: 700;
     font-size: 0.85rem;
+    border: 1px solid transparent;
+    transition: border-color var(--transition);
+}
+
+.cookie-bar__accept:hover {
+    border-color: var(--bg);
 }
 
 .cookie-bar__actions {
