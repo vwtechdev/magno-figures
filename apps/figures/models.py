@@ -40,6 +40,9 @@ class Figure(BaseModel):
     sold_out = models.BooleanField(
         default=False, verbose_name="Esgotado"
     )
+    is_new_release = models.BooleanField(
+        default=False, db_index=True, verbose_name="Lançamento"
+    )
     weight_kg = models.DecimalField(
         max_digits=5,
         decimal_places=3,

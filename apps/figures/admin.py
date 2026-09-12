@@ -26,15 +26,16 @@ class FigureImageInline(admin.TabularInline):
 @admin.register(Figure)
 class FigureAdmin(admin.ModelAdmin):
     form = FigureAdminForm
-    list_display = ("name", "price", "discount_percent", "stock", "sold_out", "is_nsfw_display", "pending_alerts_display", "is_active", "created_at")
-    list_filter = ("is_active", "categories", "created_at")
+    list_display = ("name", "price", "discount_percent", "stock", "sold_out", "is_new_release", "is_nsfw_display", "pending_alerts_display", "is_active", "created_at")
+    list_editable = ("is_new_release",)
+    list_filter = ("is_active", "is_new_release", "categories", "created_at")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("categories",)
     readonly_fields = ("is_nsfw_display", "pending_alerts_display", "created_at", "updated_at", "created_by", "updated_by")
     inlines = [FigureImageInline]
     fieldsets = (
-        (None, {"fields": ("name", "slug", "description", "image", "batch_upload", "price", "discount_percent", "stock")}),
+        (None, {"fields": ("name", "slug", "description", "image", "batch_upload", "price", "discount_percent", "stock", "is_new_release")}),
         ("Envio", {"fields": ("weight_kg", "height_cm", "width_cm", "length_cm")}),
         ("Categorias", {"fields": ("categories",)}),
         ("Status", {"fields": ("is_active", "sold_out", "is_nsfw_display", "pending_alerts_display")}),
