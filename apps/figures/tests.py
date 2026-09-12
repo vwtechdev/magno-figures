@@ -658,6 +658,14 @@ class DiscountTest(TestCase):
         self.assertNotContains(response, "Sold Promo")
         self.assertContains(response, "Promoções")
 
+    def test_release_filter_returns_only_flagged(self):
+        self.plain.is_new_release = True
+        self.plain.save(update_fields=["is_new_release"])
+        response = self.client.get(reverse("figures:list"), {"release": "1"})
+        self.assertContains(response, "Plain Figure")
+        self.assertNotContains(response, "Promo Figure")
+        self.assertContains(response, "Lançamentos")
+
     def test_sidebar_promo_checkbox_checked_state(self):
         response = self.client.get(reverse("figures:list"))
         self.assertContains(response, 'name="promo" value="1"')

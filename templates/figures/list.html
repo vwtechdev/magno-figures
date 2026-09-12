@@ -13,6 +13,8 @@
     <p class="catalog-page__subtitle">Resultados para “{{ query }}”</p>
     {% elif promo_only %}
     <p class="catalog-page__subtitle">Promoções</p>
+    {% elif release_only %}
+    <p class="catalog-page__subtitle">Lançamentos</p>
     {% endif %}
 
     <button type="button" class="filters__toggle" id="filtersToggle" aria-expanded="false" aria-controls="catalogFilters">Filtros</button>

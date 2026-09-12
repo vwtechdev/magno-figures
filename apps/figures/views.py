@@ -74,6 +74,9 @@ def figure_list_view(request):
     promo_only = request.GET.get("promo") == "1"
     if promo_only:
         figures = figures.filter(discount_percent__gt=0, sold_out=False)
+    release_only = request.GET.get("release") == "1"
+    if release_only:
+        figures = figures.filter(is_new_release=True)
     sort = request.GET.get("sort", "").strip()
     if sort == "az":
         figures = figures.order_by("name")
@@ -147,6 +150,7 @@ def figure_list_view(request):
         "max_price": (request.GET.get("max_price") or "").strip(),
         "needs_verification": needs_verification,
         "promo_only": promo_only,
+        "release_only": release_only,
         "sort": sort,
     }
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
