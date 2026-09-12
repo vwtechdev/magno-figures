@@ -92,6 +92,16 @@
         <span class="product__stock product__stock--out">Sob encomenda</span>
         {% endif %}
 
+        <details class="detail-card">
+            <summary class="detail-card__summary">
+                <span>Descrição</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="detail-card__body">
+                <div class="product__description">{{ figure.description }}</div>
+            </div>
+        </details>
+
         {% if figure.categories.all %}
         <div class="product__categories">
             {% for category in figure.categories.all %}
@@ -132,16 +142,6 @@
             </form>
             {% endif %}
         </div>
-
-        <details class="detail-card">
-            <summary class="detail-card__summary">
-                <span>Descrição</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-            </summary>
-            <div class="detail-card__body">
-                <div class="product__description">{{ figure.description }}</div>
-            </div>
-        </details>
     </div>
 </section>
 
