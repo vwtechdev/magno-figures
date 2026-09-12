@@ -73,11 +73,62 @@ document.addEventListener("DOMContentLoaded", () => {
     const formatPrice = (value) =>
         `R$ ${value.toFixed(2).replace(".", ",")}`;
 
-    const renderOptions = (zipcode, options) => {
+    // ============ CEP persistence (cookie + localStorage cache) ============
+    const ZIP_COOKIE = "shipping_zip";
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+    const getCookie = (name) => {
+        const match = document.cookie.match(
+            new RegExp(`(?:^|; )${name}=([^;]*)`)
+        );
+        return match ? decodeURIComponent(match[1]) : "";
+    };
+
+    const setCookie = (name, value, days) => {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+    };
+
+    const cacheKey = (zipcode) => `frete:${figureSlug}:${zipcode}`;
+
+    const readCache = (zipcode) => {
+        try {
+            const raw = localStorage.getItem(cacheKey(zipcode));
+            if (!raw) return null;
+            const entry = JSON.parse(raw);
+            if (
+                !entry ||
+                !Array.isArray(entry.options) ||
+                Date.now() - entry.ts > CACHE_TTL_MS
+            ) {
+                return null;
+            }
+            return entry;
+        } catch (err) {
+            return null;
+        }
+    };
+
+    const writeCache = (zipcode, options, city) => {
+        try {
+            localStorage.setItem(
+                cacheKey(zipcode),
+                JSON.stringify({
+                    ts: Date.now(),
+                    options,
+                    city: city || "",
+                })
+            );
+        } catch (err) {
+            // storage cheio/bloqueado: segue sem cache
+        }
+    };
+
+    const renderOptions = (zipcode, options, city) => {
         results.innerHTML = "";
         const dest = document.createElement("div");
         dest.className = "shipping__dest";
-        dest.textContent = `Destino: ${zipcode.slice(0, 5)}-${zipcode.slice(5)}`;
+        dest.textContent = `Destino: ${zipcode.slice(0, 5)}-${zipcode.slice(5)}${city ? ` — ${city}` : ""}`;
         results.appendChild(dest);
         options.forEach((option) => {
             const div = document.createElement("div");
@@ -92,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const enrichDestination = async (zipcode) => {
+    const enrichDestination = async (zipcode, options) => {
         const dest = results.querySelector(".shipping__dest");
         if (!dest) return;
         const base = `Destino: ${zipcode.slice(0, 5)}-${zipcode.slice(5)}`;
@@ -100,7 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(`https://viacep.com.br/ws/${zipcode}/json/`);
             const data = await response.json();
             if (data && !data.erro && data.localidade) {
-                dest.textContent = `${base} — ${data.localidade}/${data.uf}`;
+                const city = `${data.localidade}/${data.uf}`;
+                dest.textContent = `${base} — ${city}`;
+                writeCache(zipcode, options, city);
             }
         } catch (err) {
             // mantém apenas o CEP
@@ -133,8 +186,10 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (!data.options || data.options.length === 0) {
                 showMessage("Nenhuma opção de frete disponível para este CEP.");
             } else {
-                renderOptions(zipcode, data.options);
-                enrichDestination(zipcode);
+                setCookie(ZIP_COOKIE, zipcode, 30);
+                writeCache(zipcode, data.options, "");
+                renderOptions(zipcode, data.options, "");
+                enrichDestination(zipcode, data.options);
             }
         } catch (err) {
             showMessage("Erro de conexão. Tente novamente.", true);
@@ -160,4 +215,17 @@ document.addEventListener("DOMContentLoaded", () => {
     zipInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") calculate();
     });
+
+    // Prefill saved ZIP; render cached options without API calls.
+    const savedZip = getCookie(ZIP_COOKIE).replace(/\D/g, "");
+    if (/^\d{8}$/.test(savedZip)) {
+        zipInput.value = maskZipCode(savedZip);
+        const cached = readCache(savedZip);
+        if (cached) {
+            renderOptions(savedZip, cached.options, cached.city);
+            if (!cached.city) {
+                enrichDestination(savedZip, cached.options);
+            }
+        }
+    }
 });
