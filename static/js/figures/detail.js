@@ -70,6 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const product = document.querySelector("[data-figure-slug]");
     const figureSlug = product ? product.dataset.figureSlug : "";
+    const shippingCard = document.getElementById("shipping");
+    const figurePackage = shippingCard
+        ? shippingCard.dataset.package || ""
+        : "";
     const formatPrice = (value) =>
         `R$ ${value.toFixed(2).replace(".", ",")}`;
 
@@ -89,7 +93,26 @@ document.addEventListener("DOMContentLoaded", () => {
         document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
     };
 
-    const cacheKey = (zipcode) => `frete:${figureSlug}:${zipcode}`;
+    const cacheKey = (zipcode) => `frete:${zipcode}:${figurePackage}`;
+
+    const dropLegacyCache = () => {
+        try {
+            const stale = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (
+                    key &&
+                    key.startsWith("frete:") &&
+                    !/^frete:\d{8}:/.test(key)
+                ) {
+                    stale.push(key);
+                }
+            }
+            stale.forEach((key) => localStorage.removeItem(key));
+        } catch (err) {
+            // storage bloqueado: segue sem cache
+        }
+    };
 
     const readCache = (zipcode) => {
         try {
@@ -217,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Prefill saved ZIP; render cached options without API calls.
+    dropLegacyCache();
     const savedZip = getCookie(ZIP_COOKIE).replace(/\D/g, "");
     if (/^\d{8}$/.test(savedZip)) {
         zipInput.value = maskZipCode(savedZip);

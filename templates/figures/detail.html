@@ -100,7 +100,7 @@
         {% endif %}
 
         {% if not figure.sold_out %}
-        <div class="detail-card" id="shipping">
+        <div class="detail-card" id="shipping" data-package="{{ figure.height_cm|unlocalize }}x{{ figure.width_cm|unlocalize }}x{{ figure.length_cm|unlocalize }}x{{ figure.weight_kg|unlocalize }}">
             <div class="detail-card__summary detail-card__summary--static">
                 <span>Calcular <span class="text-gold">frete</span></span>
             </div>

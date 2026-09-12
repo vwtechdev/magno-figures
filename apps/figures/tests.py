@@ -396,6 +396,50 @@ class SuperFreteShippingTest(TestCase):
         self.assertEqual(options, [])
         self.assertEqual(error, "CEP de origem não configurado.")
 
+    @override_settings(SUPERFRETE_TOKEN="token-teste", SUPERFRETE_SANDBOX=True)
+    def test_shipping_view_returns_package_dimensions(self):
+        Website.objects.create(
+            company_name="Loja Teste",
+            whatsapp="5511999999999",
+            email="loja@example.com",
+            origin_zip_code="05311-900",
+        )
+        data = [
+            {
+                "id": 1,
+                "name": "PAC",
+                "company": {"name": "Correios"},
+                "price": 10.50,
+                "delivery_time": 3,
+                "has_error": False,
+            },
+        ]
+        with mock.patch(
+            "apps.figures.services.requests.post",
+            return_value=self._fake_response(data),
+        ):
+            response = self.client.get(
+                reverse("figures:shipping", args=[self.figure.slug]),
+                {"zipcode": "01310100"},
+            )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual([option["name"] for option in payload["options"]], ["PAC"])
+        self.figure.refresh_from_db()
+        self.assertEqual(
+            payload["package"],
+            {
+                "height": str(self.figure.height_cm),
+                "width": str(self.figure.width_cm),
+                "length": str(self.figure.length_cm),
+                "weight": str(self.figure.weight_kg),
+            },
+        )
+        detail = self.client.get(
+            reverse("figures:detail", args=[self.figure.slug])
+        )
+        self.assertContains(detail, "data-package=")
+
     @override_settings(
         SUPERFRETE_TOKEN="token-teste",
         SUPERFRETE_SANDBOX=True,

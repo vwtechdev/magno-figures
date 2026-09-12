@@ -188,7 +188,17 @@ def figure_shipping_view(request, slug):
     options, error = calculate_shipping(figure, zipcode, origin_zip)
     if error:
         return JsonResponse({"error": error}, status=503)
-    return JsonResponse({"options": options})
+    return JsonResponse(
+        {
+            "options": options,
+            "package": {
+                "height": str(figure.height_cm),
+                "width": str(figure.width_cm),
+                "length": str(figure.length_cm),
+                "weight": str(figure.weight_kg),
+            },
+        }
+    )
 
 
 def stock_alert_subscribe_view(request, slug):
