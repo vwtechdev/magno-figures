@@ -117,8 +117,8 @@
 
         <div class="product__cta-row">
             {% if not figure.sold_out %}
-            <a href="{% url 'carts:add' figure.id %}?buy=1" class="product__cta product__cta--buy">Comprar</a>
             <a href="{% url 'carts:add' figure.id %}" class="product__cta product__cta--ghost">Adicionar ao carrinho</a>
+            <a href="{% url 'carts:add' figure.id %}?buy=1" class="product__cta product__cta--buy">Comprar</a>
             {% else %}
             <form class="notify" method="post" action="{% url 'figures:notify' figure.slug %}">
                 {% csrf_token %}
