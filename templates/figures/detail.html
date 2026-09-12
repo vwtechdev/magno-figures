@@ -99,7 +99,7 @@
         <span class="product__stock product__stock--out">Sob encomenda</span>
         {% endif %}
 
-        <details class="detail-card">
+        <details class="detail-card" open>
             <summary class="detail-card__summary">
                 <span>Descrição</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
@@ -110,7 +110,7 @@
         </details>
 
         {% if not figure.sold_out %}
-        <details class="detail-card" id="shipping" open>
+        <details class="detail-card" id="shipping">
             <summary class="detail-card__summary">
                 <span>Calcular <span class="text-gold">frete</span></span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
