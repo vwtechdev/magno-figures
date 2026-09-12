@@ -92,8 +92,6 @@
         <span class="product__stock product__stock--out">Sob encomenda</span>
         {% endif %}
 
-        <div class="product__description">{{ figure.description }}</div>
-
         {% if figure.categories.all %}
         <div class="product__categories">
             {% for category in figure.categories.all %}
@@ -129,6 +127,8 @@
             </form>
             {% endif %}
         </div>
+
+        <div class="product__description">{{ figure.description }}</div>
     </div>
 </section>
 
