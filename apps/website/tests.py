@@ -177,8 +177,18 @@ class WebsiteSeoTest(TestCase):
         self.assertEqual(response["Content-Type"], "application/xml")
         content = response.content.decode()
         self.assertIn(f"<loc>{site_base_url()}/figures/</loc>", content)
-        self.assertIn(f"<loc>{site_base_url()}/about/</loc>", content)
+        self.assertNotIn(f"<loc>{site_base_url()}/about/</loc>", content)
+        self.assertNotIn(f"<loc>{site_base_url()}/privacy/</loc>", content)
+        self.assertNotIn(f"<loc>{site_base_url()}/terms/</loc>", content)
         self.assertIn(f"<loc>{site_base_url()}/figures/figure-seo/</loc>", content)
+
+    def test_institutional_pages_are_noindex(self):
+        for path in ("/about/", "/privacy/", "/terms/"):
+            response = self.client.get(path)
+            self.assertContains(
+                response,
+                '<meta name="robots" content="noindex, nofollow">',
+            )
 
 
 class WebsiteEmptySeoTest(TestCase):

@@ -68,7 +68,7 @@ def robots_txt_view(request):
 def sitemap_view(request):
     base = site_base_url()
     entries = []
-    for path in ("/", "/figures/", "/about/", "/privacy/", "/terms/"):
+    for path in ("/", "/figures/"):
         entries.append(
             {"loc": base + path, "changefreq": "weekly", "priority": "0.8"}
         )
