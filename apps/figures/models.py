@@ -43,25 +43,25 @@ class Figure(BaseModel):
     weight_kg = models.DecimalField(
         max_digits=5,
         decimal_places=3,
-        default=3,
+        default=1,
         verbose_name="Peso (kg)",
     )
     height_cm = models.DecimalField(
         max_digits=5,
         decimal_places=1,
-        default=60,
+        default=30,
         verbose_name="Altura (cm)",
     )
     width_cm = models.DecimalField(
         max_digits=5,
         decimal_places=1,
-        default=40,
+        default=15,
         verbose_name="Largura (cm)",
     )
     length_cm = models.DecimalField(
         max_digits=5,
         decimal_places=1,
-        default=35,
+        default=15,
         verbose_name="Comprimento (cm)",
     )
     image = models.ImageField(
