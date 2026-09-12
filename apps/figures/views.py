@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
 from django.db import IntegrityError
-from django.db.models import Case, Count, F, Q, Value, When
+from django.db.models import Case, Count, F, IntegerField, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -97,6 +97,18 @@ def figure_list_view(request):
         )
     else:
         sort = ""
+        figures = figures.annotate(
+            _is_promo=Case(
+                When(discount_percent__gt=0, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+            _is_release=Case(
+                When(is_new_release=True, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+        ).order_by("-_is_promo", "-_is_release", "-created_at", "pk")
     figures = filter_nsfw_figures_selected(request, figures, selected)
     page_obj = Paginator(
         figures, settings.FIGURES_PER_PAGE

@@ -175,6 +175,15 @@ class CatalogSortTest(TestCase):
             ["Coringa", "Akira", "Batman"],
         )
 
+    def test_default_order_promos_releases_then_recent(self):
+        self.figure_a.is_new_release = True
+        self.figure_a.save(update_fields=["is_new_release"])
+        response = self.client.get(reverse("figures:list"))
+        self.assertEqual(
+            [f.name for f in response.context["figures"]],
+            ["Coringa", "Akira", "Batman"],
+        )
+
     def test_sidebar_renders_sort_select(self):
         response = self.client.get(reverse("figures:list"))
         self.assertContains(response, 'select name="sort"')
