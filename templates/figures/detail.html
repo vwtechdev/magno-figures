@@ -51,6 +51,13 @@
 
 {% block content %}
 <section class="product container" data-figure-slug="{{ figure.slug }}">
+    {% if figure.categories.all %}
+    <div class="product__categories product__categories--top">
+        {% for category in figure.categories.all %}
+        <a href="{% url 'categories:detail' category.slug %}" class="product__category">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
     <h1 class="product__title">{{ figure.name }}{% if figure.is_nsfw %} <span class="badge badge--nsfw">+18</span>{% endif %}</h1>
 
     <div class="product__gallery">
@@ -101,14 +108,6 @@
                 <div class="product__description">{{ figure.description }}</div>
             </div>
         </details>
-
-        {% if figure.categories.all %}
-        <div class="product__categories">
-            {% for category in figure.categories.all %}
-            <a href="{% url 'categories:detail' category.slug %}" class="product__category">{{ category.name }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
 
         {% if not figure.sold_out %}
         <details class="detail-card" id="shipping" open>
