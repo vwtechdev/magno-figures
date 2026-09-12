@@ -191,6 +191,7 @@
     background: transparent;
     color: var(--gold-2);
     border: 1px solid var(--border);
+    margin-left: auto;
 }
 
 .product__cta--ghost:hover {
