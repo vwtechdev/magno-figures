@@ -99,14 +99,7 @@
         <span class="product__stock product__stock--out">Sob encomenda</span>
         {% endif %}
 
-        <div class="detail-card">
-            <div class="detail-card__summary detail-card__summary--static">
-                <span>Descrição</span>
-            </div>
-            <div class="detail-card__body">
-                <div class="product__description">{{ figure.description }}</div>
-            </div>
-        </div>
+        <div class="product__description">{{ figure.description }}</div>
 
         {% if not figure.sold_out %}
         <details class="detail-card" id="shipping">
