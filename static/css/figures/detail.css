@@ -91,7 +91,7 @@
 
 .product__title {
     font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 
 .product__price {
@@ -101,7 +101,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .product__stock {
@@ -110,7 +110,7 @@
     border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
 }
 
 .product__stock--in {
@@ -270,7 +270,7 @@
 
 /* ============ DETAIL CARDS (dropdown) ============ */
 .detail-card {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     border-radius: var(--radius);
     background: rgba(var(--white-rgb), 0.03);
     border: 1px solid var(--border);
@@ -282,7 +282,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 12px 16px;
     font-size: 1.05rem;
     font-weight: 600;
     cursor: pointer;
@@ -303,7 +303,7 @@
 }
 
 .detail-card__body {
-    padding: 0 20px 20px;
+    padding: 0 16px 16px;
 }
 
 .detail-card__body .product__description {
@@ -445,6 +445,13 @@
     .product {
         grid-template-columns: 1fr;
         column-gap: 0;
+    }
+
+    .product__categories--top {
+        grid-column: auto;
+        grid-row: auto;
+        order: 0;
+        margin-bottom: 10px;
     }
 
     .product__gallery {
