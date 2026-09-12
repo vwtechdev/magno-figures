@@ -102,11 +102,10 @@
         <div class="product__description">{{ figure.description }}</div>
 
         {% if not figure.sold_out %}
-        <details class="detail-card" id="shipping">
-            <summary class="detail-card__summary">
+        <div class="detail-card" id="shipping">
+            <div class="detail-card__summary detail-card__summary--static">
                 <span>Calcular <span class="text-gold">frete</span></span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-            </summary>
+            </div>
             <div class="detail-card__body">
                 <div class="shipping__form">
                     <input type="text" id="zipCodeInput" class="shipping__input" placeholder="00000-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
@@ -115,7 +114,7 @@
                 <p class="shipping__hint">Informe seu CEP e clique em Calcular</p>
                 <div class="shipping__results" id="shippingResults" aria-live="polite"></div>
             </div>
-        </details>
+        </div>
         {% endif %}
 
         <div class="product__cta-row">

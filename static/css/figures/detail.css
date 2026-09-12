@@ -285,21 +285,10 @@
     padding: 12px 16px;
     font-size: 1.05rem;
     font-weight: 600;
-    cursor: pointer;
-    list-style: none;
 }
 
-.detail-card__summary::-webkit-details-marker {
-    display: none;
-}
-
-.detail-card__summary svg {
-    flex-shrink: 0;
-    transition: transform var(--transition);
-}
-
-.detail-card[open] .detail-card__summary svg {
-    transform: rotate(180deg);
+.detail-card__summary--static {
+    cursor: default;
 }
 
 .detail-card__body {
