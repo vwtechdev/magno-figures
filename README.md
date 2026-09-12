@@ -11,10 +11,13 @@ Sistema web para a Magno-Figures: catálogo de action figures em uma vitrine onl
 
 ## Funcionalidades
 
-- Catálogo com busca, categorias hierárquicas e paginação
+- Catálogo com busca, filtros (categoria, preço, ofertas, lançamentos), ordenação e paginação
+- Home com vitrines Lançamentos (flag manual por peça), Catálogo e Promoções
 - Carrinho (sessão/usuário) e checkout atômico → mensagem pré-formatada no WhatsApp
-- Cálculo de frete por CEP (SuperFrete, PAC/SEDEX) com destino exibido
-- SEO: Open Graph/Twitter Cards, canonical, JSON-LD (WebSite/Product/Breadcrumb), `sitemap.xml` e `robots.txt`
+- Cálculo de frete por CEP (SuperFrete) com CEP persistido em cookie e cotações em cache
+- Auth com verificação de email, reCAPTCHA v2 e rate limiting no nginx
+- Aviso de cookies (aceitar/recusar, GA só com consentimento) — textos de política/termos/sobre via admin (LGPD)
+- SEO via admin (título, descrição, redes): Open Graph/Twitter Cards, canonical, JSON-LD, `sitemap.xml` e `robots.txt`
 - Emails em background (thread daemon) para notificação de pedido e reset de senha
 
 ## Configuração
