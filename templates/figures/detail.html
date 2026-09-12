@@ -101,15 +101,20 @@
         {% endif %}
 
         {% if not figure.sold_out %}
-        <div class="shipping" id="shipping">
-            <h3 class="shipping__title">Calcular <span class="text-gold">frete</span></h3>
-            <div class="shipping__form">
-                <input type="text" id="zipCodeInput" class="shipping__input" placeholder="00000-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
-                <button type="button" id="btnCalcShipping" class="shipping__btn">Calcular</button>
+        <details class="detail-card" id="shipping" open>
+            <summary class="detail-card__summary">
+                <span>Calcular <span class="text-gold">frete</span></span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="detail-card__body">
+                <div class="shipping__form">
+                    <input type="text" id="zipCodeInput" class="shipping__input" placeholder="00000-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
+                    <button type="button" id="btnCalcShipping" class="shipping__btn">Calcular</button>
+                </div>
+                <p class="shipping__hint">Informe seu CEP e clique em Calcular</p>
+                <div class="shipping__results" id="shippingResults" aria-live="polite"></div>
             </div>
-            <p class="shipping__hint">Informe seu CEP e clique em Calcular</p>
-            <div class="shipping__results" id="shippingResults" aria-live="polite"></div>
-        </div>
+        </details>
         {% endif %}
 
         <div class="product__cta-row">
@@ -128,7 +133,15 @@
             {% endif %}
         </div>
 
-        <div class="product__description">{{ figure.description }}</div>
+        <details class="detail-card">
+            <summary class="detail-card__summary">
+                <span>Descrição</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="detail-card__body">
+                <div class="product__description">{{ figure.description }}</div>
+            </div>
+        </details>
     </div>
 </section>
 

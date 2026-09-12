@@ -261,18 +261,46 @@
     }
 }
 
-/* ============ SHIPPING ============ */
-.shipping {
-    margin-bottom: 28px;
-    padding: 20px;
+/* ============ DETAIL CARDS (dropdown) ============ */
+.detail-card {
+    margin-bottom: 20px;
     border-radius: var(--radius);
     background: rgba(var(--white-rgb), 0.03);
     border: 1px solid var(--border);
+    overflow: hidden;
 }
 
-.shipping__title {
+.detail-card__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
     font-size: 1.05rem;
-    margin-bottom: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.detail-card__summary::-webkit-details-marker {
+    display: none;
+}
+
+.detail-card__summary svg {
+    flex-shrink: 0;
+    transition: transform var(--transition);
+}
+
+.detail-card[open] .detail-card__summary svg {
+    transform: rotate(180deg);
+}
+
+.detail-card__body {
+    padding: 0 20px 20px;
+}
+
+.detail-card__body .product__description {
+    margin: 0;
 }
 
 .shipping__form {
