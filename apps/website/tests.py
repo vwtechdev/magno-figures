@@ -294,6 +294,16 @@ class HomeSectionsTest(TestCase):
         self.assertNotIn(self.promo, catalog)
         self.assertNotIn(self.sold_promo, catalog)
 
+    def test_catalog_excludes_releases_and_promotions(self):
+        self.new.is_new_release = True
+        self.new.save(update_fields=["is_new_release"])
+        response = self.client.get(reverse("website:home"))
+        catalog = list(response.context["figures"])
+        self.assertEqual(catalog, [self.old])
+        self.assertNotIn(self.new, catalog)
+        self.assertNotIn(self.promo, catalog)
+        self.assertNotIn(self.sold_promo, catalog)
+
     def test_new_releases_uses_manual_flag(self):
         self.new.is_new_release = True
         self.new.save(update_fields=["is_new_release"])
