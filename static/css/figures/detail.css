@@ -312,9 +312,6 @@
 
 .detail-card__body .product__description {
     margin: 0;
-    max-height: 220px;
-    overflow-y: auto;
-    padding-right: 8px;
 }
 
 .shipping__form {
