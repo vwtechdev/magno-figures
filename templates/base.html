@@ -153,7 +153,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
+    <footer class="footer" data-nosnippet>
         <div class="container">
             <div class="footer__grid">
                 <div class="footer__col">
@@ -229,7 +229,7 @@
     </div>
 
     <div class="cookie-bar" id="cookieBar" data-ga="{% if website_config.google_analytics %}1{% else %}0{% endif %}" hidden>
-        <p class="cookie-bar__text">Ao navegar por este site, você aceita o uso de cookies para agilizar a sua experiência de compra. <a href="{% url 'website:privacy' %}" class="cookie-bar__link">Saiba mais</a></p>
+        <p class="cookie-bar__text">Usamos cookies para melhorar sua experiência de compra. Escolha aceitar ou recusar. <a href="{% url 'website:privacy' %}" class="cookie-bar__link">Saiba mais</a></p>
         <div class="cookie-bar__actions">
             <button class="cookie-bar__reject" id="cookieReject" type="button">Recusar</button>
             <button class="cookie-bar__accept" id="cookieAccept" type="button">Aceitar cookies</button>

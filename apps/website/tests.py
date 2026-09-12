@@ -471,7 +471,7 @@ class CookieBarTest(TestCase):
         self.assertContains(response, 'id="cookieAccept"')
         self.assertContains(response, "Aceitar cookies")
         self.assertContains(
-            response, "uso de cookies para agilizar a sua experiência de compra"
+            response, "Usamos cookies para melhorar sua experiência de compra"
         )
         self.assertContains(response, reverse("website:privacy"))
         self.assertContains(response, "js/website/cookies.js")
