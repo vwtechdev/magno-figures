@@ -584,6 +584,7 @@ ul {
     padding: 20px 0;
     text-align: center;
     color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
 .footer__break {
@@ -594,8 +595,6 @@ ul {
     .footer__break {
         display: inline;
     }
-}
-    font-size: 0.85rem;
 }
 
 /* ============ CARD COMPONENT ============ */
