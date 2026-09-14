@@ -3,9 +3,53 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = form
         ? form.querySelector(".navbar__search-input")
         : null;
+    const submitBtn = form
+        ? form.querySelector(".navbar__search-btn")
+        : null;
     if (!form || !input) {
         return;
     }
+
+    const magnifierHtml = submitBtn ? submitBtn.innerHTML : "";
+    const clearHtml = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>';
+
+    const showMagnifier = () => {
+        if (!submitBtn) {
+            return;
+        }
+        submitBtn.innerHTML = magnifierHtml;
+        submitBtn.setAttribute("aria-label", "Buscar");
+    };
+
+    const showClear = () => {
+        if (!submitBtn) {
+            return;
+        }
+        submitBtn.innerHTML = clearHtml;
+        submitBtn.setAttribute("aria-label", "Limpar pesquisa");
+    };
+
+    const syncIcon = () => {
+        if (input.value) {
+            showClear();
+        } else {
+            showMagnifier();
+        }
+    };
+
+    if (submitBtn) {
+        submitBtn.addEventListener("click", (event) => {
+            if (input.value) {
+                event.preventDefault();
+                input.value = "";
+                showMagnifier();
+                close();
+                input.focus();
+            }
+        });
+    }
+
+    input.addEventListener("blur", showMagnifier);
 
     const box = document.createElement("div");
     box.className = "search-suggest";
@@ -67,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     input.addEventListener("input", () => {
         clearTimeout(timer);
+        syncIcon();
         const query = input.value.trim();
         if (query.length < 2) {
             close();
@@ -116,4 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     form.addEventListener("submit", close);
+
+    syncIcon();
 });
