@@ -24,7 +24,7 @@ def home_view(request):
         "banners": Banner.objects.active(),
         "figures": visible_figures.filter(
             discount_percent=0, is_new_release=False
-        ).order_by("created_at")[:10],
+        ).order_by("-created_at")[:20],
         "new_releases": visible_figures.filter(is_new_release=True).order_by(
             "-created_at"
         )[:10],
