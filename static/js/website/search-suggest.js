@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const place = () => {
-        const rect = input.getBoundingClientRect();
+        const rect = form.getBoundingClientRect();
         box.style.top = `${rect.bottom + window.scrollY + 6}px`;
         box.style.left = `${rect.left + window.scrollX}px`;
         box.style.width = `${rect.width}px`;
