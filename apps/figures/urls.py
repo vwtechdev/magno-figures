@@ -6,6 +6,7 @@ app_name = "figures"
 
 urlpatterns = [
     path("", views.figure_list_view, name="list"),
+    path("suggest/", views.figure_suggest_view, name="suggest"),
     path("<slug:slug>/shipping/", views.figure_shipping_view, name="shipping"),
     path(
         "<slug:slug>/notify-when-available/",

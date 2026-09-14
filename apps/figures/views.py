@@ -11,6 +11,7 @@ from django.db.models import Case, Count, F, IntegerField, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 
 from apps.categories.gating import (
     filter_nsfw_figures,
@@ -184,6 +185,30 @@ def figure_detail_view(request, slug):
         "related": related,
     }
     return render(request, "figures/detail.html", context)
+
+
+def figure_suggest_view(request):
+    query = request.GET.get("q", "").strip()
+    if len(query) < 2:
+        return JsonResponse({"results": []})
+    figures = Figure.objects.active().prefetch_related("images").filter(
+        Q(name__icontains=query) | Q(description__icontains=query)
+    )
+    figures = filter_nsfw_figures(request, figures).order_by(
+        "-discount_percent", "name"
+    )[:6]
+    results = []
+    for figure in figures:
+        image = figure.first_image
+        results.append(
+            {
+                "name": figure.name,
+                "url": reverse("figures:detail", args=[figure.slug]),
+                "price": float(figure.sale_price),
+                "image": image.url if image else "",
+            }
+        )
+    return JsonResponse({"results": results})
 
 
 def figure_shipping_view(request, slug):

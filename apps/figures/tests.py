@@ -686,3 +686,88 @@ class DiscountTest(TestCase):
         self.assertContains(response, "R$ 199,90")
         self.assertContains(response, "R$ 179,91")
         self.assertContains(response, '"price": "179.91"')
+
+
+class SearchSuggestTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            email="",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+        )
+        self.naruto = Figure.objects.create(
+            name="Naruto Sennin",
+            slug="naruto-sennin",
+            description="Hokage.",
+            price=Decimal("100.00"),
+            stock=3,
+            image=make_image("naruto.png"),
+        )
+        self.goku = Figure.objects.create(
+            name="Goku",
+            slug="goku",
+            description="Saiyajin.",
+            price=Decimal("200.00"),
+            stock=3,
+            image=make_image("goku.png"),
+        )
+        nsfw_cat = Category.objects.create(
+            name="+18", slug="mais-18", is_nsfw=True
+        )
+        self.dark = Figure.objects.create(
+            name="Naruto Dark",
+            slug="naruto-dark",
+            description="Versão adulta.",
+            price=Decimal("300.00"),
+            stock=3,
+            image=make_image("dark.png"),
+        )
+        self.dark.categories.add(nsfw_cat)
+
+    def test_suggest_matches_by_name(self):
+        response = self.client.get(reverse("figures:suggest"), {"q": "Nar"})
+        payload = response.json()
+        names = [item["name"] for item in payload["results"]]
+        self.assertIn("Naruto Sennin", names)
+        self.assertNotIn("Goku", names)
+        item = next(
+            item for item in payload["results"] if item["name"] == "Naruto Sennin"
+        )
+        self.assertEqual(
+            item["url"], reverse("figures:detail", args=["naruto-sennin"])
+        )
+        self.assertEqual(item["price"], 100.00)
+        self.assertTrue(item["image"])
+
+    def test_suggest_requires_two_chars(self):
+        response = self.client.get(reverse("figures:suggest"), {"q": "N"})
+        self.assertEqual(response.json(), {"results": []})
+
+    def test_suggest_hides_nsfw_until_verified(self):
+        response = self.client.get(reverse("figures:suggest"), {"q": "Nar"})
+        names = [item["name"] for item in response.json()["results"]]
+        self.assertNotIn("Naruto Dark", names)
+        self.client.post(
+            reverse("categories:age_gate"), {"confirm": "yes", "next": "/"}
+        )
+        response = self.client.get(reverse("figures:suggest"), {"q": "Nar"})
+        names = [item["name"] for item in response.json()["results"]]
+        self.assertIn("Naruto Dark", names)
+
+    def test_suggest_limits_to_six(self):
+        for i in range(7):
+            Figure.objects.create(
+                name=f"Naruto Extra {i}",
+                slug=f"naruto-extra-{i}",
+                description="Extra.",
+                price=Decimal("10.00"),
+                stock=3,
+                image=make_image(f"extra-{i}.png"),
+            )
+        response = self.client.get(reverse("figures:suggest"), {"q": "Nar"})
+        self.assertEqual(len(response.json()["results"]), 6)
