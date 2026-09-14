@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const rect = input.getBoundingClientRect();
         box.style.top = `${rect.bottom + window.scrollY + 6}px`;
         box.style.left = `${rect.left + window.scrollX}px`;
-        box.style.width = `${Math.max(rect.width, 220)}px`;
+        box.style.width = `${rect.width}px`;
     };
 
     const render = (results) => {
