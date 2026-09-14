@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const thumbs = Array.from(document.querySelectorAll(".product__thumb"));
     const lightboxImage = document.getElementById("lightboxImage");
     const lightboxCount = document.getElementById("lightboxCount");
-    const sources = [
-        mainImage.src,
-        ...thumbs.map((thumb) => thumb.querySelector("img").src),
-    ];
+    const thumbSrcs = thumbs.map((thumb) => thumb.querySelector("img").src);
+    const sources = thumbSrcs.length ? thumbSrcs : [mainImage.src];
     let current = 0;
 
     function sync(index) {
@@ -21,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
             lightboxCount.textContent = `${current + 1} / ${sources.length}`;
         }
         thumbs.forEach((thumb, i) => {
-            thumb.classList.toggle("is-active", i + 1 === current);
+            thumb.classList.toggle("is-active", i === current);
         });
     }
 
@@ -40,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     mainImage.addEventListener("click", () => open(current));
     thumbs.forEach((thumb, i) => {
-        thumb.addEventListener("click", () => sync(i + 1));
+        thumb.addEventListener("click", () => sync(i));
     });
 
     document.getElementById("lightboxClose").addEventListener("click", close);
