@@ -89,6 +89,31 @@
             if (node) {
                 if (box.checked) {
                     node.classList.add("is-open");
+                    // Single selection up the path: uncheck ancestors
+                    // but keep their dropdowns open.
+                    var el = node.parentElement;
+                    while (el) {
+                        var ancestor = el.closest
+                            ? el.closest(".filters__node")
+                            : null;
+                        if (!ancestor) {
+                            break;
+                        }
+                        ancestor.classList.add("is-open");
+                        var ancestorBox = ancestor.querySelector(
+                            ":scope > .filters__node-row input[name='cat']"
+                        );
+                        if (ancestorBox) {
+                            ancestorBox.checked = false;
+                        }
+                        var ancestorToggle = ancestor.querySelector(
+                            ":scope > .filters__node-row > .filters__node-toggle"
+                        );
+                        if (ancestorToggle) {
+                            ancestorToggle.setAttribute("aria-expanded", "true");
+                        }
+                        el = ancestor.parentElement;
+                    }
                 } else {
                     node.classList.remove("is-open");
                 }
