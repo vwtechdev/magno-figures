@@ -37,8 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // Enter inside the field triggers an implicit click on the submit
+    // button before submitting: let it through instead of clearing.
+    let submitViaEnter = false;
+
     if (submitBtn) {
         submitBtn.addEventListener("click", (event) => {
+            if (submitViaEnter) {
+                submitViaEnter = false;
+                return;
+            }
             if (input.value) {
                 event.preventDefault();
                 input.value = "";
@@ -111,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     input.addEventListener("input", () => {
         clearTimeout(timer);
+        submitViaEnter = false;
         syncIcon();
         const query = input.value.trim();
         if (query.length < 2) {
@@ -137,7 +146,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     input.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
+        if (event.key === "Enter") {
+            submitViaEnter = true;
+        } else if (event.key === "Escape") {
             close();
         }
     });
