@@ -98,6 +98,13 @@
             var node = btn.closest(".filters__node");
             var open = node.classList.toggle("is-open");
             btn.setAttribute("aria-expanded", open ? "true" : "false");
+            if (open) {
+                var box = node.querySelector(":scope > .filters__node-row input[name='cat']");
+                if (box && box.checked) {
+                    box.checked = false;
+                    load(buildUrl(), false);
+                }
+            }
         });
     });
 
