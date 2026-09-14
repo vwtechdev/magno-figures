@@ -82,14 +82,21 @@
 
     form.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
         box.addEventListener("change", function () {
-            if (box.checked) {
-                var node = box.closest(".filters__node");
-                if (node) {
+            var node = box.closest(".filters__node");
+            var toggle = node
+                ? node.querySelector(":scope > .filters__node-row > .filters__node-toggle")
+                : null;
+            if (node) {
+                if (box.checked) {
                     node.classList.add("is-open");
-                    var toggle = node.querySelector(":scope > .filters__node-row > .filters__node-toggle");
-                    if (toggle) {
-                        toggle.setAttribute("aria-expanded", "true");
-                    }
+                } else {
+                    node.classList.remove("is-open");
+                }
+                if (toggle) {
+                    toggle.setAttribute(
+                        "aria-expanded",
+                        box.checked ? "true" : "false"
+                    );
                 }
             }
             load(buildUrl(), false);
