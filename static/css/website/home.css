@@ -158,7 +158,7 @@
 
 .catalog__scroll {
     display: flex;
-    gap: 24px;
+    gap: 12px;
     overflow-x: auto;
     padding: 8px 4px 20px;
     scroll-snap-type: x mandatory;
