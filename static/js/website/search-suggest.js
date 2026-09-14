@@ -171,7 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    form.addEventListener("submit", close);
+    form.addEventListener("submit", () => {
+        close();
+        input.blur();
+    });
 
     syncIcon();
 });
