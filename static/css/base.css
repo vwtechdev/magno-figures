@@ -584,6 +584,17 @@ ul {
     padding: 20px 0;
     text-align: center;
     color: var(--text-muted);
+}
+
+.footer__break {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .footer__break {
+        display: inline;
+    }
+}
     font-size: 0.85rem;
 }
 
