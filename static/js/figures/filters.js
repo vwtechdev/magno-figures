@@ -82,6 +82,16 @@
 
     form.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
         box.addEventListener("change", function () {
+            if (box.checked) {
+                var node = box.closest(".filters__node");
+                if (node) {
+                    node.classList.add("is-open");
+                    var toggle = node.querySelector(":scope > .filters__node-row > .filters__node-toggle");
+                    if (toggle) {
+                        toggle.setAttribute("aria-expanded", "true");
+                    }
+                }
+            }
             load(buildUrl(), false);
         });
     });
