@@ -90,13 +90,12 @@
 }
 
 .hero__dots {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
+    justify-content: center;
     gap: 10px;
-    z-index: 5;
+    max-width: 2172px;
+    margin: 12px auto 0;
+    padding: 0;
 }
 
 .hero__dot {
@@ -230,8 +229,8 @@
     }
 
     .hero__dots {
-        bottom: 7px;
         gap: 7px;
+        margin-top: 10px;
     }
 
     .hero__dot {
