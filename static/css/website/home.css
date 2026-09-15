@@ -254,6 +254,7 @@
         margin: 69px 0 48px;
         border-radius: 0;
         padding-bottom: 22px;
+        aspect-ratio: 2172 / 850;
     }
 
     .hero__arrow {
