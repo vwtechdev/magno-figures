@@ -82,4 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo({ top: 0, behavior: "smooth" });
         });
     }
+
+    const navbar = document.querySelector(".navbar");
+    if (navbar && document.body.classList.contains("home-page")) {
+        const onNavScroll = () => {
+            navbar.classList.toggle("navbar--scrolled", window.scrollY > 40);
+        };
+        window.addEventListener("scroll", onNavScroll, { passive: true });
+        onNavScroll();
+    }
 });

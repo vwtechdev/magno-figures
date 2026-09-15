@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block body_class %}home-page{% endblock %}
+
 {% block title %}{{ website_config.company_name }}{% if website_config.subtitle %} - {{ website_config.subtitle }}{% else %} — Catálogo de Action Figures{% endif %}{% endblock %}
 
 {% block content %}
