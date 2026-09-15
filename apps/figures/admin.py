@@ -27,7 +27,6 @@ class FigureImageInline(admin.TabularInline):
 class FigureAdmin(admin.ModelAdmin):
     form = FigureAdminForm
     list_display = ("name", "price", "discount_percent", "stock", "sold_out", "is_new_release", "is_nsfw_display", "pending_alerts_display", "is_active", "created_at")
-    list_editable = ("is_new_release",)
     list_filter = ("is_active", "is_new_release", "categories", "created_at")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
