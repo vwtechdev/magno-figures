@@ -107,8 +107,8 @@ ul {
 body.home-page .navbar {
     background: transparent;
     border-bottom-color: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 body.home-page .navbar.navbar--scrolled {
