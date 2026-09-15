@@ -104,20 +104,6 @@ ul {
 }
 
 /* ============ NAVBAR ============ */
-body.home-page .navbar {
-    background: transparent;
-    border-bottom-color: transparent;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-}
-
-body.home-page .navbar.navbar--scrolled {
-    background: var(--navbar);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom-color: rgba(var(--gold-2-rgb), 0.15);
-}
-
 .navbar {
     position: fixed;
     top: 0;
