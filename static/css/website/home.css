@@ -2,9 +2,9 @@
 .hero {
     position: relative;
     width: 100%;
-    max-width: 1248px;
+    max-width: 2172px;
     margin: 100px auto 48px;
-    aspect-ratio: 1248 / 250;
+    aspect-ratio: 2172 / 724;
     overflow: hidden;
     border-radius: 16px;
 }
