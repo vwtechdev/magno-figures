@@ -109,6 +109,34 @@
     transition: background var(--transition), transform var(--transition);
 }
 
+.scroll-hint {
+    display: flex;
+    justify-content: center;
+    padding: 4px 0 0;
+    color: var(--gold-2);
+    animation: scrollHint 2s ease-in-out infinite;
+}
+
+.scroll-hint:hover {
+    color: var(--gold-3);
+}
+
+@keyframes scrollHint {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.65;
+    }
+    50% {
+        transform: translateY(6px);
+        opacity: 1;
+    }
+}
+
+#releasesScroll,
+#catalogScroll {
+    scroll-margin-top: 80px;
+}
+
 .hero__dot.is-active {
     background: var(--gold-gradient);
     transform: scale(1.3);
