@@ -35,13 +35,18 @@ class Figure(BaseModel):
         help_text="Percentual de desconto sobre o preço. Ex.: 10 = 10% OFF.",
     )
     stock = models.PositiveIntegerField(
-        default=0, verbose_name="Estoque"
+        default=0,
+        verbose_name="Estoque",
+        help_text="Quantidade disponível. 0 não oculta a peça: sem Esgotado marcado, aparece como Sob encomenda.",
     )
     sold_out = models.BooleanField(
         default=False, verbose_name="Esgotado"
     )
     is_new_release = models.BooleanField(
-        default=False, db_index=True, verbose_name="Lançamento"
+        default=False,
+        db_index=True,
+        verbose_name="Lançamento",
+        help_text="Exibir esta peça na vitrine Lançamentos da página inicial.",
     )
     release_order = models.PositiveIntegerField(
         default=0,
