@@ -26,7 +26,7 @@ def home_view(request):
             discount_percent=0, is_new_release=False
         ).order_by("-created_at")[:20],
         "new_releases": visible_figures.filter(is_new_release=True).order_by(
-            "-created_at"
+            "release_order", "-created_at"
         )[:10],
         "promotions": visible_figures.filter(
             discount_percent__gt=0, sold_out=False

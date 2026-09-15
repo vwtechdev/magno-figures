@@ -43,6 +43,11 @@ class Figure(BaseModel):
     is_new_release = models.BooleanField(
         default=False, db_index=True, verbose_name="Lançamento"
     )
+    release_order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Ordem do lançamento",
+        help_text="Menor aparece primeiro na vitrine Lançamentos. 0 = sem prioridade.",
+    )
     weight_kg = models.DecimalField(
         max_digits=5,
         decimal_places=3,

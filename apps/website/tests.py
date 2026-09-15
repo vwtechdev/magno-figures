@@ -312,6 +312,17 @@ class HomeSectionsTest(TestCase):
         self.assertEqual(releases, [self.new])
         self.assertContains(response, "Lançamentos")
 
+    def test_new_releases_respects_manual_order(self):
+        self.old.is_new_release = True
+        self.old.release_order = 1
+        self.old.save(update_fields=["is_new_release", "release_order"])
+        self.new.is_new_release = True
+        self.new.release_order = 2
+        self.new.save(update_fields=["is_new_release", "release_order"])
+        response = self.client.get(reverse("website:home"))
+        releases = list(response.context["new_releases"])
+        self.assertEqual(releases, [self.old, self.new])
+
     def test_new_releases_excludes_unflagged_and_inactive(self):
         self.old.is_active = False
         self.old.save(update_fields=["is_active"])
