@@ -132,6 +132,12 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .scroll-hint {
+        animation: none;
+    }
+}
+
 #releasesScroll,
 #catalogScroll {
     scroll-margin-top: 80px;
