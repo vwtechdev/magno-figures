@@ -1,19 +1,19 @@
-from decimal import Decimal
-from io import BytesIO
 import json
 import os
 import re
 import tempfile
 import time
+from decimal import Decimal
+from io import BytesIO
 from unittest import mock
 
 import requests
-from PIL import Image
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from apps.categories.models import Category
 from apps.figures.models import Figure, FigureImage
