@@ -52,7 +52,6 @@ class WebsiteSeoTest(TestCase):
 
     def test_seo_meta_tags_rendered(self):
         response = self.client.get(reverse("website:home"))
-        html = response.content.decode()
         self.assertContains(
             response,
             '<meta name="description" content="Catálogo de action figures para colecionadores.">',
@@ -246,6 +245,7 @@ class BannerFileStorageTest(TestCase):
 
         self.assertFalse(os.path.exists(old_path))
         self.assertTrue(os.path.exists(banner.image.path))
+
 
 class HomeSectionsTest(TestCase):
     def setUp(self):
@@ -487,7 +487,10 @@ class WebsiteSubtitleTitleTest(TestCase):
     def test_home_title_uses_subtitle_when_set(self):
         self._make_website(subtitle="O melhor site de action figures")
         response = self.client.get(reverse("website:home"))
-        self.assertContains(response, "<title>Magno Figures - O melhor site de action figures</title>")
+        self.assertContains(
+            response,
+            "<title>Magno Figures - O melhor site de action figures</title>",
+        )
 
     def test_home_title_falls_back_without_subtitle(self):
         self._make_website()
