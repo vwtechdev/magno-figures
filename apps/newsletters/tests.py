@@ -1,14 +1,14 @@
+import time
 from decimal import Decimal
 from io import BytesIO
-import time
 from unittest import mock
 
-from PIL import Image
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from apps.figures.models import Figure
 from apps.newsletters.models import (
