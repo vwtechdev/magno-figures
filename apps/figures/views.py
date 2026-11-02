@@ -86,7 +86,12 @@ def figure_list_view(request):
     elif sort == "price_asc":
         figures = figures.order_by(
             Case(
-                When(discount_percent__gt=0, then=F("price") * (100 - F("discount_percent")) / Value(100)),
+                When(
+                    discount_percent__gt=0,
+                    then=F("price")
+                    * (100 - F("discount_percent"))
+                    / Value(100),
+                ),
                 default=F("price"),
             ),
             "pk",
@@ -94,7 +99,12 @@ def figure_list_view(request):
     elif sort == "price_desc":
         figures = figures.order_by(
             -Case(
-                When(discount_percent__gt=0, then=F("price") * (100 - F("discount_percent")) / Value(100)),
+                When(
+                    discount_percent__gt=0,
+                    then=F("price")
+                    * (100 - F("discount_percent"))
+                    / Value(100),
+                ),
                 default=F("price"),
             ),
             "pk",
