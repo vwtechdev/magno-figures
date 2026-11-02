@@ -87,7 +87,10 @@ class Website(BaseModel):
         max_length=255,
         blank=True,
         verbose_name="Subtítulo (marca)",
-        help_text="Tagline exibida no título da aba da página inicial. Ex.: O melhor site de action figures.",
+        help_text=(
+            "Tagline exibida no título da aba da página inicial. "
+            "Ex.: O melhor site de action figures."
+        ),
     )
     logo = models.ImageField(
         upload_to="website/",
@@ -110,7 +113,10 @@ class Website(BaseModel):
         max_length=160,
         blank=True,
         verbose_name="Descrição (SEO)",
-        help_text="Texto curto usado no footer e como meta description nas buscas do Google (máx. 160 caracteres).",
+        help_text=(
+            "Texto curto usado no footer e como meta description "
+            "nas buscas do Google (máx. 160 caracteres)."
+        ),
     )
     origin_zip_code = models.CharField(
         max_length=9,
@@ -138,7 +144,10 @@ class Website(BaseModel):
     google_analytics = models.TextField(
         blank=True,
         verbose_name="Script Google Analytics",
-        help_text="Cole o snippet completo fornecido pelo Google Analytics (tags <script>...</script>).",
+        help_text=(
+            "Cole o snippet completo fornecido pelo Google "
+            "Analytics (tags <script>...</script>)."
+        ),
     )
     about = models.TextField(
         verbose_name="Sobre"
@@ -153,13 +162,19 @@ class Website(BaseModel):
         null=True,
         blank=True,
         verbose_name="Política atualizada em",
-        help_text="Preenchida automaticamente com a data do dia quando o texto da política é alterado.",
+        help_text=(
+            "Preenchida automaticamente com a data do dia "
+            "quando o texto da política é alterado."
+        ),
     )
     terms_updated_at = models.DateField(
         null=True,
         blank=True,
         verbose_name="Termos atualizados em",
-        help_text="Preenchida automaticamente com a data do dia quando o texto dos termos é alterado.",
+        help_text=(
+            "Preenchida automaticamente com a data do dia "
+            "quando o texto dos termos é alterado."
+        ),
     )
     theme_background = models.CharField(
         max_length=7,
