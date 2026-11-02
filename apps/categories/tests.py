@@ -4,11 +4,11 @@ from decimal import Decimal
 from io import BytesIO
 from urllib.parse import urlencode
 
-from PIL import Image
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from PIL import Image
 
 from apps.categories.gating import AGE_VERIFIED_SESSION_KEY
 from apps.categories.models import Category
