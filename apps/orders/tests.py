@@ -1,16 +1,16 @@
-from decimal import Decimal
-from io import BytesIO
 import re
 import time
+from decimal import Decimal
+from io import BytesIO
 from unittest import mock
 
-from PIL import Image
 from django.core import mail
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from apps.accounts.models import User
 from apps.addresses.models import Address
