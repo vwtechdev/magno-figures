@@ -2,6 +2,7 @@ import json
 import os
 import re
 import tempfile
+from datetime import date
 from decimal import Decimal
 from io import BytesIO
 
@@ -543,3 +544,44 @@ class LegalPagesUpdatedAtTest(TestCase):
         for name in ("website:privacy", "website:terms"):
             response = self.client.get(reverse(name))
             self.assertNotContains(response, "Última atualização")
+
+    def test_editing_privacy_text_stamps_today(self):
+        self.website.privacy_policy = "Política revisada."
+        self.website.save()
+        self.website.refresh_from_db()
+        self.assertEqual(self.website.privacy_updated_at, date.today())
+        self.assertEqual(self.website.terms_updated_at, date(2026, 10, 15))
+
+    def test_editing_terms_text_stamps_today(self):
+        self.website.terms = "Termos revisados."
+        self.website.save()
+        self.website.refresh_from_db()
+        self.assertEqual(self.website.terms_updated_at, date.today())
+        self.assertEqual(self.website.privacy_updated_at, date(2026, 11, 2))
+
+    def test_saving_other_fields_keeps_dates(self):
+        self.website.company_name = "Magno Figures Store"
+        self.website.save()
+        self.website.refresh_from_db()
+        self.assertEqual(self.website.privacy_updated_at, date(2026, 11, 2))
+        self.assertEqual(self.website.terms_updated_at, date(2026, 10, 15))
+
+    def test_created_with_text_stamps_today(self):
+        Website.objects.all().delete()
+        cache.clear()
+        config = Website.objects.create(
+            company_name="Magno Figures",
+            whatsapp="5511999999999",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+            terms="Termos de uso.",
+        )
+        self.assertEqual(config.privacy_updated_at, date.today())
+        self.assertEqual(config.terms_updated_at, date.today())
+
+    def test_created_without_text_keeps_dates_empty(self):
+        Website.objects.all().delete()
+        cache.clear()
+        config = Website.objects.get_config()
+        self.assertIsNone(config.privacy_updated_at)
+        self.assertIsNone(config.terms_updated_at)
