@@ -220,6 +220,7 @@ class CheckoutFlowTest(TestCase):
         self.assertRedirects(response, reverse("carts:detail"))
         self.assertFalse(Order.objects.exists())
 
+
 @override_settings(SUPERFRETE_TOKEN="", DEBUG=True)
 class CheckoutDiscountTest(TestCase):
     def setUp(self):
