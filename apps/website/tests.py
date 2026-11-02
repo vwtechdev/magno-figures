@@ -84,10 +84,12 @@ class WebsiteSeoTest(TestCase):
         response = self.client.get(reverse("website:home"))
         self.assertNotContains(response, "googletagmanager.com")
 
-    def test_cookie_bar_has_reject_button(self):
+    def test_cookie_bar_has_single_acknowledgment_button(self):
         response = self.client.get(reverse("website:home"))
-        self.assertContains(response, 'id="cookieReject"')
-        self.assertContains(response, "Recusar")
+        self.assertContains(response, 'id="cookieAccept"')
+        self.assertContains(response, "Entendi")
+        self.assertNotContains(response, "cookieReject")
+        self.assertNotContains(response, "Recusar")
 
     def test_twitter_social_link_rendered(self):
         response = self.client.get(reverse("website:home"))
@@ -502,9 +504,9 @@ class CookieBarTest(TestCase):
         response = self.client.get(reverse("website:home"))
         self.assertContains(response, 'id="cookieBar"')
         self.assertContains(response, 'id="cookieAccept"')
-        self.assertContains(response, "Aceitar cookies")
+        self.assertContains(response, "Entendi")
         self.assertContains(
-            response, "Usamos cookies para melhorar sua experiência de compra"
+            response, "Usamos cookies essenciais e funcionais"
         )
         self.assertContains(response, reverse("website:privacy"))
         self.assertContains(response, "js/website/cookies.js")
