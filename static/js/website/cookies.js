@@ -42,9 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     accept.addEventListener("click", () => {
         setChoice("granted");
         hide();
-        if (bar.dataset.ga === "1") {
-            window.setTimeout(() => window.location.reload(), 320);
-        }
     });
 
     reject.addEventListener("click", () => {
