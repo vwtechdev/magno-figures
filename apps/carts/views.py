@@ -102,7 +102,9 @@ def get_cart_items(request):
                 "quantity": item.quantity,
                 "total": item.figure.sale_price * item.quantity,
             }
-            for item in _get_user_cart(request.user).items.select_related("figure").order_by("-created_at")
+            for item in _get_user_cart(request.user)
+            .items.select_related("figure")
+            .order_by("-created_at")
         ]
     else:
         items = []
