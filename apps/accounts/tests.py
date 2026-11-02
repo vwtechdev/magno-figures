@@ -383,6 +383,7 @@ class ProfileDataTest(TestCase):
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.cpf, "")
+
     def test_profile_data_saves_birth_date(self):
         self.client.post(
             reverse("accounts:profile_data"),
