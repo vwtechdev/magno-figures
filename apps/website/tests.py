@@ -6,11 +6,11 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 
-from PIL import Image
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from apps.figures.models import Figure
 from apps.website.models import Banner, Website
