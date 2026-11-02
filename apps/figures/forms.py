@@ -21,7 +21,10 @@ def _natural_sort_key(file):
 class FigureAdminForm(forms.ModelForm):
     batch_upload = forms.FileField(
         label="Upload em lote",
-        help_text="Selecione todas as imagens da galeria da figura de uma vez. Máximo de 50 imagens por figura.",
+        help_text=(
+            "Selecione todas as imagens da galeria da figura de "
+            "uma vez. Máximo de 50 imagens por figura."
+        ),
         required=False,
         validators=[validate_image_size, validate_image_extension],
     )
