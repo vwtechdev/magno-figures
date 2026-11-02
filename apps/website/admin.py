@@ -54,7 +54,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Sobre", {"fields": ("about", "privacy_policy", "terms")}),
+        ("Sobre", {"fields": ("about", "privacy_policy", "privacy_updated_at", "terms", "terms_updated_at")}),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
 

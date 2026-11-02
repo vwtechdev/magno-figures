@@ -148,6 +148,18 @@ class Website(BaseModel):
     terms = models.TextField(
         blank=True, verbose_name="Termos de Uso"
     )
+    privacy_updated_at = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Política atualizada em",
+        help_text="Data exibida na página da Política de Privacidade.",
+    )
+    terms_updated_at = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Termos atualizados em",
+        help_text="Data exibida na página dos Termos de Uso.",
+    )
     theme_background = models.CharField(
         max_length=7,
         blank=True,
