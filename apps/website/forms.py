@@ -21,7 +21,10 @@ def _natural_sort_key(file):
 class WebsiteAdminForm(forms.ModelForm):
     batch_upload = forms.FileField(
         label="Upload de banners",
-        help_text="Selecione todas as imagens dos banners de uma vez. Máximo de 50 banners por envio.",
+        help_text=(
+            "Selecione todas as imagens dos banners de uma vez. "
+            "Máximo de 50 banners por envio."
+        ),
         required=False,
         validators=[validate_image_size, validate_image_extension],
     )
