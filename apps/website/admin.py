@@ -30,7 +30,19 @@ class WebsiteAdmin(admin.ModelAdmin):
     list_display = ("company_name", "whatsapp", "email")
     readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
     fieldsets = (
-        ("Identidade", {"fields": ("company_name", "subtitle", "description", "logo", "favicon", "batch_upload")}),
+        (
+            "Identidade",
+            {
+                "fields": (
+                    "company_name",
+                    "subtitle",
+                    "description",
+                    "logo",
+                    "favicon",
+                    "batch_upload",
+                )
+            },
+        ),
         ("Contato", {"fields": ("whatsapp", "email", "instagram", "facebook", "twitter")}),
         ("SEO", {"fields": ("seo_keywords", "google_analytics")}),
         ("Envio", {"fields": ("origin_zip_code",)}),
@@ -54,7 +66,18 @@ class WebsiteAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Sobre", {"fields": ("about", "privacy_policy", "privacy_updated_at", "terms", "terms_updated_at")}),
+        (
+            "Sobre",
+            {
+                "fields": (
+                    "about",
+                    "privacy_policy",
+                    "privacy_updated_at",
+                    "terms",
+                    "terms_updated_at",
+                )
+            },
+        ),
         ("Metadados", {"fields": ("created_at", "updated_at", "created_by", "updated_by")}),
     )
 
