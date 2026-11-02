@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.core.validators import RegexValidator
 from django.db import models
+from django.utils import timezone
 
 from core.models import BaseModel
 from core.validators import validate_image_size
@@ -152,13 +153,13 @@ class Website(BaseModel):
         null=True,
         blank=True,
         verbose_name="Política atualizada em",
-        help_text="Data exibida na página da Política de Privacidade.",
+        help_text="Preenchida automaticamente com a data do dia quando o texto da política é alterado.",
     )
     terms_updated_at = models.DateField(
         null=True,
         blank=True,
         verbose_name="Termos atualizados em",
-        help_text="Data exibida na página dos Termos de Uso.",
+        help_text="Preenchida automaticamente com a data do dia quando o texto dos termos é alterado.",
     )
     theme_background = models.CharField(
         max_length=7,
@@ -276,6 +277,50 @@ class Website(BaseModel):
 
     def save(self, *args, **kwargs):
         self.pk = 1
+        update_fields = kwargs.get("update_fields")
+        previous = (
+            Website.objects.filter(pk=1)
+            .values(
+                "privacy_policy",
+                "terms",
+                "privacy_updated_at",
+                "terms_updated_at",
+            )
+            .first()
+        )
+        today = timezone.localdate()
+        stamped = set()
+
+        def same(current, stored):
+            """Compara datas vindas do formulário (str) e do banco (date)."""
+            return str(current or "") == str(stored or "")
+
+        if previous is None:
+            has_privacy = (self.privacy_policy or "").strip()
+            if has_privacy and self.privacy_updated_at is None:
+                self.privacy_updated_at = today
+                stamped.add("privacy_updated_at")
+            has_terms = (self.terms or "").strip()
+            if has_terms and self.terms_updated_at is None:
+                self.terms_updated_at = today
+                stamped.add("terms_updated_at")
+        else:
+            privacy_changed = (
+                self.privacy_policy or ""
+            ) != previous["privacy_policy"]
+            if privacy_changed and same(
+                self.privacy_updated_at, previous["privacy_updated_at"]
+            ):
+                self.privacy_updated_at = today
+                stamped.add("privacy_updated_at")
+            terms_changed = (self.terms or "") != previous["terms"]
+            if terms_changed and same(
+                self.terms_updated_at, previous["terms_updated_at"]
+            ):
+                self.terms_updated_at = today
+                stamped.add("terms_updated_at")
+        if update_fields is not None and stamped:
+            kwargs["update_fields"] = set(update_fields) | stamped
         super().save(*args, **kwargs)
         Website.objects.clear_cache()
 
