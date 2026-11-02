@@ -510,3 +510,36 @@ class CookieBarTest(TestCase):
         )
         self.assertContains(response, reverse("website:privacy"))
         self.assertContains(response, "js/website/cookies.js")
+
+
+class LegalPagesUpdatedAtTest(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.website = Website.objects.create(
+            company_name="Magno Figures",
+            logo=make_image("logo.png"),
+            favicon=make_image("favicon.png"),
+            whatsapp="5511999999999",
+            about="Sobre a loja.",
+            privacy_policy="Política de privacidade.",
+            terms="Termos de uso.",
+            privacy_updated_at="2026-11-02",
+            terms_updated_at="2026-10-15",
+        )
+
+    def test_privacy_page_shows_update_date(self):
+        response = self.client.get(reverse("website:privacy"))
+        self.assertContains(response, "Última atualização: 02/11/2026")
+
+    def test_terms_page_shows_update_date(self):
+        response = self.client.get(reverse("website:terms"))
+        self.assertContains(response, "Última atualização: 15/10/2026")
+
+    def test_dates_are_hidden_when_empty(self):
+        Website.objects.filter(pk=self.website.pk).update(
+            privacy_updated_at=None, terms_updated_at=None
+        )
+        cache.clear()
+        for name in ("website:privacy", "website:terms"):
+            response = self.client.get(reverse(name))
+            self.assertNotContains(response, "Última atualização")
