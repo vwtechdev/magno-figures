@@ -1,11 +1,11 @@
 from decimal import Decimal
 from io import BytesIO
 
-from PIL import Image
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from PIL import Image
 
 from apps.accounts.models import User
 from apps.figures.models import Figure
