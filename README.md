@@ -22,7 +22,7 @@ Sistema web para a Magno-Figures: catálogo de action figures em uma vitrine onl
 
 ## Configuração
 
-As variáveis de ambiente são gerenciadas pelo usuário via `.env` (não versionado) — veja `.env-example` para a referência.
+As variáveis de ambiente são gerenciadas pelo usuário via `.env` (não versionado) — veja `.env.example` para a referência.
 
 ## Deploy
 
