@@ -37,7 +37,10 @@ class Figure(BaseModel):
     stock = models.PositiveIntegerField(
         default=0,
         verbose_name="Estoque",
-        help_text="Quantidade disponível. 0 não oculta a peça: sem Esgotado marcado, aparece como Sob encomenda.",
+        help_text=(
+            "Quantidade disponível. 0 não oculta a peça: sem "
+            "Esgotado marcado, aparece como Sob encomenda."
+        ),
     )
     sold_out = models.BooleanField(
         default=False, verbose_name="Esgotado"
