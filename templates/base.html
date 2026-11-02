@@ -29,7 +29,7 @@
     <style id="website-theme">:root { {% for name, value in website_config.theme_css_vars.items %}{{ name }}: {{ value }};{% endfor %} }</style>
     {% endif %}
     {% block extra_css %}{% endblock %}
-    {% if request.COOKIES.mf_cookie_consent == "granted" and website_config.google_analytics %}{{ website_config.google_analytics|safe }}{% endif %}
+    {% if website_config.google_analytics %}{{ website_config.google_analytics|safe }}{% endif %}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
