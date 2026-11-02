@@ -18,3 +18,9 @@
 .page__body p {
     margin-bottom: 16px;
 }
+
+.page__updated {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: -12px 0 24px;
+}

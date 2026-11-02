@@ -7,6 +7,9 @@
 {% block content %}
 <section class="page container">
     <h1 class="page__title"><span class="text-gold">Termos</span> de Uso</h1>
+    {% if website_config.terms_updated_at %}
+    <p class="page__updated">Última atualização: {{ website_config.terms_updated_at|date:"d/m/Y" }}</p>
+    {% endif %}
     <div class="page__body">{{ website_config.terms|linebreaks }}</div>
 </section>
 {% endblock %}
