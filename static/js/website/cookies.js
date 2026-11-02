@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const bar = document.getElementById("cookieBar");
     const accept = document.getElementById("cookieAccept");
-    const reject = document.getElementById("cookieReject");
-    if (!bar || !accept || !reject) return;
+    if (!bar || !accept) return;
 
     const KEY = "mf-cookie-consent";
     const hasChoice = () => {
@@ -41,11 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     accept.addEventListener("click", () => {
         setChoice("granted");
-        hide();
-    });
-
-    reject.addEventListener("click", () => {
-        setChoice("denied");
         hide();
     });
 });
