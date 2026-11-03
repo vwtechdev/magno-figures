@@ -4,10 +4,12 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.generic import DetailView, ListView
 
 from apps.addresses.forms import AddressForm
 from apps.addresses.models import Address
@@ -31,24 +33,28 @@ def _cart_has_nsfw(request):
     )
 
 
-@login_required
-def order_list_view(request):
-    orders = (
-        Order.objects.filter(user=request.user)
-        .prefetch_related("items", "items__figure", "items__figure__images")
-        .order_by("-created_at")
-    )
-    return render(request, "orders/list.html", {"orders": orders})
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = "orders/list.html"
+    context_object_name = "orders"
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(user=self.request.user)
+            .prefetch_related(
+                "items", "items__figure", "items__figure__images"
+            )
+            .order_by("-created_at")
+        )
 
 
-@login_required
-def order_detail_view(request, pk):
-    order = get_object_or_404(
-        Order,
-        pk=pk,
-        user=request.user,
-    )
-    return render(request, "orders/detail.html", {"order": order})
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "orders/detail.html"
+    context_object_name = "order"
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
 
 @login_required
