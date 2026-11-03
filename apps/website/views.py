@@ -35,18 +35,6 @@ def home_view(request):
     return render(request, "website/home.html", context)
 
 
-def about_view(request):
-    return render(request, "website/about.html")
-
-
-def privacy_view(request):
-    return render(request, "website/privacy.html")
-
-
-def terms_view(request):
-    return render(request, "website/terms.html")
-
-
 def robots_txt_view(request):
     content = (
         "User-agent: *\n"
