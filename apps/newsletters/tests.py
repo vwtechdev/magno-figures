@@ -1,3 +1,4 @@
+import smtplib
 import time
 from decimal import Decimal
 from io import BytesIO
@@ -18,6 +19,7 @@ from apps.newsletters.models import (
 )
 from apps.newsletters.notifications import send_campaign, stock_alert_token
 from apps.website.models import Website
+from core.mail import flush_email_queue
 
 
 def make_image(name="figure.png"):
@@ -379,6 +381,33 @@ class NewsletterCampaignTest(TransactionTestCase):
         self.assertTrue(
             self._wait_for_sent(), "campanha não foi marcada como enviada"
         )
+
+    def test_send_campaign_aborts_batch_on_auth_failure(self):
+        class RejectingConnection:
+            attempts = 0
+
+            def send_messages(self, messages):
+                RejectingConnection.attempts += 1
+                raise smtplib.SMTPAuthenticationError(
+                    535, b"5.7.8 Username and Password not accepted"
+                )
+
+            def close(self):
+                pass
+
+        with mock.patch(
+            "core.mail.get_connection", return_value=RejectingConnection()
+        ):
+            total = send_campaign(self.campaign)
+            self.assertEqual(total, 2)
+            self.assertTrue(flush_email_queue(), "lote não finalizou")
+
+        # Uma única tentativa de autenticação para o lote inteiro, e a
+        # campanha continua pendente para nova tentativa.
+        self.assertEqual(RejectingConnection.attempts, 1)
+        self.campaign.refresh_from_db()
+        self.assertFalse(self.campaign.is_sent)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_send_campaign_skips_already_sent(self):
         send_campaign(self.campaign)
