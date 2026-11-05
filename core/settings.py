@@ -202,7 +202,7 @@ JAZZMIN_UI_TWEAKS = {
     "layout_options": {
         "dark_mode_toggle": True
     },
-    "dark_mode_theme": "darkly",
+    "default_theme_mode": "auto",
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-secondary",
