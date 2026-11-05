@@ -1,5 +1,6 @@
 import logging
 import os
+import smtplib
 import threading
 import time
 from concurrent.futures import Future, ThreadPoolExecutor
@@ -155,11 +156,20 @@ def _deliver_single(payload, on_success, on_error):
     return ok
 
 
+def _close_quietly(connection):
+    try:
+        if connection is not None:
+            connection.close()
+    except Exception:
+        pass
+
+
 def _deliver_batch(payloads, retries, retry_delay, on_success, on_error):
     results = []
     connection = None
+    aborted = False
     try:
-        for payload in payloads:
+        for index, payload in enumerate(payloads):
             ok = False
             for attempt in range(retries + 1):
                 try:
@@ -175,12 +185,22 @@ def _deliver_batch(payloads, retries, retry_delay, on_success, on_error):
                     ok = True
                     break
                 except Exception as exc:
-                    try:
-                        if connection is not None:
-                            connection.close()
-                    except Exception:
-                        pass
+                    _close_quietly(connection)
                     connection = None
+                    if isinstance(exc, smtplib.SMTPAuthenticationError):
+                        # Credencial recusada não melhora com retry e cada
+                        # tentativa nova arrisca bloqueio da conta pelo
+                        # provedor. Aborta o lote; o restante entra como
+                        # falha para os callbacks não marcarem como enviado.
+                        logger.error(
+                            "Autenticação SMTP recusada; lote abortado após "
+                            "%s de %s e-mail(s): %s",
+                            index,
+                            len(payloads),
+                            exc,
+                        )
+                        aborted = True
+                        break
                     if attempt < retries:
                         logger.warning(
                             "Tentativa %s de envio em lote falhou para %s: %s",
@@ -204,12 +224,11 @@ def _deliver_batch(payloads, retries, retry_delay, on_success, on_error):
                             exc_info=True,
                         )
             results.append(ok)
+            if aborted:
+                results.extend([False] * (len(payloads) - index - 1))
+                break
     finally:
-        if connection is not None:
-            try:
-                connection.close()
-            except Exception:
-                pass
+        _close_quietly(connection)
         close_old_connections()
     if on_success is not None:
         _run_callback(on_success, results, "batch:success")
