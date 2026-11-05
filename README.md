@@ -16,7 +16,6 @@ gerenciada pelo admin do Django.
 | Frete | API SuperFrete (cotação por CEP, sandbox/produção) |
 | E-mail | SMTP (Gmail) com envio assíncrono em pool de threads |
 | Frontend | Templates Django + CSS/JS sem framework/build step |
-| Qualidade | flake8 · isort · suíte de testes (`manage.py test`) |
 
 ## Estrutura do projeto
 
@@ -35,9 +34,8 @@ magno-figures/
 ├── templates/               # templates globais + um diretório por app
 ├── static/                  # css/js/img (inclui customizações do admin)
 ├── nginx/                   # proxy + rate limiting de rotas de autenticação
-├── docs/ · PRD.md           # documentação interna local (não versionada)
 ├── docker-compose.yml · Dockerfile · deploy.sh · wait-for-database.sh
-└── manage.py · requirements.txt · requirements-dev.txt · setup.cfg
+└── manage.py · requirements.txt
 ```
 
 Rotas de topo (`core/urls.py`): `admin/`, `health/`, `robots.txt`, `sitemap.xml` e
@@ -129,26 +127,6 @@ Observações:
 - Sem chaves de reCAPTCHA configuradas, a verificação é ignorada (útil em dev/test).
 - Após editar o `.env` em produção, recrie o container (`docker compose up -d web`):
   o `env_file` só é lido na criação.
-
-### Desenvolvimento
-
-O projeto usa settings separadas para desenvolvimento (SQLite, cache local, e-mail
-no console). Sempre informe `--settings=core.settings_dev`:
-
-```bash
-python manage.py check --settings=core.settings_dev
-python manage.py makemigrations --settings=core.settings_dev
-python manage.py migrate --settings=core.settings_dev
-python manage.py seed_demo --settings=core.settings_dev   # dados de demonstração
-python manage.py test --settings=core.settings_dev apps
-node --check static/js/figures/detail.js                  # JS não tem runner de teste
-```
-
-- Lint: `./venv/bin/python -m isort .` e `./venv/bin/python -m flake8 <arquivos>`
-  (configuração em `setup.cfg` e `.flake8`, limite de 100 colunas).
-- `requirements-dev.txt` contém as dependências locais de desenvolvimento.
-- Rode os testes uma app label por vez quando depurar
-  (`manage.py test apps.figures`).
 
 ## Deploy
 
